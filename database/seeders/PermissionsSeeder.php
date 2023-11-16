@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -508,11 +510,11 @@ class PermissionsSeeder extends Seeder
 			'id'    => 124,
 			'name'  => 'edit_tax_discount_shipping_quotation',
 		],
-		
+
 		)
 	);
 	}
-	
 
-	
+
+
 }

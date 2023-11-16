@@ -10,7 +10,7 @@ use App\Models\ProductVariant;
 use App\Models\product_warehouse;
 use App\Models\Unit;
 use App\Models\Warehouse;
-use App\utils\helpers;
+use App\Utils\Helpers;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Validator;
@@ -36,7 +36,7 @@ class ProductsController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helpers();
         // Filter fields With Params to retrieve
         $columns = array(0 => 'name', 1 => 'category_id', 2 => 'brand_id', 3 => 'code');
         $param = array(0 => 'like', 1 => '=', 2 => '=', 3 => 'like');
@@ -79,7 +79,7 @@ class ProductsController extends BaseController
             $item['name'] = $product->name;
             $item['category'] = $product['category']->name;
             $item['brand'] = $product['brand'] ? $product['brand']->name : 'N/D';
-           
+
 
             $firstimage = explode(',', $product->image);
             $item['image'] = $firstimage[0];
@@ -95,7 +95,7 @@ class ProductsController extends BaseController
               $product_warehouse_total_qty = product_warehouse::where('product_id', $product->id)
               ->where('deleted_at', '=', null)
               ->sum('qte');
-             
+
               $item['quantity'] = $product_warehouse_total_qty .' '.$product['unit']->ShortName;
 
               }elseif($product->type == 'is_variant'){
@@ -119,7 +119,7 @@ class ProductsController extends BaseController
                   $product_warehouse_total_qty = product_warehouse::where('product_id', $product->id)
                   ->where('deleted_at', '=', null)
                   ->sum('qte');
-                 
+
                   $item['quantity'] = $product_warehouse_total_qty .' '.$product['unit']->ShortName;
 
               }else{
@@ -163,7 +163,7 @@ class ProductsController extends BaseController
         $this->authorizeForUser($request->user('api'), 'create', Product::class);
 
         try {
-           
+
             // define validation rules for product
             $productRules = [
                 'code'         => [
@@ -222,7 +222,7 @@ class ProductsController extends BaseController
                             return;
                         }
 
-                       
+
 
                         //check if variant name empty
                         $names = array_column($variants, 'text');
@@ -377,7 +377,7 @@ class ProductsController extends BaseController
                     $manage_stock = 0;
 
                 }
-                
+
                 $Product->is_variant = $request['is_variant'] == 'true' ? 1 : 0;
                 $Product->is_imei = $request['is_imei'] == 'true' ? 1 : 0;
                 $Product->not_selling = $request['not_selling'] == 'true' ? 1 : 0;
@@ -466,7 +466,7 @@ class ProductsController extends BaseController
 
         $this->authorizeForUser($request->user('api'), 'update', Product::class);
         try {
-            
+
              // define validation rules for product
              $productRules = [
                 'code'         => [
@@ -503,7 +503,7 @@ class ProductsController extends BaseController
                         }
                         // check for duplicate codes in variants array
                         $variants = $request->variants;
-                       
+
 
                         if($variants){
                             foreach ($variants as $variant) {
@@ -588,7 +588,7 @@ class ProductsController extends BaseController
                             return;
                         }
 
-                        
+
                         // check for duplicate codes in product_variants table
                         $duplicateCodes = DB::table('product_variants')
                             ->where(function ($query) use ($id) {
@@ -694,10 +694,10 @@ class ProductsController extends BaseController
                 }
 
 
-            
+
                 $Product->is_imei = $request['is_imei'] == 'true' ? 1 : 0;
                 $Product->not_selling = $request['not_selling'] == 'true' ? 1 : 0;
-                
+
                 // Store Variants Product
                 $oldVariants = ProductVariant::where('product_id', $id)
                     ->where('deleted_at', null)
@@ -988,7 +988,7 @@ class ProductsController extends BaseController
 
     }
 
-   
+
     //--------------  Show Product Details ---------------\\
 
     public function Get_Products_Details(Request $request, $id)
@@ -1113,10 +1113,10 @@ class ProductsController extends BaseController
                     ->where(function ($query) use ($request) {
                         if ($request->stock == '1' && $request->product_service == '1') {
                             return $query->where('qte', '>', 0)->orWhere('manage_stock', false);
-        
+
                         }elseif($request->stock == '1' && $request->product_service == '0') {
                             return $query->where('qte', '>', 0)->orWhere('manage_stock', true);
-        
+
                         }else{
                             return $query->where('manage_stock', true);
                         }
@@ -1162,7 +1162,7 @@ class ProductsController extends BaseController
                     $price = $product_price * $product_warehouse['product']['unitSale']->operator_value;
                 }
 
-                
+
             }else{
                 $item['qte_sale'] = $product_warehouse['product']->type!='is_service'?$product_warehouse->qte:'---';
                 $price = $product_price;
@@ -1204,13 +1204,13 @@ class ProductsController extends BaseController
         return response()->json($data);
     }
 
-    
+
     public function show($id)
     {
         //
     }
-    
-    
+
+
     //------------ Get product By ID -----------------\\
     public function show_product_data($id , $variant_id)
     {
@@ -1270,7 +1270,7 @@ class ProductsController extends BaseController
             $item['name'] = $Product_data['name'];
         }
 
-       
+
         //check if product has Unit sale
         if ($Product_data['unitSale']) {
 
@@ -1386,7 +1386,7 @@ class ProductsController extends BaseController
         $data_collection = $collection->slice($offSet, $perPage)->values();
 
         $products = new LengthAwarePaginator($data_collection, count($data), $perPage, Paginator::resolveCurrentPage(), array('path' => Paginator::resolveCurrentPath()));
-       
+
          //get warehouses assigned to user
          $user_auth = auth()->user();
          if($user_auth->is_all_warehouses){
@@ -1395,7 +1395,7 @@ class ProductsController extends BaseController
              $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
              $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
          }
- 
+
         return response()->json([
             'products' => $products,
             'warehouses' => $warehouses,
@@ -1434,7 +1434,7 @@ class ProductsController extends BaseController
              $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
              $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
          }
-        
+
         return response()->json(['warehouses' => $warehouses]);
 
     }
@@ -1563,7 +1563,7 @@ class ProductsController extends BaseController
                               ->where('deleted_at', null)
                               ->get();
 
-      
+
         $units = Unit::where('deleted_at', null)
             ->where('base_unit', null)
             ->get();
@@ -1581,7 +1581,7 @@ class ProductsController extends BaseController
     // import Products
     public function import_products(Request $request)
     {
-       
+
         $file_upload = $request->file('products');
         $ext = pathinfo($file_upload->getClientOriginalName(), PATHINFO_EXTENSION);
         if ($ext != 'csv') {
@@ -1630,7 +1630,7 @@ class ProductsController extends BaseController
                     'status' => false,
                 ]);
             }
-          
+
             try {
                 \DB::transaction(function () use ($data , $warehouses) {
 
@@ -1693,7 +1693,7 @@ class ProductsController extends BaseController
 
         }
 
-    
+
         // Return success response
         return response()->json(['status' => true]);
 

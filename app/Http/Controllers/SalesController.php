@@ -32,7 +32,7 @@ use App\Models\PosSetting;
 use App\Models\User;
 use App\Models\UserWarehouse;
 use App\Models\Warehouse;
-use App\utils\helpers;
+use App\Utils\Helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -62,7 +62,7 @@ class SalesController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helpers();
         // Filter fields With Params to retrieve
         $param = array(
             0 => 'like',
@@ -119,14 +119,14 @@ class SalesController extends BaseController
         if($perPage == "-1"){
             $perPage = $totalRows;
         }
-        
+
         $Sales = $Filtred->offset($offSet)
             ->limit($perPage)
             ->orderBy($order, $dir)
             ->get();
 
         foreach ($Sales as $Sale) {
-            
+
             $item['id'] = $Sale['id'];
             $item['date'] = $Sale['date'];
             $item['Ref'] = $Sale['Ref'];
@@ -154,10 +154,10 @@ class SalesController extends BaseController
             }else{
                 $item['sale_has_return'] = 'no';
             }
-            
+
             $data[] = $item;
         }
-        
+
         $stripe_key = config('app.STRIPE_KEY');
         $customers = client::where('deleted_at', '=', null)->get(['id', 'name']);
 
@@ -192,7 +192,7 @@ class SalesController extends BaseController
         ]);
 
         \DB::transaction(function () use ($request) {
-            $helpers = new helpers();
+            $helpers = new Helpers();
             $order = new Sale;
 
             $order->is_pos = 0;
@@ -285,7 +285,7 @@ class SalesController extends BaseController
 
                     $total_paid = $sale->paid_amount + $request['amount'];
                     $due = $sale->GrandTotal - $total_paid;
-                    
+
                     if ($due === 0.0 || $due < 0.0) {
                         $payment_statut = 'paid';
                     } else if ($due != $sale->GrandTotal) {
@@ -293,23 +293,23 @@ class SalesController extends BaseController
                     } else if ($due == $sale->GrandTotal) {
                         $payment_statut = 'unpaid';
                     }
-                    
+
                     if($request['amount'] > 0){
                         if ($request->payment['Reglement'] == 'credit card') {
                             $Client = Client::whereId($request->client_id)->first();
                             Stripe\Stripe::setApiKey(config('app.STRIPE_SECRET'));
-    
+
                             // Check if the payment record exists
                             $PaymentWithCreditCard = PaymentWithCreditCard::where('customer_id', $request->client_id)->first();
                             if (!$PaymentWithCreditCard) {
-    
+
                                 // Create a new customer and charge the customer with a new credit card
                                 $customer = \Stripe\Customer::create([
                                     'source' => $request->token,
                                     'email'  => $Client->email,
                                     'name'   => $Client->name,
                                 ]);
-    
+
                                 // Charge the Customer instead of the card:
                                 $charge = \Stripe\Charge::create([
                                     'amount'   => $request['amount'] * 100,
@@ -317,19 +317,19 @@ class SalesController extends BaseController
                                     'customer' => $customer->id,
                                 ]);
                                 $PaymentCard['customer_stripe_id'] = $customer->id;
-    
+
                             // Check if the payment record not exists
                             } else {
-    
+
                                  // Retrieve the customer ID and card ID
                                 $customer_id = $PaymentWithCreditCard->customer_stripe_id;
                                 $card_id = $request->card_id;
-    
+
                                 // Charge the customer with the new credit card or the selected card
                                 if ($request->is_new_credit_card || $request->is_new_credit_card == 'true' || $request->is_new_credit_card === 1) {
                                     // Retrieve the customer
                                     $customer = \Stripe\Customer::retrieve($customer_id);
-    
+
                                     // Create New Source
                                     $card = \Stripe\Customer::createSource(
                                         $customer_id,
@@ -337,7 +337,7 @@ class SalesController extends BaseController
                                           'source' => $request->token,
                                         ]
                                       );
-    
+
                                     $charge = \Stripe\Charge::create([
                                         'amount'   => $request['amount'] * 100,
                                         'currency' => 'usd',
@@ -345,7 +345,7 @@ class SalesController extends BaseController
                                         'source'   => $card->id,
                                     ]);
                                     $PaymentCard['customer_stripe_id'] = $customer_id;
-    
+
                                 } else {
                                     $charge = \Stripe\Charge::create([
                                         'amount'   => $request['amount'] * 100,
@@ -356,7 +356,7 @@ class SalesController extends BaseController
                                     $PaymentCard['customer_stripe_id'] = $customer_id;
                                 }
                             }
-    
+
                             $PaymentSale            = new PaymentSale();
                             $PaymentSale->sale_id   = $order->id;
                             $PaymentSale->Ref       = app('App\Http\Controllers\PaymentSalesController')->getNumberOrder();
@@ -367,20 +367,20 @@ class SalesController extends BaseController
                             $PaymentSale->notes     = NULL;
                             $PaymentSale->user_id   = Auth::user()->id;
                             $PaymentSale->save();
-    
+
                             $sale->update([
                                 'paid_amount'    => $total_paid,
                                 'payment_statut' => $payment_statut,
                             ]);
-    
+
                             $PaymentCard['customer_id'] = $request->client_id;
                             $PaymentCard['payment_id']  = $PaymentSale->id;
                             $PaymentCard['charge_id']   = $charge->id;
                             PaymentWithCreditCard::create($PaymentCard);
-    
+
                             // Paying Method Cash
                         } else {
-    
+
                             PaymentSale::create([
                                 'sale_id' => $order->id,
                                 'Ref' => app('App\Http\Controllers\PaymentSalesController')->getNumberOrder(),
@@ -391,18 +391,18 @@ class SalesController extends BaseController
                                 'notes' => NULL,
                                 'user_id' => Auth::user()->id,
                             ]);
-    
+
                             $sale->update([
                                 'paid_amount' => $total_paid,
                                 'payment_statut' => $payment_statut,
                             ]);
                         }
-    
+
                     }
                 } catch (Exception $e) {
                     return response()->json(['message' => $e->getMessage()], 500);
                 }
-                
+
             }
 
         }, 10);
@@ -427,7 +427,7 @@ class SalesController extends BaseController
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $current_Sale = Sale::findOrFail($id);
-            
+
             if (SaleReturn::where('sale_id', $id)->where('deleted_at', '=', null)->exists()) {
                 return response()->json(['success' => false , 'Return exist for the Transaction' => false], 403);
             }else{
@@ -450,7 +450,7 @@ class SalesController extends BaseController
                 $old_products_id = [];
                 foreach ($old_sale_details as $key => $value) {
                     $old_products_id[] = $value->id;
-                    
+
                     //check if detail has sale_unit_id Or Null
                     if($value['sale_unit_id'] !== null){
                         $old_unit = Unit::where('id', $value['sale_unit_id'])->first();
@@ -512,7 +512,7 @@ class SalesController extends BaseController
 
                     $get_type_product = Product::where('id', $prod_detail['product_id'])->first()->type;
 
-                    
+
                     if($prod_detail['sale_unit_id'] !== null || $get_type_product == 'is_service'){
                         $unit_prod = Unit::where('id', $prod_detail['sale_unit_id'])->first();
 
@@ -610,7 +610,7 @@ class SalesController extends BaseController
      public function destroy(Request $request, $id)
      {
          $this->authorizeForUser($request->user('api'), 'delete', Sale::class);
- 
+
          \DB::transaction(function () use ($id, $request) {
              $role = Auth::user()->roles()->first();
              $view_records = Role::findOrFail($role->id)->inRole('record_view');
@@ -621,14 +621,14 @@ class SalesController extends BaseController
              if (SaleReturn::where('sale_id', $id)->where('deleted_at', '=', null)->exists()) {
                 return response()->json(['success' => false , 'Return exist for the Transaction' => false], 403);
             }else{
-                
+
                 // Check If User Has Permission view All Records
                 if (!$view_records) {
                     // Check If User->id === Sale->id
                     $this->authorizeForUser($request->user('api'), 'check_record', $current_Sale);
                 }
                 foreach ($old_sale_details as $key => $value) {
-                    
+
                     //check if detail has sale_unit_id Or Null
                     if($value['sale_unit_id'] !== null){
                         $old_unit = Unit::where('id', $value['sale_unit_id'])->first();
@@ -676,7 +676,7 @@ class SalesController extends BaseController
                             }
                         }
                     }
-                    
+
                 }
 
                 if($shipment_data){
@@ -700,9 +700,9 @@ class SalesController extends BaseController
                     $Payment_Sale->delete();
                 }
             }
- 
+
          }, 10);
- 
+
          return response()->json(['success' => true]);
      }
 
@@ -732,7 +732,7 @@ class SalesController extends BaseController
                         $this->authorizeForUser($request->user('api'), 'check_record', $current_Sale);
                     }
                     foreach ($old_sale_details as $key => $value) {
-                    
+
                          //check if detail has sale_unit_id Or Null
                         if($value['sale_unit_id'] !== null){
                             $old_unit = Unit::where('id', $value['sale_unit_id'])->first();
@@ -746,16 +746,16 @@ class SalesController extends BaseController
                                 $old_unit = NULL;
                             }
                         }
-        
+
                         if ($current_Sale->statut == "completed") {
-        
+
                             if ($value['product_variant_id'] !== null) {
                                 $product_warehouse = product_warehouse::where('deleted_at', '=', null)
                                     ->where('warehouse_id', $current_Sale->warehouse_id)
                                     ->where('product_id', $value['product_id'])
                                     ->where('product_variant_id', $value['product_variant_id'])
                                     ->first();
-        
+
                                 if ($product_warehouse && $old_unit) {
                                     if ($old_unit->operator == '/') {
                                         $product_warehouse->qte += $value['quantity'] / $old_unit->operator_value;
@@ -764,7 +764,7 @@ class SalesController extends BaseController
                                     }
                                     $product_warehouse->save();
                                 }
-        
+
                             } else {
                                 $product_warehouse = product_warehouse::where('deleted_at', '=', null)
                                     ->where('warehouse_id', $current_Sale->warehouse_id)
@@ -780,13 +780,13 @@ class SalesController extends BaseController
                                 }
                             }
                         }
-                        
+
                     }
 
                     if($shipment_data){
                         $shipment_data->delete();
                     }
-                    
+
                     $current_Sale->details()->delete();
                     $current_Sale->update([
                         'deleted_at' => Carbon::now(),
@@ -812,7 +812,7 @@ class SalesController extends BaseController
         return response()->json(['success' => true]);
     }
 
-   
+
     //---------------- Get Details Sale-----------------\\
 
     public function show(Request $request, $id)
@@ -884,7 +884,7 @@ class SalesController extends BaseController
 
                 $data['code'] = $productsVariants->code;
                 $data['name'] = '['.$productsVariants->name .']'. $detail['product']['name'];
- 
+
             } else {
                 $data['code'] = $detail['product']['code'];
                 $data['name'] = $detail['product']['name'];
@@ -933,7 +933,7 @@ class SalesController extends BaseController
 
     public function Print_Invoice_POS(Request $request, $id)
     {
-        $helpers = new helpers();
+        $helpers = new Helpers();
         $details = array();
 
         $sale = Sale::with('details.product.unitSale')
@@ -976,13 +976,13 @@ class SalesController extends BaseController
 
                     $data['code'] = $productsVariants->code;
                     $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
-                    
+
                 } else {
                     $data['code'] = $detail['product']['code'];
                     $data['name'] = $detail['product']['name'];
                 }
-                
-           
+
+
             $data['quantity'] = number_format($detail->quantity, 2, '.', '');
             $data['total'] = number_format($detail->total, 2, '.', '');
             $data['unit_sale'] = $unit?$unit->ShortName:'';
@@ -1067,7 +1067,7 @@ class SalesController extends BaseController
     {
 
         $details = array();
-        $helpers = new helpers();
+        $helpers = new Helpers();
         $sale_data = Sale::with('details.product.unitSale')
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
@@ -1217,7 +1217,7 @@ class SalesController extends BaseController
               // Check If User->id === sale->id
               $this->authorizeForUser($request->user('api'), 'check_record', $Sale_data);
           }
-  
+
           if ($Sale_data->client_id) {
               if (Client::where('id', $Sale_data->client_id)
                   ->where('deleted_at', '=', null)
@@ -1229,7 +1229,7 @@ class SalesController extends BaseController
           } else {
               $sale['client_id'] = '';
           }
-  
+
           if ($Sale_data->warehouse_id) {
               if (Warehouse::where('id', $Sale_data->warehouse_id)
                   ->where('deleted_at', '=', null)
@@ -1241,7 +1241,7 @@ class SalesController extends BaseController
           } else {
               $sale['warehouse_id'] = '';
           }
-  
+
           $sale['date'] = $Sale_data->date;
           $sale['tax_rate'] = $Sale_data->tax_rate;
           $sale['TaxNet'] = $Sale_data->TaxNet;
@@ -1249,7 +1249,7 @@ class SalesController extends BaseController
           $sale['shipping'] = $Sale_data->shipping;
           $sale['statut'] = $Sale_data->statut;
           $sale['notes'] = $Sale_data->notes;
-  
+
           $detail_id = 0;
           foreach ($Sale_data['details'] as $detail) {
 
@@ -1267,26 +1267,26 @@ class SalesController extends BaseController
                     }{
                         $unit = NULL;
                     }
-    
+
                     $data['no_unit'] = 0;
                 }
 
-        
+
               if ($detail->product_variant_id) {
                   $item_product = product_warehouse::where('product_id', $detail->product_id)
                       ->where('deleted_at', '=', null)
                       ->where('product_variant_id', $detail->product_variant_id)
                       ->where('warehouse_id', $Sale_data->warehouse_id)
                       ->first();
-  
+
                   $productsVariants = ProductVariant::where('product_id', $detail->product_id)
                       ->where('id', $detail->product_variant_id)->first();
-  
+
                   $item_product ? $data['del'] = 0 : $data['del'] = 1;
                   $data['product_variant_id'] = $detail->product_variant_id;
                   $data['code'] = $productsVariants->code;
                   $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
-                 
+
                   if ($unit && $unit->operator == '/') {
                     $stock = $item_product ? $item_product->qte * $unit->operator_value : 0;
                   } else if ($unit && $unit->operator == '*') {
@@ -1294,12 +1294,12 @@ class SalesController extends BaseController
                   } else {
                     $stock = 0;
                   }
-  
+
               } else {
                   $item_product = product_warehouse::where('product_id', $detail->product_id)
                       ->where('deleted_at', '=', null)->where('warehouse_id', $Sale_data->warehouse_id)
                       ->where('product_variant_id', '=', null)->first();
-  
+
                   $item_product ? $data['del'] = 0 : $data['del'] = 1;
                   $data['product_variant_id'] = null;
                   $data['code'] = $detail['product']['code'];
@@ -1312,9 +1312,9 @@ class SalesController extends BaseController
                   } else {
                     $stock = 0;
                   }
-  
+
                 }
-                
+
                 $data['id'] = $detail->id;
                 $data['stock'] = $detail['product']['type'] !='is_service'?$stock:'---';
                 $data['product_type'] = $detail['product']['type'];
@@ -1337,7 +1337,7 @@ class SalesController extends BaseController
 
                 $tax_price = $detail->TaxNet * (($detail->price - $data['DiscountNet']) / 100);
                 $data['Unit_price'] = $detail->price;
-                
+
                 $data['tax_percent'] = $detail->TaxNet;
                 $data['tax_method'] = $detail->tax_method;
                 $data['discount'] = $detail->discount;
@@ -1355,7 +1355,7 @@ class SalesController extends BaseController
 
                $details[] = $data;
           }
-        
+
          //get warehouses assigned to user
         $user_auth = auth()->user();
         if($user_auth->is_all_warehouses){
@@ -1366,7 +1366,7 @@ class SalesController extends BaseController
         }
 
           $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
-  
+
           return response()->json([
               'details' => $details,
               'sale' => $sale,
@@ -1374,7 +1374,7 @@ class SalesController extends BaseController
               'warehouses' => $warehouses,
           ]);
         }
-  
+
       }
 
 
@@ -1431,7 +1431,7 @@ class SalesController extends BaseController
 
         $detail_id = 0;
         foreach ($Quotation['details'] as $detail) {
-           
+
                 //check if detail has sale_unit_id Or Null
                 if($detail->sale_unit_id !== null || $detail['product']['type'] == 'is_service'){
                     $unit = Unit::where('id', $detail->sale_unit_id)->first();
@@ -1478,7 +1478,7 @@ class SalesController extends BaseController
                         $stock = 0;
                     }
                 }
-                
+
                 $data['id'] = $id;
                 $data['stock'] = $detail['product']['type'] !='is_service'?$stock:'---';
                 $data['product_type'] = $detail['product']['type'];
@@ -1528,7 +1528,7 @@ class SalesController extends BaseController
            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
        }
-         
+
         $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
 
         return response()->json([
@@ -1540,7 +1540,7 @@ class SalesController extends BaseController
 
     }
 
-    
+
     //------------------- get_Products_by_sale -----------------\\
 
     public function get_Products_by_sale(Request $request , $id)
@@ -1692,16 +1692,16 @@ class SalesController extends BaseController
 
           //sale
           $sale = Sale::with('client')->where('deleted_at', '=', null)->findOrFail($request->id);
- 
-          $helpers = new helpers();
+
+          $helpers = new Helpers();
           $currency = $helpers->Get_Currency();
- 
+
           //settings
           $settings = Setting::where('deleted_at', '=', null)->first();
-      
+
           //the custom msg of sale
           $emailMessage  = EmailMessage::where('name', 'sale')->first();
-  
+
           if($emailMessage){
               $message_body = $emailMessage->body;
               $message_subject = $emailMessage->subject;
@@ -1709,166 +1709,166 @@ class SalesController extends BaseController
               $message_body = '';
               $message_subject = '';
           }
-  
+
           //Tags
           $random_number = Str::random(10);
           $invoice_url = url('/api/sale_pdf/' . $request->id.'?'.$random_number);
           $invoice_number = $sale->Ref;
-  
+
           $total_amount = $currency .' '.number_format($sale->GrandTotal, 2, '.', ',');
           $paid_amount  = $currency .' '.number_format($sale->paid_amount, 2, '.', ',');
           $due_amount   = $currency .' '.number_format($sale->GrandTotal - $sale->paid_amount, 2, '.', ',');
-  
+
           $contact_name = $sale['client']->name;
           $business_name = $settings->CompanyName;
-  
+
           //receiver email
           $receiver_email = $sale['client']->email;
-  
+
           //replace the text with tags
           $message_body = str_replace('{contact_name}', $contact_name, $message_body);
           $message_body = str_replace('{business_name}', $business_name, $message_body);
           $message_body = str_replace('{invoice_url}', $invoice_url, $message_body);
           $message_body = str_replace('{invoice_number}', $invoice_number, $message_body);
-  
+
           $message_body = str_replace('{total_amount}', $total_amount, $message_body);
           $message_body = str_replace('{paid_amount}', $paid_amount, $message_body);
           $message_body = str_replace('{due_amount}', $due_amount, $message_body);
- 
+
          $email['subject'] = $message_subject;
          $email['body'] = $message_body;
          $email['company_name'] = $business_name;
- 
-         $this->Set_config_mail(); 
- 
+
+         $this->Set_config_mail();
+
          $mail = Mail::to($receiver_email)->send(new CustomEmail($email));
- 
+
          return $mail;
      }
- 
- 
+
+
 
      //-------------------Sms Notifications -----------------\\
- 
+
      public function Send_SMS(Request $request)
      {
         $this->authorizeForUser($request->user('api'), 'view', Sale::class);
 
          //sale
          $sale = Sale::with('client')->where('deleted_at', '=', null)->findOrFail($request->id);
- 
-         $helpers = new helpers();
+
+         $helpers = new Helpers();
          $currency = $helpers->Get_Currency();
-         
+
          //settings
          $settings = Setting::where('deleted_at', '=', null)->first();
-     
+
          $default_sms_gateway = sms_gateway::where('id' , $settings->sms_gateway)
          ->where('deleted_at', '=', null)->first();
 
          //the custom msg of sale
          $smsMessage  = SMSMessage::where('name', 'sale')->first();
- 
+
          if($smsMessage){
              $message_text = $smsMessage->text;
          }else{
              $message_text = '';
          }
- 
+
          //Tags
          $random_number = Str::random(10);
          $invoice_url = url('/api/sale_pdf/' . $request->id.'?'.$random_number);
          $invoice_number = $sale->Ref;
- 
+
          $total_amount = $currency.' '.number_format($sale->GrandTotal, 2, '.', ',');
          $paid_amount  = $currency.' '.number_format($sale->paid_amount, 2, '.', ',');
          $due_amount   = $currency.' '.number_format($sale->GrandTotal - $sale->paid_amount, 2, '.', ',');
- 
+
          $contact_name = $sale['client']->name;
          $business_name = $settings->CompanyName;
- 
+
          //receiver Number
          $receiverNumber = $sale['client']->phone;
- 
+
          //replace the text with tags
          $message_text = str_replace('{contact_name}', $contact_name, $message_text);
          $message_text = str_replace('{business_name}', $business_name, $message_text);
          $message_text = str_replace('{invoice_url}', $invoice_url, $message_text);
          $message_text = str_replace('{invoice_number}', $invoice_number, $message_text);
- 
+
          $message_text = str_replace('{total_amount}', $total_amount, $message_text);
          $message_text = str_replace('{paid_amount}', $paid_amount, $message_text);
          $message_text = str_replace('{due_amount}', $due_amount, $message_text);
- 
+
          //twilio
          if($default_sms_gateway->title == "twilio"){
              try {
-     
+
                  $account_sid = env("TWILIO_SID");
                  $auth_token = env("TWILIO_TOKEN");
                  $twilio_number = env("TWILIO_FROM");
-     
+
                  $client = new Client_Twilio($account_sid, $auth_token);
                  $client->messages->create($receiverNumber, [
-                     'from' => $twilio_number, 
+                     'from' => $twilio_number,
                      'body' => $message_text]);
-         
+
              } catch (Exception $e) {
                  return response()->json(['message' => $e->getMessage()], 500);
              }
          //nexmo
          }elseif($default_sms_gateway->title == "nexmo"){
              try {
- 
+
                  $basic  = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
                  $client = new \Nexmo\Client($basic);
                  $nexmo_from = env("NEXMO_FROM");
-         
+
                  $message = $client->message()->send([
                      'to' => $receiverNumber,
                      'from' => $nexmo_from,
                      'text' => $message_text
                  ]);
-                         
+
              } catch (Exception $e) {
                  return response()->json(['message' => $e->getMessage()], 500);
              }
- 
+
          //---- infobip
          }elseif($default_sms_gateway->title == "infobip"){
- 
+
              $BASE_URL = env("base_url");
              $API_KEY = env("api_key");
              $SENDER = env("sender_from");
- 
+
              $configuration = (new Configuration())
                  ->setHost($BASE_URL)
                  ->setApiKeyPrefix('Authorization', 'App')
                  ->setApiKey('Authorization', $API_KEY);
-             
+
              $client = new Client_guzzle();
-             
+
              $sendSmsApi = new SendSMSApi($client, $configuration);
              $destination = (new SmsDestination())->setTo($receiverNumber);
              $message = (new SmsTextualMessage())
                  ->setFrom($SENDER)
                  ->setText($message_text)
                  ->setDestinations([$destination]);
-                 
+
              $request = (new SmsAdvancedTextualRequest())->setMessages([$message]);
-             
+
              try {
                  $smsResponse = $sendSmsApi->sendSmsMessage($request);
                  echo ("Response body: " . $smsResponse);
              } catch (Throwable $apiException) {
                  echo("HTTP Code: " . $apiException->getCode() . "\n");
              }
-             
+
          }
- 
+
          return response()->json(['success' => true]);
- 
-         
+
+
      }
 
 

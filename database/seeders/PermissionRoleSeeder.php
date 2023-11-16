@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -633,7 +635,7 @@ class PermissionRoleSeeder extends Seeder
 				'permission_id' => 124,
 				'role_id'       => 1,
 			],
-			
+
 		)
 	);
     }

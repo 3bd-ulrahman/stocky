@@ -10,7 +10,7 @@ use App\Models\ProductVariant;
 use App\Models\product_warehouse;
 use App\Models\Role;
 use App\Models\Warehouse;
-use App\utils\helpers;
+use App\Utils\Helpers;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -34,7 +34,7 @@ class AdjustmentController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helpers();
         // Filter fields With Params to retrieve
         $columns = array(0 => 'Ref', 1 => 'warehouse_id', 2 => 'date');
         $param = array(0 => 'like', 1 => '=', 2 => '=');
@@ -636,7 +636,7 @@ class AdjustmentController extends BaseController
                     ->where('warehouse_id', $Adjustment_data->warehouse_id)
                     ->where('product_variant_id', '=', null)
                     ->first();
-                    
+
                     $data['id'] = $detail->id;
                     $data['detail_id'] = $detail_id += 1;
                     $data['quantity'] = $detail->quantity;
@@ -653,7 +653,7 @@ class AdjustmentController extends BaseController
             $details[] = $data;
         }
 
-       
+
         //get warehouses assigned to user
          $user_auth = auth()->user();
          if($user_auth->is_all_warehouses){

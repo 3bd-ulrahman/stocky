@@ -12,7 +12,7 @@ use Infobip\Model\SmsTextualMessage;
 use Illuminate\Support\Str;
 use App\Models\EmailMessage;
 use App\Mail\CustomEmail;
-use App\utils\helpers;
+use App\Utils\Helpers;
 
 use App\Mail\Payment_Sale;
 use App\Models\Client;
@@ -48,7 +48,7 @@ class PaymentSalesController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helpers();
         $role = Auth::user()->roles()->first();
         $view_records = Role::findOrFail($role->id)->inRole('record_view');
         // Filter fields With Params to retriever
@@ -133,7 +133,7 @@ class PaymentSalesController extends BaseController
         $this->authorizeForUser($request->user('api'), 'create', PaymentSale::class);
 
         \DB::transaction(function () use ($request) {
-            $helpers = new helpers();
+            $helpers = new Helpers();
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $sale = Sale::findOrFail($request['sale_id']);
@@ -277,7 +277,7 @@ class PaymentSalesController extends BaseController
 
     public function show($id){
     //
-        
+
     }
 
     //----------- Update Payments Sale --------------\\
@@ -287,7 +287,7 @@ class PaymentSalesController extends BaseController
         $this->authorizeForUser($request->user('api'), 'update', PaymentSale::class);
 
         \DB::transaction(function () use ($id, $request) {
-            $helpers = new helpers();
+            $helpers = new Helpers();
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $payment = PaymentSale::findOrFail($id);
@@ -327,7 +327,7 @@ class PaymentSalesController extends BaseController
                         'payment_statut' => $payment_statut,
                     ]);
 
-                } 
+                }
 
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
@@ -378,7 +378,7 @@ class PaymentSalesController extends BaseController
                     \Stripe\Refund::create([
                         'charge' => $PaymentWithCreditCard->charge_id,
                     ]);
-    
+
                     $PaymentWithCreditCard->delete();
                 }
             }
@@ -433,7 +433,7 @@ class PaymentSalesController extends BaseController
         $payment_data['date'] = $payment->date;
         $payment_data['Reglement'] = $payment->Reglement;
 
-        $helpers = new helpers();
+        $helpers = new Helpers();
         $settings = Setting::where('deleted_at', '=', null)->first();
         $symbol = $helpers->Get_Currency_Code();
 
@@ -469,12 +469,12 @@ class PaymentSalesController extends BaseController
         //PaymentSale
         $payment = PaymentSale::with('sale.client')->findOrFail($request->id);
 
-        $helpers = new helpers();
+        $helpers = new Helpers();
         $currency = $helpers->Get_Currency();
 
         //settings
         $settings = Setting::where('deleted_at', '=', null)->first();
-    
+
         //the custom msg of payment_received
         $emailMessage  = EmailMessage::where('name', 'payment_received')->first();
 
@@ -485,12 +485,12 @@ class PaymentSalesController extends BaseController
             $message_body = '';
             $message_subject = '';
         }
-    
-        
+
+
         $payment_number = $payment->Ref;
 
         $total_amount = $currency .' '.number_format($payment->montant, 2, '.', ',');
-    
+
         $contact_name = $payment['sale']['client']->name;
         $business_name = $settings->CompanyName;
 
@@ -507,16 +507,16 @@ class PaymentSalesController extends BaseController
         $email['body'] = $message_body;
         $email['company_name'] = $business_name;
 
-        $this->Set_config_mail(); 
+        $this->Set_config_mail();
 
         $mail = Mail::to($receiver_email)->send(new CustomEmail($email));
 
         return $mail;
     }
-   
- 
-   
-   
+
+
+
+
     //-------------------Sms Notifications -----------------\\
 
     public function Send_SMS(Request $request)
@@ -528,11 +528,11 @@ class PaymentSalesController extends BaseController
 
         //settings
         $settings = Setting::where('deleted_at', '=', null)->first();
-        
+
         $default_sms_gateway = sms_gateway::where('id' , $settings->sms_gateway)
          ->where('deleted_at', '=', null)->first();
 
-        $helpers = new helpers();
+        $helpers = new Helpers();
         $currency = $helpers->Get_Currency();
 
         //the custom msg of payment_received
@@ -543,14 +543,14 @@ class PaymentSalesController extends BaseController
         }else{
             $message_text = '';
         }
-        
+
         $payment_number = $payment->Ref;
 
         $total_amount = $currency .' '.number_format($payment->montant, 2, '.', ',');
-        
+
         $contact_name = $payment['sale']['client']->name;
         $business_name = $settings->CompanyName;
-    
+
         //receiver phone
         $receiverNumber = $payment['sale']['client']->phone;
 
@@ -563,16 +563,16 @@ class PaymentSalesController extends BaseController
         //twilio
         if($default_sms_gateway->title == "twilio"){
             try {
-    
+
                 $account_sid = env("TWILIO_SID");
                 $auth_token = env("TWILIO_TOKEN");
                 $twilio_number = env("TWILIO_FROM");
-    
+
                 $client = new Client_Twilio($account_sid, $auth_token);
                 $client->messages->create($receiverNumber, [
-                    'from' => $twilio_number, 
+                    'from' => $twilio_number,
                     'body' => $message_text]);
-        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }
@@ -583,13 +583,13 @@ class PaymentSalesController extends BaseController
                 $basic  = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
                 $client = new \Nexmo\Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
-        
+
                 $message = $client->message()->send([
                     'to' => $receiverNumber,
                     'from' => $nexmo_from,
                     'text' => $message_text
                 ]);
-                        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }
@@ -605,25 +605,25 @@ class PaymentSalesController extends BaseController
                 ->setHost($BASE_URL)
                 ->setApiKeyPrefix('Authorization', 'App')
                 ->setApiKey('Authorization', $API_KEY);
-            
+
             $client = new Client_guzzle();
-            
+
             $sendSmsApi = new SendSMSApi($client, $configuration);
             $destination = (new SmsDestination())->setTo($receiverNumber);
             $message = (new SmsTextualMessage())
                 ->setFrom($SENDER)
                 ->setText($message_text)
                 ->setDestinations([$destination]);
-                
+
             $request = (new SmsAdvancedTextualRequest())->setMessages([$message]);
-            
+
             try {
                 $smsResponse = $sendSmsApi->sendSmsMessage($request);
                 echo ("Response body: " . $smsResponse);
             } catch (Throwable $apiException) {
                 echo("HTTP Code: " . $apiException->getCode() . "\n");
             }
-            
+
         }
 
         return response()->json(['success' => true]);

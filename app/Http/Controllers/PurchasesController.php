@@ -33,7 +33,7 @@ use App\Models\Setting;
 use App\Models\Warehouse;
 use App\Models\User;
 use App\Models\UserWarehouse;
-use App\utils\helpers;
+use App\Utils\Helpers;
 use Carbon\Carbon;
 use \Nwidart\Modules\Facades\Module;
 use App\Models\sms_gateway;
@@ -58,7 +58,7 @@ class PurchasesController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helpers();
         // Filter fields With Params to retrieve
         $param = array(
             0 => 'like',
@@ -159,7 +159,7 @@ class PurchasesController extends BaseController
          }else{
              $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
              $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-         } 
+         }
 
         return response()->json([
             'totalRows' => $totalRows,
@@ -297,7 +297,7 @@ class PurchasesController extends BaseController
                 $old_products_id = [];
                 foreach ($old_purchase_details as $key => $value) {
                     $old_products_id[] = $value->id;
-                
+
                     //check if detail has purchase_unit_id Or Null
                     if($value['purchase_unit_id'] !== null){
                         $unit = Unit::where('id', $value['purchase_unit_id'])->first();
@@ -357,7 +357,7 @@ class PurchasesController extends BaseController
 
                 // Update Data with New request
                 foreach ($new_purchase_details as $key => $prod_detail) {
-                    
+
                     if($prod_detail['no_unit'] !== 0){
                         $unit_prod = Unit::where('id', $prod_detail['purchase_unit_id'])->first();
 
@@ -473,7 +473,7 @@ class PurchasesController extends BaseController
                 }
 
                 foreach ($old_purchase_details as $key => $value) {
-                
+
                     //check if detail has purchase_unit_id Or Null
                     if($value['purchase_unit_id'] !== null){
                         $unit = Unit::where('id', $value['purchase_unit_id'])->first();
@@ -563,7 +563,7 @@ class PurchasesController extends BaseController
                         $this->authorizeForUser($request->user('api'), 'check_record', $current_Purchase);
                     }
                     foreach ($old_purchase_details as $key => $value) {
-                
+
                         //check if detail has purchase_unit_id Or Null
                         if($value['purchase_unit_id'] !== null){
                             $unit = Unit::where('id', $value['purchase_unit_id'])->first();
@@ -573,45 +573,45 @@ class PurchasesController extends BaseController
                             ->first();
                             $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
                         }
-        
+
                         if ($current_Purchase->statut == "received") {
-        
+
                             if ($value['product_variant_id'] !== null) {
                                 $product_warehouse = product_warehouse::where('deleted_at', '=', null)
                                     ->where('warehouse_id', $current_Purchase->warehouse_id)
                                     ->where('product_id', $value['product_id'])
                                     ->where('product_variant_id', $value['product_variant_id'])
                                     ->first();
-        
+
                                 if ($unit && $product_warehouse) {
                                     if ($unit->operator == '/') {
                                         $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
                                     } else {
                                         $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
                                     }
-        
+
                                     $product_warehouse->save();
                                 }
-        
+
                             } else {
                                 $product_warehouse = product_warehouse::where('deleted_at', '=', null)
                                     ->where('warehouse_id', $current_Purchase->warehouse_id)
                                     ->where('product_id', $value['product_id'])
                                     ->first();
-        
+
                                 if ($unit && $product_warehouse) {
                                     if ($unit->operator == '/') {
                                         $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
                                     } else {
                                         $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
                                     }
-        
+
                                     $product_warehouse->save();
                                 }
                             }
                         }
                     }
-        
+
                     $current_Purchase->details()->delete();
                     $current_Purchase->update([
                         'deleted_at' => Carbon::now(),
@@ -641,7 +641,7 @@ class PurchasesController extends BaseController
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
 
-        
+
         $details = array();
 
         // Check If User Has Permission view All Records
@@ -696,12 +696,12 @@ class PurchasesController extends BaseController
 
                 $data['code'] = $productsVariants->code;
                 $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
-           
+
             } else {
                 $data['code'] = $detail['product']['code'];
                 $data['name'] = $detail['product']['name'];
             }
-            
+
             $data['quantity'] = $detail->quantity;
             $data['total'] = $detail->total;
             $data['cost'] = $detail->cost;
@@ -795,7 +795,7 @@ class PurchasesController extends BaseController
     public function Purchase_pdf(Request $request, $id)
     {
         $details = array();
-        $helpers = new helpers();
+        $helpers = new Helpers();
         $Purchase_data = Purchase::with('details.product.unitPurchase')
             ->where('deleted_at', '=', null)
             ->findOrFail($id);
@@ -909,7 +909,7 @@ class PurchasesController extends BaseController
          }else{
              $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
              $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-         } 
+         }
 
         $suppliers = Provider::where('deleted_at', '=', null)->get(['id', 'name']);
 
@@ -997,7 +997,7 @@ class PurchasesController extends BaseController
 
                     $data['code'] = $productsVariants->code;
                     $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
-                    $data['product_variant_id'] = $detail->product_variant_id;                
+                    $data['product_variant_id'] = $detail->product_variant_id;
 
                     if ($unit && $unit->operator == '/') {
                         $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
@@ -1017,7 +1017,7 @@ class PurchasesController extends BaseController
 
                     $data['code'] = $detail['product']['code'];
                     $data['name'] = $detail['product']['name'];
-                
+
 
                     if ($unit && $unit->operator == '/') {
                         $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
@@ -1035,7 +1035,7 @@ class PurchasesController extends BaseController
                 $data['product_id'] = $detail->product_id;
                 $data['unitPurchase'] = $unit->ShortName;
                 $data['purchase_unit_id'] = $unit->id;
-                
+
                 $data['is_imei'] = $detail['product']['is_imei'];
                 $data['imei_number'] = $detail->imei_number;
 
@@ -1073,7 +1073,7 @@ class PurchasesController extends BaseController
                 $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
                 $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
             }
-            
+
             $suppliers = Provider::where('deleted_at', '=', null)->get(['id', 'name']);
 
             return response()->json([
@@ -1098,7 +1098,7 @@ class PurchasesController extends BaseController
             ->findOrFail($id);
 
         $details = array();
-        
+
         // Check If User Has Permission view All Records
         if (!$view_records) {
             // Check If User->id === Purchase->id
@@ -1144,7 +1144,7 @@ class PurchasesController extends BaseController
                 $data['name'] = '['.$productsVariants->name . ']' . $detail['product']['name'];
                 $data['code'] = $productsVariants->code;
 
-                $data['product_variant_id'] = $detail->product_variant_id;                
+                $data['product_variant_id'] = $detail->product_variant_id;
 
                 if ($unit && $unit->operator == '/') {
                     $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
@@ -1163,7 +1163,7 @@ class PurchasesController extends BaseController
                 $data['product_variant_id'] = null;
                 $data['code'] = $detail['product']['code'];
                 $data['name'] = $detail['product']['name'];
-                
+
 
                 if ($unit && $unit->operator == '/') {
                     $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
@@ -1182,7 +1182,7 @@ class PurchasesController extends BaseController
             $data['product_id'] = $detail->product_id;
             $data['unitPurchase'] = $unit->ShortName;
             $data['purchase_unit_id'] = $unit->id;
-            
+
             $data['is_imei'] = $detail['product']['is_imei'];
             $data['imei_number'] = $detail->imei_number;
 
@@ -1229,15 +1229,15 @@ class PurchasesController extends BaseController
         //purchase
         $purchase = Purchase::with('provider')->where('deleted_at', '=', null)->findOrFail($request->id);
 
-        $helpers = new helpers();
+        $helpers = new Helpers();
         $currency = $helpers->Get_Currency();
 
         //settings
         $settings = Setting::where('deleted_at', '=', null)->first();
-    
+
          //the custom msg of sale
          $emailMessage  = EmailMessage::where('name', 'purchase')->first();
- 
+
          if($emailMessage){
              $message_body = $emailMessage->body;
              $message_subject = $emailMessage->subject;
@@ -1257,7 +1257,7 @@ class PurchasesController extends BaseController
         $contact_name = $purchase['provider']->name;
         $business_name = $settings->CompanyName;
 
-        //receiver email 
+        //receiver email
         $receiver_email = $purchase['provider']->email;
 
         //replace the text with tags
@@ -1274,7 +1274,7 @@ class PurchasesController extends BaseController
         $email['body'] = $message_body;
         $email['company_name'] = $business_name;
 
-        $this->Set_config_mail(); 
+        $this->Set_config_mail();
         $mail = Mail::to($receiver_email)->send(new CustomEmail($email));
         return $mail;
     }
@@ -1283,123 +1283,123 @@ class PurchasesController extends BaseController
 
      public function Send_SMS(Request $request)
      {
- 
+
         $this->authorizeForUser($request->user('api'), 'view', Purchase::class);
 
          //purchase
          $purchase = Purchase::with('provider')->where('deleted_at', '=', null)->findOrFail($request->id);
- 
-         $helpers = new helpers();
+
+         $helpers = new Helpers();
          $currency = $helpers->Get_Currency();
- 
+
          //settings
          $settings = Setting::where('deleted_at', '=', null)->first();
-     
+
          $default_sms_gateway = sms_gateway::where('id' , $settings->sms_gateway)
             ->where('deleted_at', '=', null)->first();
 
          //the custom msg of purchase
          $smsMessage  = SMSMessage::where('name', 'purchase')->first();
- 
+
          if($smsMessage){
              $message_text = $smsMessage->text;
          }else{
              $message_text = '';
          }
- 
+
          //Tags
          $random_number = Str::random(10);
          $invoice_url = url('/api/purchase_pdf/' . $request->id.'?'.$random_number);
          $invoice_number = $purchase->Ref;
- 
+
          $total_amount = $currency . ' '.number_format($purchase->GrandTotal, 2, '.', ',');
          $paid_amount  = $currency . ' '.number_format($purchase->paid_amount, 2, '.', ',');
          $due_amount   = $currency . ' '.number_format($purchase->GrandTotal - $purchase->paid_amount, 2, '.', ',');
- 
+
          $contact_name = $purchase['provider']->name;
          $business_name = $settings->CompanyName;
- 
+
          //receiver Number
          $receiverNumber = $purchase['provider']->phone;
- 
+
          //replace the text with tags
          $message_text = str_replace('{contact_name}', $contact_name, $message_text);
          $message_text = str_replace('{business_name}', $business_name, $message_text);
          $message_text = str_replace('{invoice_url}', $invoice_url, $message_text);
          $message_text = str_replace('{invoice_number}', $invoice_number, $message_text);
- 
+
          $message_text = str_replace('{total_amount}', $total_amount, $message_text);
          $message_text = str_replace('{paid_amount}', $paid_amount, $message_text);
          $message_text = str_replace('{due_amount}', $due_amount, $message_text);
- 
+
          //twilio
          if($default_sms_gateway->title == "twilio"){
              try {
-     
+
                  $account_sid = env("TWILIO_SID");
                  $auth_token = env("TWILIO_TOKEN");
                  $twilio_number = env("TWILIO_FROM");
-     
+
                  $client = new Client_Twilio($account_sid, $auth_token);
                  $client->messages->create($receiverNumber, [
-                     'from' => $twilio_number, 
+                     'from' => $twilio_number,
                      'body' => $message_text]);
-         
+
              } catch (Exception $e) {
                  return response()->json(['message' => $e->getMessage()], 500);
              }
          //nexmo
          }elseif($default_sms_gateway->title == "nexmo"){
              try {
- 
+
                  $basic  = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
                  $client = new \Nexmo\Client($basic);
                  $nexmo_from = env("NEXMO_FROM");
-         
+
                  $message = $client->message()->send([
                      'to' => $receiverNumber,
                      'from' => $nexmo_from,
                      'text' => $message_text
                  ]);
-                         
+
              } catch (Exception $e) {
                  return response()->json(['message' => $e->getMessage()], 500);
              }
- 
+
          //---- infobip
          }elseif($default_sms_gateway->title == "infobip"){
- 
+
              $BASE_URL = env("base_url");
              $API_KEY = env("api_key");
              $SENDER = env("sender_from");
- 
+
              $configuration = (new Configuration())
                  ->setHost($BASE_URL)
                  ->setApiKeyPrefix('Authorization', 'App')
                  ->setApiKey('Authorization', $API_KEY);
-             
+
              $client = new Client_guzzle();
-             
+
              $sendSmsApi = new SendSMSApi($client, $configuration);
              $destination = (new SmsDestination())->setTo($receiverNumber);
              $message = (new SmsTextualMessage())
                  ->setFrom($SENDER)
                  ->setText($message_text)
                  ->setDestinations([$destination]);
-                 
+
              $request = (new SmsAdvancedTextualRequest())->setMessages([$message]);
-             
+
              try {
                  $smsResponse = $sendSmsApi->sendSmsMessage($request);
                  echo ("Response body: " . $smsResponse);
              } catch (Throwable $apiException) {
                  echo("HTTP Code: " . $apiException->getCode() . "\n");
              }
-             
+
          }
- 
+
          return response()->json(['success' => true]);
-         
+
      }
 
 

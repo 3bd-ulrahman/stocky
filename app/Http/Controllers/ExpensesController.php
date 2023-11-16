@@ -7,7 +7,7 @@ use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Role;
 use App\Models\Warehouse;
-use App\utils\helpers;
+use App\Utils\Helpers;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -29,7 +29,7 @@ class ExpensesController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helpers();
         $role = Auth::user()->roles()->first();
         $view_records = Role::findOrFail($role->id)->inRole('record_view');
         // Filter fields With Params to retrieve
@@ -138,7 +138,7 @@ class ExpensesController extends BaseController
 
     public function show($id){
         //
-        
+
         }
 
     //-------------- Update  Expense -----------\\

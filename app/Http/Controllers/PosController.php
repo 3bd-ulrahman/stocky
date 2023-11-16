@@ -18,7 +18,7 @@ use App\Models\Sale;
 use App\Models\Unit;
 use App\Models\SaleDetail;
 use App\Models\Warehouse;
-use App\utils\helpers;
+use App\Utils\Helpers;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -42,7 +42,7 @@ class PosController extends BaseController
         ]);
 
         $item = \DB::transaction(function () use ($request) {
-            $helpers = new helpers();
+            $helpers = new Helpers();
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');
             $order = new Sale;
@@ -135,7 +135,7 @@ class PosController extends BaseController
                 } else if ($due == $sale->GrandTotal) {
                     $payment_statut = 'unpaid';
                 }
-                              
+
                 if($request['amount'] > 0){
                     if ($request->payment['Reglement'] == 'credit card') {
                         $Client = Client::whereId($request->client_id)->first();
@@ -244,7 +244,7 @@ class PosController extends BaseController
                     }
 
                 }
-              
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }
@@ -279,10 +279,10 @@ class PosController extends BaseController
                 ->where(function ($query) use ($request) {
                     if ($request->stock == '1' && $request->product_service == '1') {
                         return $query->where('qte', '>', 0)->orWhere('manage_stock', false);
-    
+
                     }elseif($request->stock == '1' && $request->product_service == '0') {
                         return $query->where('qte', '>', 0)->orWhere('manage_stock', true);
-    
+
                     }else{
                         return $query->where('manage_stock', true);
                     }
@@ -362,7 +362,7 @@ class PosController extends BaseController
             $item['unitSale'] = $product_warehouse['product']['unitSale']?$product_warehouse['product']['unitSale']->ShortName:'';
             $item['qte'] = $product_warehouse['product']->type!='is_service'?$product_warehouse->qte:'---';
             $item['product_type'] = $product_warehouse['product']->type;
-            
+
             if ($product_warehouse['product']->TaxNet !== 0.0) {
 
                 //Exclusive
@@ -427,8 +427,8 @@ class PosController extends BaseController
           }
 
 
-      
-        
+
+
 
         if ($settings->client_id) {
             if (Client::where('id', $settings->client_id)->where('deleted_at', '=', null)->first()) {

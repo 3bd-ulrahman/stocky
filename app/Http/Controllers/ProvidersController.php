@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Provider;
 use App\Models\Setting;
-use App\utils\helpers;
+use App\Utils\Helpers;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -32,7 +32,7 @@ class ProvidersController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helpers();
         // Filter fields With Params to retrieve
         $columns = array(0 => 'name', 1 => 'code', 2 => 'phone', 3 => 'email');
         $param = array(0 => 'like', 1 => 'like', 2 => 'like', 3 => 'like');
@@ -134,7 +134,7 @@ class ProvidersController extends BaseController
 
     public function show($id){
         //
-        
+
         }
 
     //----------- Update Supplier-------\\
@@ -258,7 +258,7 @@ class ProvidersController extends BaseController
                         'tax_number' => $value['tax_number'] == '' ? null : $value['tax_number'],
                     ]);
                 }
-                
+
             }
 
             return response()->json([
@@ -274,7 +274,7 @@ class ProvidersController extends BaseController
     public function pay_supplier_due(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'pay_supplier_due', Provider::class);
-       
+
         if($request['amount'] > 0){
            $provider_purchases_due = Purchase::where('deleted_at', '=', null)
            ->where([
@@ -315,7 +315,7 @@ class ProvidersController extends BaseController
                $paid_amount_total -= $amount;
            }
        }
-       
+
         return response()->json(['success' => true]);
 
     }
@@ -325,7 +325,7 @@ class ProvidersController extends BaseController
     public function pay_purchase_return_due(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'pay_purchase_return_due', Provider::class);
-        
+
         if($request['amount'] > 0){
             $supplier_purchase_return_due = PurchaseReturn::where('deleted_at', '=', null)
             ->where([
@@ -366,7 +366,7 @@ class ProvidersController extends BaseController
                 $paid_amount_total -= $amount;
             }
         }
-        
+
         return response()->json(['success' => true]);
 
     }

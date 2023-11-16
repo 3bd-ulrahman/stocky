@@ -9,7 +9,7 @@ use App\Models\role_user;
 use App\Models\product_warehouse;
 use App\Models\Warehouse;
 use App\Models\UserWarehouse;
-use App\utils\helpers;
+use App\Utils\Helpers;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use File;
@@ -35,7 +35,7 @@ class UserController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helpers();
         // Filter fields With Params to retrieve
         $columns = array(0 => 'username', 1 => 'statut', 2 => 'phone', 3 => 'email');
         $param = array(0 => 'like', 1 => '=', 2 => 'like', 3 => 'like');
@@ -86,7 +86,7 @@ class UserController extends BaseController
 
     public function GetUserAuth(Request $request)
     {
-        $helpers = new helpers();
+        $helpers = new Helpers();
         $user['avatar'] = Auth::user()->avatar;
         $user['username'] = Auth::user()->username;
         $user['currency'] = $helpers->Get_Currency();
@@ -176,7 +176,7 @@ class UserController extends BaseController
             if(!$User->is_all_warehouses){
                 $User->assignedWarehouses()->sync($request['assigned_to']);
             }
-    
+
         }, 10);
 
         return response()->json(['success' => true]);
@@ -186,7 +186,7 @@ class UserController extends BaseController
 
     public function show($id){
         //
-        
+
     }
 
     public function edit(Request $request, $id)
@@ -204,9 +204,9 @@ class UserController extends BaseController
     //------------- UPDATE  USER ---------\\
 
     public function update(Request $request, $id)
-    {        
+    {
         $this->authorizeForUser($request->user('api'), 'update', User::class);
-        
+
         $this->validate($request, [
             'email' => 'required|email|unique:users',
             'email' => Rule::unique('users')->ignore($id),
@@ -279,7 +279,7 @@ class UserController extends BaseController
             $user_saved->assignedWarehouses()->sync($request['assigned_to']);
 
         }, 10);
-        
+
         return response()->json(['success' => true]);
 
     }

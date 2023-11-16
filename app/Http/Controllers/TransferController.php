@@ -12,7 +12,7 @@ use App\Models\TransferDetail;
 use App\Models\Warehouse;
 use App\Models\User;
 use App\Models\UserWarehouse;
-use App\utils\helpers;
+use App\Utils\Helpers;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
@@ -36,7 +36,7 @@ class TransferController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new helpers();
+        $helpers = new Helpers();
         // Filter fields With Params to retrieve
         $columns = array(0 => 'Ref', 1 => 'from_warehouse_id', 2 => 'to_warehouse_id', 3 => 'statut');
         $param = array(0 => 'like', 1 => '=', 2 => '=', 3 => 'like');
@@ -140,7 +140,7 @@ class TransferController extends BaseController
             $data = $request['details'];
 
             foreach ($data as $key => $value) {
-               
+
                 $unit = Unit::where('id', $value['purchase_unit_id'])->first();
 
                 if ($request->transfer['statut'] == "completed") {
@@ -593,8 +593,8 @@ class TransferController extends BaseController
                      ->where('id', $value['product_id'])
                      ->first();
                      $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
-                 } 
- 
+                 }
+
                 if ($current_Transfer->statut == "completed") {
                     if ($value['product_variant_id'] !== null) {
 
@@ -688,7 +688,7 @@ class TransferController extends BaseController
                         }
                     }
                 }
-                   
+
             }
 
             $current_Transfer->details()->delete();
@@ -732,7 +732,7 @@ class TransferController extends BaseController
                     ->where('id', $value['product_id'])
                     ->first();
                     $unit = Unit::where('id', $product_unit_purchase_id['unitPurchase']->id)->first();
-                } 
+                }
 
                if ($current_Transfer->statut == "completed") {
                    if ($value['product_variant_id'] !== null) {
@@ -827,7 +827,7 @@ class TransferController extends BaseController
                        }
                    }
                }
-                  
+
            }
 
             $current_Transfer->details()->delete();
@@ -957,7 +957,7 @@ class TransferController extends BaseController
                 $data['product_variant_id'] = null;
                 $data['code'] = $detail['product']['code'];
                 $data['name'] = $detail['product']['name'];
-               
+
                 if ($unit && $unit->operator == '/') {
                     $data['stock'] = $item_product ? $item_product->qte * $unit->operator_value : 0;
                 } else if ($unit && $unit->operator == '*') {
@@ -1096,10 +1096,10 @@ class TransferController extends BaseController
            $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
            $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
        }
-       
+
         return response()->json(['warehouses' => $warehouses]);
     }
 
-  
+
 
 }
