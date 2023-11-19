@@ -17,12 +17,12 @@ class CreateWarehousesTable extends Migration {
 		{
 			$table->engine = 'InnoDB';
 			$table->integer('id', true);
-			$table->string('name', 192);
-			$table->string('city', 192)->nullable();
-			$table->string('mobile', 192)->nullable();
-			$table->string('zip', 192)->nullable();
-			$table->string('email', 192)->nullable();
-			$table->string('country', 192)->nullable();
+			$table->string('name', 100);
+			$table->string('city', 50)->nullable();
+			$table->string('mobile', 50)->nullable();
+			$table->string('zip', 50)->nullable();
+			$table->string('email', 50)->nullable();
+			$table->string('country', 50)->nullable();
 			$table->timestamps(6);
 			$table->softDeletes();
 		});

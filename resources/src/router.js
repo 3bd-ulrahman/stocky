@@ -22,7 +22,7 @@ const routes = [
         name: "dashboard",
         component: () =>
           import(
-                        /* webpackChunkName: "dashboard" */ "./views/app/dashboard/dashboard"
+                        /* webpackChunkName: "dashboard" */ "./views/app/dashboard/Index"
           )
       },
 

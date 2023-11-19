@@ -20,7 +20,7 @@ class CreatePermissionRoleTable extends Migration {
 			$table->integer('permission_id')->index('permission_role_permission_id');
 			$table->integer('role_id')->index('permission_role_role_id');
 		});
-}
+    }
 
 
 	/**
@@ -32,5 +32,4 @@ class CreatePermissionRoleTable extends Migration {
 	{
 		Schema::drop('permission_role');
 	}
-
 }

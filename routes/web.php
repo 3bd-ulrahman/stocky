@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -122,7 +123,7 @@ Route::group(['middleware' => ['auth', 'Is_Active']], function () {
 
 
     });
-    
+
     Auth::routes([
         'register' => false,
     ]);

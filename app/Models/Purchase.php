@@ -3,15 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Purchase extends Model
 {
+    use SoftDeletes;
+
+    protected $table = 'purchases';
+
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'date', 'Ref', 'provider_id', 'warehouse_id', 'GrandTotal',
-        'discount', 'shipping', 'statut', 'notes', 'TaxNet', 'tax_rate', 'paid_amount',
-        'payment_statut', 'created_at', 'updated_at', 'deleted_at',
+        'date',
+        'Ref',
+        'provider_id',
+        'warehouse_id',
+        'GrandTotal',
+        'discount',
+        'shipping',
+        'statut',
+        'notes',
+        'TaxNet',
+        'tax_rate',
+        'paid_amount',
+        'payment_statut',
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
 
     protected $casts = [

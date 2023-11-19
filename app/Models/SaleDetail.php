@@ -6,10 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class SaleDetail extends Model
 {
+    protected $table = 'sale_details';
 
     protected $fillable = [
-        'id', 'date', 'sale_id','sale_unit_id', 'quantity', 'product_id', 'total', 'product_variant_id',
-        'price', 'TaxNet', 'discount', 'discount_method', 'tax_method',
+        'id',
+        'date',
+        'sale_id',
+        'sale_unit_id',
+        'quantity',
+        'product_id',
+        'total',
+        'product_variant_id',
+        'price',
+        'TaxNet',
+        'discount',
+        'discount_method',
+        'tax_method',
     ];
 
     protected $casts = [
@@ -27,12 +39,11 @@ class SaleDetail extends Model
 
     public function sale()
     {
-        return $this->belongsTo('App\Models\Sale');
+        return $this->belongsTo(Sale::class);
     }
 
     public function product()
     {
-        return $this->belongsTo('App\Models\Product');
+        return $this->belongsTo(Product::class);
     }
-
 }

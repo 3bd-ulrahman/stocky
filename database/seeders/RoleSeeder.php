@@ -17,14 +17,11 @@ class RoleSeeder extends Seeder
     public function run()
     {
         // Insert some stuff
-	    DB::table('roles')->insert(
-            array([
-                'id'    => 1,
-                'name'  => 'Owner',
-                'label' => 'Owner',
-                'status' => 1,
-                'description' => 'Owner',
-            ])
-        );
+	    DB::table('roles')->insert([
+            'name'  => 'Owner',
+            'label' => 'Owner',
+            'status' => 1,
+            'description' => 'Owner',
+        ]);
     }
 }

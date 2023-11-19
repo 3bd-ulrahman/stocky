@@ -3,15 +3,38 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Sale extends Model
 {
+    use SoftDeletes;
+
+    protected $table = 'sales';
+
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'date', 'Ref', 'is_pos', 'client_id', 'GrandTotal', 'qte_retturn', 'TaxNet', 'tax_rate', 'notes',
-        'total_retturn', 'warehouse_id', 'user_id', 'statut', 'discount', 'shipping',
-        'paid_amount', 'payment_statut', 'created_at', 'updated_at', 'deleted_at','shipping_status'
+        'date',
+        'Ref',
+        'is_pos',
+        'client_id',
+        'GrandTotal',
+        'qte_retturn',
+        'TaxNet',
+        'tax_rate',
+        'notes',
+        'total_retturn',
+        'warehouse_id',
+        'user_id',
+        'statut',
+        'discount',
+        'shipping',
+        'paid_amount',
+        'payment_statut',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'shipping_status'
     ];
 
     protected $casts = [
@@ -29,6 +52,7 @@ class Sale extends Model
         'paid_amount' => 'double',
     ];
 
+    // Relationships
     public function user()
     {
         return $this->belongsTo('App\Models\User');
@@ -53,5 +77,4 @@ class Sale extends Model
     {
         return $this->belongsTo('App\Models\Warehouse');
     }
-
 }

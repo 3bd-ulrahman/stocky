@@ -52,7 +52,7 @@ axios.interceptors.response.use((response) => {
 }, (error) => {
   if (error.response && error.response.data) {
     if (error.response.status === 401) {
-      window.location.href='/login';
+      window.location.href = '/login';
     }
 
     if (error.response.status === 404) {
@@ -82,7 +82,7 @@ Vue.component("breadcumb", Breadcumb);
 
 Vue.config.productionTip = true;
 Vue.config.silent = true;
-Vue.config.devtools = false;
+Vue.config.devtools = true;
 
 new Vue({
   store,
