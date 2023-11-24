@@ -224,8 +224,8 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     //------------------------------- Category --------------------------\\
     //------------------------------------------------------------------\\
 
-    Route::resource('categories', 'CategorieController');
-    Route::post('categories/delete/by_selection', 'CategorieController@delete_by_selection');
+    Route::resource('categories', 'CategoryController');
+    Route::post('categories/delete/by_selection', 'CategoryController@delete_by_selection');
 
     //------------------------------- Units --------------------------\\
     //------------------------------------------------------------------\\

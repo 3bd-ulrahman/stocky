@@ -18,10 +18,10 @@ use App\Models\UserWarehouse;
 use App\Models\Warehouse;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {

@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         Schema::disableForeignKeyConstraints();
         $this->call([
             ClientSeeder::class,
+            CategorySeeder::class,
             CurrencySeeder::class,
             SettingSeeder::class,
             ServerSeeder::class,

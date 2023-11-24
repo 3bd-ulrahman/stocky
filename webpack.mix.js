@@ -17,18 +17,17 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 
 mix.js('resources/src/main.js', 'public').js('resources/src/login.js', 'public')
-    .vue();
+  .vue();
 
-    mix.webpackConfig({
-        output: {
-          
-            filename:'js/[name].min.js',
-            chunkFilename: 'js/bundle/[name].[hash].js',
-          },
-        plugins: [
-            new MomentLocalesPlugin(),
-            new CleanWebpackPlugin({
-                cleanOnceBeforeBuildPatterns: ['./js/*']
-              }),
-        ]
-    });
+mix.webpackConfig({
+  output: {
+    filename: 'js/[name].min.js',
+    chunkFilename: 'js/bundle/[name].[hash].js',
+  },
+  plugins: [
+    new MomentLocalesPlugin(),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: ['./js/*']
+    }),
+  ]
+});

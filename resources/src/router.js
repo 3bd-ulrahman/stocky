@@ -21,9 +21,7 @@ const routes = [
         path: "/app/dashboard",
         name: "dashboard",
         component: () =>
-          import(
-                        /* webpackChunkName: "dashboard" */ "./views/app/dashboard/Index"
-          )
+          import("./views/app/dashboard/Index")
       },
 
       //Products
@@ -78,11 +76,8 @@ const routes = [
           // categories
           {
             name: "categories",
-            path: "Categories",
-            component: () =>
-              import(
-                                /* webpackChunkName: "Categories" */ "./views/app/pages/products/categorie"
-              )
+            path: "categories",
+            component: () => import("./views/app/pages/products/categories/Index.vue")
           },
 
           // brands
