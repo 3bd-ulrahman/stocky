@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Locale;
+use App\Models\Setting;
 use App\Utils\Helpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -42,8 +44,8 @@ class CategoryController extends BaseController
             ->orderBy($order, $dir)
             ->get();
 
-        $defaultLocale = config('translatable.locales');
-        $locales = config('translatable.locales');
+        $defaultLocale = Setting::query()->first()->default_language;
+        $locales = Locale::query()->get();
 
         return response()->json([
             'categories' => $categories,
@@ -58,6 +60,14 @@ class CategoryController extends BaseController
     public function store(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'create', Category::class);
+
+        $array = [
+            [
+                'en' => [
+                    'name' => 'Abdulrahman'
+                ]
+            ]
+        ];
 
         $defaultLocale = config('translatable.defaults');
         $request->validate([

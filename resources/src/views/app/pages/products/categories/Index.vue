@@ -74,7 +74,9 @@
                     label="Code"
                     v-model="category.code"
                   />
-                  <b-form-invalid-feedback id="Code-feedback">{{ validationContext.errors[0] }}</b-form-invalid-feedback>
+                  <b-form-invalid-feedback id="Code-feedback">
+                    {{ validationContext.errors[0] }}
+                  </b-form-invalid-feedback>
                 </b-form-group>
               </validation-provider>
             </b-col>
@@ -82,18 +84,18 @@
             <!-- Name category -->
             <b-col md="12" v-for="locale in locales" :key="locale">
               <validation-provider
-                :name="`name${locale}`"
-                :rules="{ required: locale === 'en' ? true : false }"
+                :name="`name${locale.abbreviation}`"
+                :rules="{ required: locale.abbreviation === 'en' ? true : false }"
                 v-slot="validationContext"
               >
-                <b-form-group :label="`${$t('Namecategorie')} ${(locale)}`">
+                <b-form-group :label="`${$t('Namecategorie')} ${(locale.abbreviation)}`">
                   <b-form-input
                     :placeholder="$t('Enter_name_category')"
                     :state="getValidationState(validationContext)"
                     aria-describedby="Name-feedback"
                     label="Name"
-                    :value="category.translations?.[locale]?.name"
-                    @input="category.translations[locale] = {name: $event}"
+                    :value="category.translations?.[locale.abbreviation]?.name"
+                    @input="category.translations[locale.abbreviation] = {name: $event}"
                   />
                   <b-form-invalid-feedback id="Name-feedback">
                     {{ validationContext.errors[0] }}
@@ -298,6 +300,7 @@ export default {
         this.totalRows = response.data.totalRows;
         this.defaultLocale = response.data.defaultLocale;
         this.locales = response.data.locales;
+        console.log(response.data.locales);
 
         // Complete the animation of theprogress bar.
         NProgress.done();

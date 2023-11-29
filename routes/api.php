@@ -1,5 +1,6 @@
 <?php
 
+use Settings\LocaleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -119,14 +120,14 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     Route::resource('employee_account', 'hrm\EmployeeAccountController');
 
 
-     //------------------------------- company --------------------------\\
+    //------------------------------- company --------------------------\\
     //--------------------------------------------------------------------\\
     Route::resource('company', 'hrm\CompanyController');
     Route::get("get_all_company", "hrm\CompanyController@Get_all_Company");
     Route::post("company/delete/by_selection", "hrm\CompanyController@delete_by_selection");
 
 
-     //------------------------------- departments --------------------------\\
+    //------------------------------- departments --------------------------\\
     //--------------------------------------------------------------------\\
     Route::resource('departments', 'hrm\DepartmentsController');
     Route::get("get_all_departments", "hrm\DepartmentsController@Get_all_Departments");
@@ -163,7 +164,7 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     Route::post("leave_type/delete/by_selection", "hrm\LeaveTypeController@delete_by_selection");
 
 
-     //------------------------------- holiday ----------------------\\
+    //------------------------------- holiday ----------------------\\
     //----------------------------------------------------------------\\
 
     Route::resource('holiday', 'hrm\HolidayController');
@@ -174,10 +175,10 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
 
     Route::prefix('core')->group(function () {
 
-       Route::get("get_departments_by_company", "hrm\CoreController@Get_departments_by_company");
-       Route::get("get_designations_by_department", "hrm\CoreController@Get_designations_by_department");
-       Route::get("get_office_shift_by_company", "hrm\CoreController@Get_office_shift_by_company");
-       Route::get("get_employees_by_company", "hrm\CoreController@Get_employees_by_company");
+        Route::get("get_departments_by_company", "hrm\CoreController@Get_departments_by_company");
+        Route::get("get_designations_by_department", "hrm\CoreController@Get_designations_by_department");
+        Route::get("get_office_shift_by_company", "hrm\CoreController@Get_office_shift_by_company");
+        Route::get("get_employees_by_company", "hrm\CoreController@Get_employees_by_company");
 
     });
 
@@ -385,10 +386,15 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
 
     //------------------------------- Settings ------------------------\\
     //------------------------------------------------------------------\\
-    Route::resource('settings', 'SettingsController');
+    /**
+     * Locales
+     */
+    Route::apiResource('settings/locales', LocaleController::class, ['namespace' => '']);
+    Route::apiResource('settings', 'SettingsController');
     Route::get('get_Settings_data', 'SettingsController@getSettings');
     Route::put('pos_settings/{id}', 'SettingsController@update_pos_settings');
     Route::get('get_pos_Settings', 'SettingsController@get_pos_Settings');
+
 
     //------------------------------- Mail Settings ------------------------\\
 
@@ -427,19 +433,18 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     Route::get("get_backup", "BackupController@Get_Backup");
     Route::get("generate_new_backup", "BackupController@Generate_Backup");
     Route::delete("delete_backup/{name}", "BackupController@Delete_Backup");
-
 });
 
-    //-------------------------------  Print & PDF ------------------------\\
-    //------------------------------------------------------------------\\
+//-------------------------------  Print & PDF ------------------------\\
+//------------------------------------------------------------------\\
 
-    Route::get('sale_pdf/{id}', 'SalesController@Sale_PDF');
-    Route::get('quote_pdf/{id}', 'QuotationsController@Quotation_pdf');
-    Route::get('purchase_pdf/{id}', 'PurchasesController@Purchase_pdf');
-    Route::get('return_sale_pdf/{id}', 'SalesReturnController@Return_pdf');
-    Route::get('return_purchase_pdf/{id}', 'PurchasesReturnController@Return_pdf');
-    Route::get('payment_purchase_pdf/{id}', 'PaymentPurchasesController@Payment_purchase_pdf');
-    Route::get('payment_return_sale_pdf/{id}', 'PaymentSaleReturnsController@payment_return');
-    Route::get('payment_return_purchase_pdf/{id}', 'PaymentPurchaseReturnsController@payment_return');
-    Route::get('payment_sale_pdf/{id}', 'PaymentSalesController@payment_sale');
-    Route::get('sales_print_invoice/{id}', 'SalesController@Print_Invoice_POS');
+Route::get('sale_pdf/{id}', 'SalesController@Sale_PDF');
+Route::get('quote_pdf/{id}', 'QuotationsController@Quotation_pdf');
+Route::get('purchase_pdf/{id}', 'PurchasesController@Purchase_pdf');
+Route::get('return_sale_pdf/{id}', 'SalesReturnController@Return_pdf');
+Route::get('return_purchase_pdf/{id}', 'PurchasesReturnController@Return_pdf');
+Route::get('payment_purchase_pdf/{id}', 'PaymentPurchasesController@Payment_purchase_pdf');
+Route::get('payment_return_sale_pdf/{id}', 'PaymentSaleReturnsController@payment_return');
+Route::get('payment_return_purchase_pdf/{id}', 'PaymentPurchaseReturnsController@payment_return');
+Route::get('payment_sale_pdf/{id}', 'PaymentSalesController@payment_sale');
+Route::get('sales_print_invoice/{id}', 'SalesController@Print_Invoice_POS');

@@ -670,10 +670,7 @@ const routes = [
       // Settings
       {
         path: "/app/settings",
-        component: () =>
-          import(
-                        /* webpackChunkName: "settings" */ "./views/app/pages/settings"
-          ),
+        component: () => import("./views/app/pages/settings"),
         redirect: "/app/settings/System_settings",
         children: [
           // Permissions
@@ -823,8 +820,14 @@ const routes = [
               import(
                                 /* webpackChunkName: "System_settings" */ "./views/app/pages/settings/system_settings"
               )
-          }
+          },
 
+          // Locales
+          {
+            name: "locales",
+            path: "locales",
+            component: () => import("./views/app/pages/settings/Locales.vue")
+          }
         ]
       },
 

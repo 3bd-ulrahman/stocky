@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Locale;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -38,11 +39,13 @@ if ($installed === false) {
     ]);
 
     Route::post('/setup/step-2', [
-        'as' => 'setupStep1', 'uses' => 'SetupController@setupStep1',
+        'as' => 'setupStep1',
+        'uses' => 'SetupController@setupStep1',
     ]);
 
     Route::post('/setup/testDB', [
-        'as' => 'testDB', 'uses' => 'TestDbController@testDB',
+        'as' => 'testDB',
+        'uses' => 'TestDbController@testDB',
     ]);
 
     Route::get('/setup/step-2', [
@@ -59,31 +62,38 @@ if ($installed === false) {
     });
 
     Route::get('/setup/getNewAppKey', [
-        'as' => 'getNewAppKey', 'uses' => 'SetupController@getNewAppKey',
+        'as' => 'getNewAppKey',
+        'uses' => 'SetupController@getNewAppKey',
     ]);
 
     Route::get('/setup/getPassport', [
-        'as' => 'getPassport', 'uses' => 'SetupController@getPassport',
+        'as' => 'getPassport',
+        'uses' => 'SetupController@getPassport',
     ]);
 
     Route::get('/setup/getMegrate', [
-        'as' => 'getMegrate', 'uses' => 'SetupController@getMegrate',
+        'as' => 'getMegrate',
+        'uses' => 'SetupController@getMegrate',
     ]);
 
     Route::post('/setup/step-3', [
-        'as' => 'setupStep2', 'uses' => 'SetupController@setupStep2',
+        'as' => 'setupStep2',
+        'uses' => 'SetupController@setupStep2',
     ]);
 
     Route::post('/setup/step-4', [
-        'as' => 'setupStep3', 'uses' => 'SetupController@setupStep3',
+        'as' => 'setupStep3',
+        'uses' => 'SetupController@setupStep3',
     ]);
 
     Route::post('/setup/step-5', [
-        'as' => 'setupStep4', 'uses' => 'SetupController@setupStep4',
+        'as' => 'setupStep4',
+        'uses' => 'SetupController@setupStep4',
     ]);
 
     Route::post('/setup/lastStep', [
-        'as' => 'lastStep', 'uses' => 'SetupController@lastStep',
+        'as' => 'lastStep',
+        'uses' => 'SetupController@lastStep',
     ]);
 
     Route::get('setup/lastStep', function () {
@@ -110,7 +120,8 @@ Route::group(['middleware' => ['auth', 'Is_Active']], function () {
     });
 
 
-    Route::get('/{vue?}',
+    Route::get(
+        '/{vue?}',
         function () {
             $installed = Storage::disk('public')->exists('installed');
 
@@ -119,14 +130,15 @@ Route::group(['middleware' => ['auth', 'Is_Active']], function () {
             } else {
                 return view('layouts.master');
             }
-        })->where('vue', '^(?!api|setup|update|password).*$');
+        }
+    )->where('vue', '^(?!api|setup|update|password).*$');
 
 
-    });
+});
 
-    Auth::routes([
-        'register' => false,
-    ]);
+Auth::routes([
+    'register' => false,
+]);
 
 
 //------------------------------------------------------------------\\
@@ -141,7 +153,8 @@ Route::group(['middleware' => ['auth', 'Is_Active']], function () {
     });
 
     Route::post('/update/lastStep', [
-        'as' => 'update_lastStep', 'uses' => 'UpdateController@lastStep',
+        'as' => 'update_lastStep',
+        'uses' => 'UpdateController@lastStep',
     ]);
 
 });

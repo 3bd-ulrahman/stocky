@@ -783,6 +783,15 @@
             </router-link>
           </li>
 
+          <li class="nav-item"
+            v-if="currentUserPermissions.includes('backup')"
+          >
+            <router-link tag="a" class to="/app/settings/locales">
+              <i class="nav-icon i-Data-Backup"></i>
+              <span class="item-name">{{$t('Locales')}}</span>
+            </router-link>
+          </li>
+
         </ul>
 
         <ul
@@ -1096,7 +1105,3 @@ export default {
   }
 };
 </script>
-
-<style lang="" scoped>
-</style>
-

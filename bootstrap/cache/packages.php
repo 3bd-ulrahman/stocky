@@ -107,6 +107,17 @@
       'Zip' => 'Macellan\\Zip\\ZipFacade',
     ),
   ),
+  'mcamara/laravel-localization' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Mcamara\\LaravelLocalization\\LaravelLocalizationServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'LaravelLocalization' => 'Mcamara\\LaravelLocalization\\Facades\\LaravelLocalization',
+    ),
+  ),
   'nesbot/carbon' => 
   array (
     'providers' => 

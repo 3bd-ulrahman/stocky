@@ -45,91 +45,14 @@
           </div>
 
           <div class="card-body">
-             <div class="menu-icon-language">
-              <a @click="SetLocal('en')">
-                <i title="en" class="flag-icon flag-icon-squared flag-icon-gb"></i> English
+            <div class="menu-icon-language">
+              <a @click="SetLocal(locale.abbreviation)" v-for="locale in locales" :key="country">
+                <i title="sa" :class="`flag-icon flag-icon-squared flag-icon-${locale.flag}`"></i>
+                <span class="title-lang">Lang</span>
               </a>
-              <a @click="SetLocal('fr')">
-                <i title="fr" class="flag-icon flag-icon-squared flag-icon-fr"></i>
-                <span class="title-lang">French</span>
-              </a>
-              <a @click="SetLocal('ar')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-sa"></i>
-                <span class="title-lang">Arabic</span>
-              </a>
-              <a @click="SetLocal('tur')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-tr"></i>
-                <span class="title-lang">Turkish</span>
-              </a>
-
-              <a @click="SetLocal('sm_ch')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-cn"></i>
-                <span class="title-lang">Simplified Chinese</span>
-              </a>
-
-              <a @click="SetLocal('thai')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-th"></i>
-                <span class="title-lang">Thaï</span>
-              </a>
-
-              <a @click="SetLocal('hn')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-in"></i>
-                <span class="title-lang">Hindi</span>
-              </a>
-
-              <a @click="SetLocal('de')">
-                <i title="de" class="flag-icon flag-icon-squared flag-icon-de"></i>
-                <span class="title-lang">German</span>
-              </a>
-              <a @click="SetLocal('es')">
-                <i title="es" class="flag-icon flag-icon-squared flag-icon-es"></i>
-                <span class="title-lang">Spanish</span>
-              </a>
-              <a @click="SetLocal('it')">
-                <i title="it" class="flag-icon flag-icon-squared flag-icon-it"></i>
-                <span class="title-lang">Italien</span>
-              </a>
-              <a @click="SetLocal('Ind')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-id"></i>
-                <span class="title-lang">Indonesian</span>
-              </a>
-
-              <a @click="SetLocal('tr_ch')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-cn"></i>
-                <span class="title-lang">Traditional Chinese</span>
-              </a>
-
-              <a @click="SetLocal('ru')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-ru"></i>
-                <span class="title-lang">Russian</span>
-              </a>
-
-              <a @click="SetLocal('vn')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-vn"></i>
-                <span class="title-lang">Vietnamese</span>
-              </a>
-              <a @click="SetLocal('kr')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-kr"></i>
-                <span class="title-lang">Korean</span>
-              </a>
-           
-              <a @click="SetLocal('ba')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-bd"></i>
-                <span class="title-lang">Bangla</span>
-              </a>
-
-              <a @click="SetLocal('br')">
-                <i title="pt" class="flag-icon flag-icon-squared flag-icon-pt"></i>
-                <span class="title-lang">Portuguese</span>
-              </a>
-
-               <a @click="SetLocal('da')">
-                <i title="sa" class="flag-icon flag-icon-squared flag-icon-dk"></i>
-                <span class="title-lang">Danish</span>
-              </a>
-            
             </div>
           </div>
+
         </div>
       </vue-perfect-scrollbar>
     </div>
@@ -163,7 +86,7 @@ export default {
         "br",
         "da",
       ],
-      
+      locales: {}
     };
   },
 
@@ -184,8 +107,19 @@ export default {
       this.$store.dispatch("language/setLanguage", locale);
       Fire.$emit("ChangeLanguage");
     },
-   
+
+    indexLocales() {
+      axios.get('settings/locales').then(response => {
+        this.locales = response.data.locales;
+      });
+    }
   },
+
+  created: function () {
+    axios.get('settings/locales').then(response => {
+      this.locales = response.data.locales;
+    });
+  }
 };
 </script>
 

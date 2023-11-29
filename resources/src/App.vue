@@ -17,7 +17,7 @@ export default {
     };
   },
   computed: {
-    
+
     ...mapGetters(["getThemeMode","isAuthenticated"]),
     themeName() {
       return this.getThemeMode.dark ? "dark-theme" : " ";
@@ -39,14 +39,14 @@ export default {
       htmlAttrs: {
         dir: this.rtl
       },
-      
+
     };
   },
 methods:{
     ...mapActions([
       "refreshUserPermissions",
     ]),
-    
+
 },
 
  beforeMount() {

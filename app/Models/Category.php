@@ -6,6 +6,7 @@ use App\Models\Concerns\Translatable;
 use App\Models\Translations\CategoryTranslation;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends Model implements TranslatableContract
@@ -22,8 +23,8 @@ class Category extends Model implements TranslatableContract
 
     public $translationModel = CategoryTranslation::class;
 
-    public function insertWithTranslations()
+    public function translations(): HasMany
     {
-
+        return $this->hasMany(CategoryTranslation::class);
     }
 }
