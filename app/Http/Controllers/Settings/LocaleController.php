@@ -32,9 +32,9 @@ class LocaleController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'locale.name' => ['required', 'string', 'max:50'],
-            'locale.abbreviation' => ['required', 'string', 'max:20'],
-            'locale.flag' => ['required', 'max:5']
+            'name' => ['required', 'string', 'max:50'],
+            'abbreviation' => ['required', 'string', 'max:20'],
+            'flag' => ['required', 'max:5']
         ]);
 
         Locale::query()->create($validated + ['status' => true]);
@@ -80,8 +80,9 @@ class LocaleController extends Controller
      */
     public function destroy($ids)
     {
-        // Locale::destroy();
+        $ids = explode(',', $ids);
+        Locale::destroy($ids);
 
-        // return response()->json(status: Response::HTTP_NO_CONTENT);
+        return response()->json(status: Response::HTTP_NO_CONTENT);
     }
 }

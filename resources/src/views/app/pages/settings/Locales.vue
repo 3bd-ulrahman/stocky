@@ -362,7 +362,7 @@ export default {
     storeLocale() {
       this.SubmitProcessing = true;
       axios.post("settings/locales", {
-        locale: this.locale
+        ...this.locale
       }).then(response => {
         this.SubmitProcessing = false;
         Fire.$emit("Event_Category");
@@ -456,7 +456,7 @@ export default {
           // Start the progress bar.
           NProgress.start();
           NProgress.set(0.1);
-          axios.delete("settings/locales", {
+          axios.delete(`settings/locales/${this.selectedIds}`, {
             selectedIds: this.selectedIds
           }).then(() => {
             this.$swal(
