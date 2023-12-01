@@ -3,6 +3,7 @@
 namespace App\Models\Concerns;
 
 use Astrotomic\Translatable\Translatable as BaseTranslatable;
+use Illuminate\Support\Facades\DB;
 
 trait Translatable
 {
@@ -20,7 +21,8 @@ trait Translatable
         foreach ($this->translations as $translation) {
             array_push($translations, $translation->attributes + [$this->getTranslationRelationKey() => $this->getKey()]);
         }
-        $translation->setConnection($this->getConnectionName())->insert($translations);
+
+        $translation->setConnection($this->getConnectionName())->upsert($translations, 'id');
 
         return $saved;
     }

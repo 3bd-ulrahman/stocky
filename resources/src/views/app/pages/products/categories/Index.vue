@@ -28,7 +28,8 @@
           nextLabel: 'next',
           prevLabel: 'prev',
         }"
-        styleClass="table-hover tableOne vgt-table">
+        styleClass="table-hover tableOne vgt-table"
+      >
         <div slot="selected-row-actions">
           <button class="btn btn-danger btn-sm" @click="delete_by_selected()">{{ $t('Del') }}</button>
         </div>
@@ -36,7 +37,8 @@
           <b-button
             @click="New_category()"
             class="btn-rounded"
-            variant="btn btn-primary btn-icon m-1">
+            variant="btn btn-primary btn-icon m-1"
+          >
             <i class="i-Add"></i>
             {{ $t('Add') }}
           </b-button>
@@ -81,11 +83,11 @@
               </validation-provider>
             </b-col>
 
-            <!-- Name category -->
-            <b-col md="12" v-for="locale in locales" :key="locale">
+            <!-- Name category (create) -->
+            <b-col md="12" v-if="!editmode" v-for="locale in locales" :key="locale">
               <validation-provider
                 :name="`name${locale.abbreviation}`"
-                :rules="{ required: locale.abbreviation === 'en' ? true : false }"
+                :rules="{ required: locale.abbreviation === defaultLocale ? true : false }"
                 v-slot="validationContext"
               >
                 <b-form-group :label="`${$t('Namecategorie')} ${(locale.abbreviation)}`">
@@ -104,9 +106,33 @@
               </validation-provider>
             </b-col>
 
+            <!-- Name category (update) -->
+            <b-col md="12" v-if="editmode" v-for="(translation, index) in category.translations" :key="locale">
+              <validation-provider
+                :name="`name${translation.locale}`"
+                :rules="{ required: translation.locale === defaultLocale ? true : false }"
+                v-slot="validationContext"
+              >
+                <b-form-group :label="`${$t('Namecategorie')} ${(translation.locale)}`">
+                  <b-form-input
+                    :placeholder="$t('Enter_name_category')"
+                    :state="getValidationState(validationContext)"
+                    aria-describedby="Name-feedback"
+                    label="Name"
+
+                    v-model="category.translations[index].name"
+                  />
+                  <b-form-invalid-feedback id="Name-feedback">
+                    {{ validationContext.errors[0] }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </validation-provider>
+            </b-col>
+
             <b-col md="12" class="mt-3">
-              <b-button variant="primary" type="submit" :disabled="SubmitProcessing"><i
-                  class="i-Yes me-2 font-weight-bold"></i> {{ $t('submit') }}</b-button>
+              <b-button variant="primary" type="submit" :disabled="SubmitProcessing">
+                <i class="i-Yes me-2 font-weight-bold"></i> {{ $t('submit') }}
+              </b-button>
               <div v-once class="typo__p" v-if="SubmitProcessing">
                 <div class="spinner sm spinner-primary mt-3"></div>
               </div>
@@ -300,7 +326,6 @@ export default {
         this.totalRows = response.data.totalRows;
         this.defaultLocale = response.data.defaultLocale;
         this.locales = response.data.locales;
-        console.log(response.data.locales);
 
         // Complete the animation of theprogress bar.
         NProgress.done();
@@ -338,24 +363,20 @@ export default {
     //---------------------------------- Update Category ----------------\\
     Update_Category() {
       this.SubmitProcessing = true;
-      axios
-        .put("categories/" + this.category.id, {
-          name: this.category.name,
-          code: this.category.code
-        })
-        .then(response => {
-          this.SubmitProcessing = false;
-          Fire.$emit("Event_Category");
-          this.makeToast(
-            "success",
-            this.$t("Update.TitleCat"),
-            this.$t("Success")
-          );
-        })
-        .catch(error => {
-          this.SubmitProcessing = false;
-          this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-        });
+      axios.put("categories/" + this.category.id, {
+        category: this.category
+      }).then(response => {
+        this.SubmitProcessing = false;
+        Fire.$emit("Event_Category");
+        this.makeToast(
+          "success",
+          this.$t("Update.TitleCat"),
+          this.$t("Success")
+        );
+      }).catch(error => {
+        this.SubmitProcessing = false;
+        this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+      });
     },
 
     //--------------------------- reset Form ----------------\\

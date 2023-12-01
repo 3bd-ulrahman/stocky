@@ -30,9 +30,23 @@
         }"
         styleClass="table-hover tableOne vgt-table"
       >
+        <div slot="selected-row-actions">
+          <button class="btn btn-danger btn-sm" @click="delete_by_selected()">{{ $t('Del') }}</button>
+        </div>
+        <div slot="table-actions" class="mt-2 mb-3">
+          <b-button
+            @click="createLocale()"
+            class="btn-rounded"
+            variant="btn btn-primary btn-icon m-1"
+          >
+            <i class="i-Add"></i>
+            {{ $t('Add') }}
+          </b-button>
+        </div>
+
         <template slot="table-row" slot-scope="props">
           <span v-if="props.column.field == 'actions'">
-            <a @click="Edit_category(props.row)" title="Edit" v-b-tooltip.hover>
+            <a @click="editLocale(props.row)" title="Edit" v-b-tooltip.hover>
               <i class="i-Edit text-25 text-success"></i>
             </a>
             <a title="Delete" v-b-tooltip.hover @click="deleteLocale(props.row.id)">
@@ -297,15 +311,15 @@ export default {
       });
     },
 
-    //------------------------------ Modal  (create category) -------------------------------\\
+    //------------------------------ Modal  (create locale) -------------------------------\\
     createLocale() {
       this.resetForm();
       this.editmode = false;
       this.$bvModal.show("createLocale");
     },
 
-    //------------------------------ Modal (Update category) -------------------------------\\
-    Edit_category(locale) {
+    //------------------------------ Modal (Update locale) -------------------------------\\
+    editLocale(locale) {
       this.indexLocales(this.serverParams.page);
       this.resetForm();
       this.locale = locale;
@@ -313,7 +327,7 @@ export default {
       this.$bvModal.show("createLocale");
     },
 
-    //--------------------------Get ALL Categories & Sub category ---------------------------\\
+    //--------------------------Get ALL Locales & Sub locale ---------------------------\\
 
     indexLocales(page) {
       // Start the progress bar.
@@ -344,12 +358,11 @@ export default {
       });
     },
 
-    //----------------------------------Create new Category ----------------\\
+    //----------------------------------Create new Locales ----------------\\
     storeLocale() {
       this.SubmitProcessing = true;
       axios.post("settings/locales", {
-        name: this.locale.name,
-        abbreviation: this.locale.abbreviation
+        locale: this.locale
       }).then(response => {
         this.SubmitProcessing = false;
         Fire.$emit("Event_Category");
@@ -443,28 +456,25 @@ export default {
           // Start the progress bar.
           NProgress.start();
           NProgress.set(0.1);
-          axios
-            .post("categories/delete/by_selection", {
-              selectedIds: this.selectedIds
-            })
-            .then(() => {
-              this.$swal(
-                this.$t("Delete.Deleted"),
-                this.$t("Delete.CatDeleted"),
-                "success"
-              );
+          axios.delete("settings/locales", {
+            selectedIds: this.selectedIds
+          }).then(() => {
+            this.$swal(
+              this.$t("Delete.Deleted"),
+              this.$t("Delete.CatDeleted"),
+              "success"
+            );
 
-              Fire.$emit("deleteLocale");
-            })
-            .catch(() => {
-              // Complete the animation of theprogress bar.
-              setTimeout(() => NProgress.done(), 500);
-              this.$swal(
-                this.$t("Delete.Failed"),
-                this.$t("Delete.Therewassomethingwronge"),
-                "warning"
-              );
-            });
+            Fire.$emit("deleteLocale");
+          }).catch(() => {
+            // Complete the animation of theprogress bar.
+            setTimeout(() => NProgress.done(), 500);
+            this.$swal(
+              this.$t("Delete.Failed"),
+              this.$t("Delete.Therewassomethingwronge"),
+              "warning"
+            );
+          });
         }
       });
     }

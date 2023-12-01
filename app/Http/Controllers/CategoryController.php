@@ -61,14 +61,6 @@ class CategoryController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'create', Category::class);
 
-        $array = [
-            [
-                'en' => [
-                    'name' => 'Abdulrahman'
-                ]
-            ]
-        ];
-
         $defaultLocale = config('translatable.defaults');
         $request->validate([
             'code' => 'required',
@@ -99,17 +91,24 @@ class CategoryController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'update', Category::class);
 
+
+        $defaultLocale = Setting::query()->first()->default_language;
         request()->validate([
-            'name' => 'required',
-            'code' => 'required',
+            'category.code' => ['required'],
+            'category.translations.*.name' => ["required_if:category.translations.*.locale,$defaultLocale"],
         ]);
 
-        Category::whereId($id)->update([
-            'code' => $request['code'],
-            'name' => $request['name'],
-        ]);
+        $transformedTranslations = [];
+        foreach ($request->category['translations'] as $translation) {
+            $locale = $translation['locale'];
+            $name = $translation['name'];
+            $transformedTranslations[$locale] = ['name' => $name];
+        }
+
+        $category = Category::query()->findOrFail($id);
+        $category->update($transformedTranslations);
+
         return response()->json(['success' => true]);
-
     }
 
     //-------------- Remove Category ---------------\\
