@@ -16,7 +16,7 @@
         placeholder: $t('Search_this_table'),
         enabled: true,
       }"
-        :select-options="{ 
+        :select-options="{
           enabled: true ,
           clearSelectionText: '',
         }"
@@ -86,7 +86,7 @@
                   </b-dropdown-item>
                 </b-navbar-nav>
 
-                 <b-dropdown-item 
+                 <b-dropdown-item
                   title="Edit"
                   v-if="currentUserPermissions.includes('Sales_edit') && props.row.sale_has_return == 'no'"
                   :to="'/app/sales/edit/'+props.row.id"
@@ -222,7 +222,7 @@
                 <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
               </router-link> <br>
               <small v-if="props.row.sale_has_return == 'yes'"><i class="text-15 text-danger i-Back"></i></small>
-              
+
             </div>
         </template>
       </vue-good-table>
@@ -277,12 +277,11 @@
                 v-model="Filter_status"
                 :reduce="label => label.value"
                 :placeholder="$t('Choose_Status')"
-                :options="
-                      [
-                        {label: 'completed', value: 'completed'},
-                        {label: 'Pending', value: 'pending'},
-                        {label: 'Ordered', value: 'ordered'},
-                      ]"
+                :options="[
+                  {label: 'completed', value: 'completed'},
+                  {label: 'Pending', value: 'pending'},
+                  {label: 'Ordered', value: 'ordered'},
+                ]"
               ></v-select>
             </b-form-group>
           </b-col>
@@ -294,32 +293,42 @@
                 v-model="Filter_Payment"
                 :reduce="label => label.value"
                 :placeholder="$t('Choose_Status')"
-                :options="
-                      [
-                        {label: 'Paid', value: 'paid'},
-                        {label: 'partial', value: 'partial'},
-                        {label: 'UnPaid', value: 'unpaid'},
-                      ]"
+                :options="[
+                  {label: 'Paid', value: 'paid'},
+                  {label: 'partial', value: 'partial'},
+                  {label: 'UnPaid', value: 'unpaid'},
+                ]"
               ></v-select>
             </b-form-group>
           </b-col>
 
-           <!-- Shipping Status  -->
+          <!-- Shipping Status  -->
           <b-col md="12">
             <b-form-group :label="$t('Shipping_status')">
               <v-select
                 v-model="Filter_shipping"
                 :reduce="label => label.value"
                 :placeholder="$t('Choose_Status')"
-                :options="
-                      [
-                        {label: 'Ordered', value: 'ordered'},
-                        {label: 'Packed', value: 'packed'},
-                        {label: 'Shipped', value: 'shipped'},
-                        {label: 'Delivered', value: 'delivered'},
-                        {label: 'Cancelled', value: 'cancelled'},
-                      ]"
+                :options="[
+                  {label: 'Ordered', value: 'ordered'},
+                  {label: 'Packed', value: 'packed'},
+                  {label: 'Shipped', value: 'shipped'},
+                  {label: 'Delivered', value: 'delivered'},
+                  {label: 'Cancelled', value: 'cancelled'},
+                ]"
               ></v-select>
+            </b-form-group>
+          </b-col>
+
+          <!-- representative -->
+          <b-col md="12">
+            <b-form-group :label="$t('Representative')">
+              <v-select
+                v-model="representative"
+                :reduce="label => label.value"
+                :placeholder="$t('Choose_Status')"
+                :options="representatives.map(representative => ({label: representative.username, value: representative.id}))"
+              />
             </b-form-group>
           </b-col>
 
@@ -541,7 +550,7 @@
               >{{parseFloat(payment.received_amount - payment.montant).toFixed(2)}}</p>
             </b-col>
 
-           
+
 
           <b-col md="12">
               <b-card v-show="payment.Reglement == 'credit card' && !EditPaiementMode">
@@ -577,11 +586,11 @@
                         <td>
                             <b-button variant="outline-primary" @click="selectCard(card)" v-if="!isSelectedCard(card) && card_id != card.card_id">
                               <span>
-                                <i class="i-Drag-Up"></i> 
+                                <i class="i-Drag-Up"></i>
                                 Use This
                               </span>
                             </b-button>
-                              <i v-if="isSelectedCard(card) || card_id == card.card_id" class="i-Yes" style=" font-size: 20px; "></i> 
+                              <i v-if="isSelectedCard(card) || card_id == card.card_id" class="i-Yes" style=" font-size: 20px; "></i>
                         </td>
                       </tr>
                     </tbody>
@@ -633,6 +642,7 @@
       <b-modal hide-footer size="md" id="modal_shipment" :title="$t('Edit')">
         <b-form @submit.prevent="Submit_Shipment">
           <b-row>
+
             <!-- Status  -->
             <b-col md="12">
               <validation-provider name="Status" :rules="{ required: true}">
@@ -643,15 +653,32 @@
                     v-model="shipment.status"
                     :reduce="label => label.value"
                     :placeholder="$t('Choose_Status')"
-                    :options="
-                                [
-                                  {label: 'Ordered', value: 'ordered'},
-                                  {label: 'Packed', value: 'packed'},
-                                  {label: 'Shipped', value: 'shipped'},
-                                  {label: 'Delivered', value: 'delivered'},
-                                  {label: 'Cancelled', value: 'cancelled'},
-                                ]"
+                    :options="[
+                      {label: 'Ordered', value: 'ordered'},
+                      {label: 'Packed', value: 'packed'},
+                      {label: 'Shipped', value: 'shipped'},
+                      {label: 'Delivered', value: 'delivered'},
+                      {label: 'Cancelled', value: 'cancelled'},
+                    ]"
                   ></v-select>
+                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                </b-form-group>
+              </validation-provider>
+            </b-col>
+
+            <!-- representative -->
+            <b-col md="12">
+              <validation-provider name="representative" :rules="{ required: true}">
+                <b-form-group slot-scope="{ valid, errors }" :label="`${$t('representative')} *`">
+                  <v-select
+                    :class="{'is-invalid': !!errors.length}"
+                    :state="errors[0] ? false : (valid ? true : null)"
+                    :value="shipment.representative?.id"
+                    @input="shipment.representative = {id: $event}"
+                    :reduce="label => label.value"
+                    :placeholder="$t('Choose_Status')"
+                    :options="representatives.map(representative => ({label: representative.username, value: representative.id}))"
+                  />
                   <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
                 </b-form-group>
               </validation-provider>
@@ -877,6 +904,7 @@ export default {
       barcodeFormat: "CODE128",
       showDropdown: false,
       EditPaiementMode: false,
+      filter: {},
       Filter_Client: "",
       Filter_Ref: "",
       Filter_date: "",
@@ -931,7 +959,9 @@ export default {
         message: "",
         client_name: "",
         Ref: ""
-      }
+      },
+      representatives: [],
+      representative: ''
     };
   },
    mounted() {
@@ -1051,6 +1081,9 @@ export default {
     }
   },
   methods: {
+    test() {
+      alert('asdasda');
+    },
 
      async Selected_PaymentMethod(value) {
       if (value === 'credit card') {
@@ -1082,7 +1115,7 @@ export default {
                 this.submit_showing_credit_card = false;
             });
 
-         
+
         }else{
           this.hasSavedPaymentMethod = false;
           this.useSavedPaymentMethod = false;
@@ -1139,7 +1172,7 @@ export default {
       a.document.write(divContents);
       a.document.write("</body></html>");
       a.document.close();
-      
+
       setTimeout(() => {
          a.print();
       }, 1000);
@@ -1197,7 +1230,7 @@ export default {
       this.Get_Sales(this.serverParams.page);
     },
 
-    
+
     onSearch(value) {
       this.search = value.searchTerm;
       this.Get_Sales(this.serverParams.page);
@@ -1215,7 +1248,7 @@ export default {
           this.$t("Warning")
         );
         this.payment.montant = 0;
-      } 
+      }
       else if (this.payment.montant > this.due) {
         this.makeToast(
           "warning",
@@ -1231,7 +1264,7 @@ export default {
     Verified_Received_Amount() {
       if (isNaN(this.payment.received_amount)) {
         this.payment.received_amount = 0;
-      } 
+      }
     },
 
 
@@ -1387,7 +1420,7 @@ export default {
       // Start the progress bar.
       NProgress.start();
       NProgress.set(0.1);
-     
+
       axios
         .get("payment_sale_pdf/" + id, {
           responseType: "blob", // important
@@ -1431,50 +1464,40 @@ export default {
       NProgress.start();
       NProgress.set(0.1);
       this.setToStrings();
-      axios
-        .get(
-          "sales?page=" +
-            page +
-            "&Ref=" +
-            this.Filter_Ref +
-            "&date=" +
-            this.Filter_date +
-            "&client_id=" +
-            this.Filter_Client +
-            "&statut=" +
-            this.Filter_status +
-            "&warehouse_id=" +
-            this.Filter_warehouse +
-            "&payment_statut=" +
-            this.Filter_Payment +
-            "&shipping_status=" +
-            this.Filter_shipping +
-            "&SortField=" +
-            this.serverParams.sort.field +
-            "&SortType=" +
-            this.serverParams.sort.type +
-            "&search=" +
-            this.search +
-            "&limit=" +
-            this.limit
-        )
-        .then(response => {
-          this.sales = response.data.sales;
-          this.customers = response.data.customers;
-          this.warehouses = response.data.warehouses;
-          this.totalRows = response.data.totalRows;
-          this.stripe_key = response.data.stripe_key;
-          // Complete the animation of theprogress bar.
-          NProgress.done();
+      axios.get('sales', {
+        params: {
+          page: page,
+          Ref: this.Filter_Ref,
+          date: this.Filter_date,
+          client_id: this.Filter_Client,
+          statut: this.Filter_status,
+          warehouse_id: this.Filter_warehouse,
+          payment_statut: this.Filter_Payment,
+          shipping_status: this.Filter_shipping,
+          SortField: this.serverParams.sort.field,
+          SortType: this.serverParams.sort.type,
+          search: this.search,
+          limit: this.limit,
+          representative: this.representative
+        }
+      }).then(response => {
+        this.sales = response.data.sales;
+        this.customers = response.data.customers;
+        this.warehouses = response.data.warehouses;
+        this.totalRows = response.data.totalRows;
+        this.stripe_key = response.data.stripe_key;
+        this.representatives = response.data.representatives;
+        // Complete the animation of theprogress bar.
+        NProgress.done();
+        this.isLoading = false;
+      })
+      .catch(response => {
+        // Complete the animation of theprogress bar.
+        NProgress.done();
+        setTimeout(() => {
           this.isLoading = false;
-        })
-        .catch(response => {
-          // Complete the animation of theprogress bar.
-          NProgress.done();
-          setTimeout(() => {
-            this.isLoading = false;
-          }, 500);
-        });
+        }, 500);
+      });
     },
 
     //---------SMS notification
@@ -1510,7 +1533,7 @@ export default {
       axios
         .post("payment_sale_send_email", {
           id: id,
-         
+
         })
         .then(response => {
           // Complete the animation of the  progress bar.
@@ -1637,7 +1660,7 @@ export default {
         NProgress.done();
         this.$bvModal.show("Add_Payment");
       }, 1000);
-     
+
     },
     //-------------------------------Show All Payment with Sale ---------------------\\
     Show_Payments(id, sale) {
@@ -1741,7 +1764,7 @@ export default {
       this.paymentProcessing = true;
       NProgress.start();
       NProgress.set(0.1);
-      
+
         axios
           .put("payment_sale/" + this.payment.id, {
             sale_id: this.sale.id,
@@ -1840,21 +1863,15 @@ export default {
      //---------------------- Get_Data_Create  ------------------------------\\
 
       Get_shipment_by_sale(sale_id) {
-        axios
-            .get("/shipments/" + sale_id)
-            .then(response => {
-                this.shipment   = response.data.shipment;
+        axios.get(`/shipments/${sale_id}`).then(response => {
+          this.shipment = response.data.shipment;
 
-                 setTimeout(() => {
-                    NProgress.done();
-                    this.$bvModal.show("modal_shipment");
-                }, 1000);
-            })
-            .catch(error => {
-              NProgress.done();
-                
-            });
-    },
+          setTimeout(() => {
+            NProgress.done();
+            this.$bvModal.show("modal_shipment");
+          }, 1000);
+        }).catch(error => { NProgress.done() });
+      },
 
       //------------- Submit Validation Edit shipment
       Submit_Shipment() {
@@ -1875,16 +1892,9 @@ export default {
     Update_Shipment() {
       var self = this;
       self.Submit_Processing_shipment = true;
-      axios
-        .post("shipments", {
-          Ref: self.shipment.Ref,
-          sale_id: self.shipment.sale_id,
-          shipping_address: self.shipment.shipping_address,
-          delivered_to: self.shipment.delivered_to,
-          shipping_details: self.shipment.shipping_details,
-          status: self.shipment.status
-        })
-        .then(response => {
+      axios.post("shipments", {
+          ...this.shipment
+        }).then(response => {
           this.makeToast(
             "success",
             this.$t("Updated_in_successfully"),
@@ -1892,8 +1902,7 @@ export default {
           );
           Fire.$emit("event_update_shipment");
           self.Submit_Processing_shipment = false;
-        })
-        .catch(error => {
+        }).catch(error => {
           this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
           self.Submit_Processing_shipment = false;
         });

@@ -10,7 +10,7 @@
             <b-card>
               <b-row>
                 <!-- date  -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="3" md="6" sm="12" class="mb-3">
                   <validation-provider
                     name="date"
                     :rules="{ required: true}"
@@ -32,7 +32,7 @@
 
 
                 <!-- Customer -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="3" md="6" sm="12" class="mb-3">
                   <validation-provider name="Customer" :rules="{ required: true}">
                     <b-form-group slot-scope="{ valid, errors }" :label="$t('Customer') + ' ' + '*'">
                       <v-select
@@ -50,7 +50,7 @@
                 </b-col>
 
                 <!-- warehouse -->
-                <b-col lg="4" md="4" sm="12" class="mb-3">
+                <b-col lg="3" md="6" sm="12" class="mb-3">
                   <validation-provider name="warehouse" :rules="{ required: true}">
                     <b-form-group slot-scope="{ valid, errors }" :label="$t('warehouse') + ' ' + '*'">
                       <v-select
@@ -68,14 +68,32 @@
                   </validation-provider>
                 </b-col>
 
+                <!-- representative -->
+                <b-col lg="3" md="6" sm="12" class="mb-3">
+                  <validation-provider name="representative" :rules="{ required: true}">
+                    <b-form-group slot-scope="{ valid, errors }" :label="$t('representative') + ' ' + '*'">
+                      <v-select
+                        :class="{'is-invalid': !!errors.length}"
+                        :state="errors[0] ? false : (valid ? true : null)"
+                        :disabled="details.length > 0"
+                        v-model="representative_id"
+                        :reduce="label => label.value"
+                        :placeholder="$t('choose_representitve')"
+                        :options="representatives.map(representative => ({label: representative.username, value: representative.id}))"
+                      />
+                      <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                    </b-form-group>
+                  </validation-provider>
+                </b-col>
+
                 <!-- Product -->
                 <b-col md="12" class="mb-5">
                   <h6>{{$t('ProductName')}}</h6>
-                 
+
                   <div id="autocomplete" class="autocomplete">
-                    <input 
+                    <input
                      :placeholder="$t('Scan_Search_Product_by_Code_Name')"
-                      @input='e => search_input = e.target.value' 
+                      @input='e => search_input = e.target.value'
                       @keyup="search(search_input)"
                       @focus="handleFocus"
                       @blur="handleBlur"
@@ -117,7 +135,7 @@
                             <span>{{detail.code}}</span>
                             <br>
                             <span class="badge badge-success">{{detail.name}}</span>
-                           
+
                           </td>
                           <td>{{currentUser.currency}} {{formatNumber(detail.Net_price, 3)}}</td>
                           <td>
@@ -427,11 +445,11 @@
                                 <td>
                                    <b-button variant="outline-primary" @click="selectCard(card)" v-if="!isSelectedCard(card) && card_id != card.card_id">
                                       <span>
-                                        <i class="i-Drag-Up"></i> 
+                                        <i class="i-Drag-Up"></i>
                                         Use This
                                       </span>
                                     </b-button>
-                                     <i v-if="isSelectedCard(card) || card_id == card.card_id" class="i-Yes" style=" font-size: 20px; "></i> 
+                                     <i v-if="isSelectedCard(card) || card_id == card.card_id" class="i-Yes" style=" font-size: 20px; "></i>
                                 </td>
                               </tr>
                             </tbody>
@@ -648,11 +666,18 @@ export default {
   },
   data() {
     return {
+      //Api
+      clients: [],
+      warehouses: [],
+      representatives: [],
+      stripe_key:'',
+
+      representative_id: '',
+
       focused: false,
       timer:null,
       search_input:'',
       product_filter:[],
-      stripe_key:'',
       stripe: {},
       cardElement: {},
 
@@ -667,8 +692,6 @@ export default {
       paymentProcessing: false,
       Submit_Processing_detail:false,
       isLoading: true,
-      warehouses: [],
-      clients: [],
       client: {},
       products: [],
       details: [],
@@ -751,7 +774,7 @@ export default {
 
   },
 
- 
+
 
   methods: {
 
@@ -788,9 +811,9 @@ export default {
       this.card_id='';
       this.is_new_credit_card= false;
       this.submit_showing_credit_card= false;
-      
+
     },
-    
+
 
      //---------------------- Event Select Payment Method ------------------------------\\
 
@@ -824,7 +847,7 @@ export default {
                 this.submit_showing_credit_card = false;
             });
 
-         
+
         }else{
           this.hasSavedPaymentMethod = false;
           this.useSavedPaymentMethod = false;
@@ -884,7 +907,7 @@ export default {
             this.$t("Warning")
           );
           this.payment.amount = 0;
-      } 
+      }
       else if (this.payment.amount > this.GrandTotal) {
         this.makeToast(
           "warning",
@@ -900,11 +923,11 @@ export default {
     Verified_Received_Amount() {
       if (isNaN(this.payment.received_amount)) {
         this.payment.received_amount = 0;
-      } 
+      }
     },
 
 
-  
+
     //--- Submit Validate Create Sale
     Submit_Sale() {
       this.$refs.create_sale.validate().then(success => {
@@ -934,6 +957,7 @@ export default {
           }
       });
     },
+
     //---Submit Validation Update Detail
     submit_Update_Detail() {
       this.$refs.Update_Detail.validate().then(success => {
@@ -1022,7 +1046,7 @@ export default {
             } else {
               this.details[i].quantity =1;
             }
-                      
+
           this.details[i].Unit_price = this.detail.Unit_price;
           this.details[i].tax_percent = this.detail.tax_percent;
           this.details[i].tax_method = this.detail.tax_method;
@@ -1102,9 +1126,9 @@ export default {
             }else{
                 this.product_filter=  this.products.filter(product => {
                   return (
-                    product.name.toLowerCase().includes(this.search_input.toLowerCase()) ||
-                    product.code.toLowerCase().includes(this.search_input.toLowerCase()) ||
-                    product.barcode.toLowerCase().includes(this.search_input.toLowerCase())
+                      product.name.toLowerCase().includes(this.search_input.toLowerCase()) ||
+                      product.code.toLowerCase().includes(this.search_input.toLowerCase()) ||
+                      product.barcode.toLowerCase().includes(this.search_input.toLowerCase())
                     );
                 });
             }
@@ -1173,15 +1197,14 @@ export default {
       // Start the progress bar.
         NProgress.start();
         NProgress.set(0.1);
-      axios
-        .get("get_Products_by_warehouse/" + id + "?stock=" + 1 + "&is_sale=" + 1 + "&product_service=" + 1)
-         .then(response => {
-            this.products = response.data;
-             NProgress.done();
+      axios.get("get_Products_by_warehouse/" + id + "?stock=" + 1 + "&is_sale=" + 1 + "&product_service=" + 1)
+      .then(response => {
+        this.products = response.data;
+          NProgress.done();
 
-            })
-          .catch(error => {
-          });
+        })
+      .catch(error => {
+      });
     },
 
     //----------------------------------------- Add Product to order list -------------------------\\
@@ -1414,7 +1437,7 @@ export default {
             token: token.id,
             is_new_credit_card: this.is_new_credit_card,
             selectedCard: this.selectedCard,
-            card_id: this.card_id,
+            card_id: this.card_id
           })
           .then(response => {
             this.paymentProcessing = false;
@@ -1448,46 +1471,44 @@ export default {
           }
         }else{
           this.paymentProcessing = true;
-          axios
-            .post("sales", {
-              date: this.sale.date,
-              client_id: this.sale.client_id,
-              warehouse_id: this.sale.warehouse_id,
-              statut: this.sale.statut,
-              notes: this.sale.notes,
-              tax_rate: this.sale.tax_rate?this.sale.tax_rate:0,
-              TaxNet: this.sale.TaxNet?this.sale.TaxNet:0,
-              discount: this.sale.discount?this.sale.discount:0,
-              shipping: this.sale.shipping?this.sale.shipping:0,
-              GrandTotal: this.GrandTotal,
-              details: this.details,
-              payment: this.payment,
-              amount: parseFloat(this.payment.amount).toFixed(2),
-              received_amount: parseFloat(this.payment.received_amount).toFixed(2),
-              change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
-              is_new_credit_card: this.is_new_credit_card,
-              selectedCard: this.selectedCard,
-              card_id: this.card_id,
-            })
-            .then(response => {
-              this.makeToast(
-                "success",
-                this.$t("Create.TitleSale"),
-                this.$t("Success")
-              );
-              NProgress.done();
-              this.paymentProcessing = false;
-              this.$router.push({ name: "index_sales" });
-            })
-            .catch(error => {
-              NProgress.done();
-              this.paymentProcessing = false;
-              this.makeToast(
-                "danger",
-                this.$t("InvalidData"),
-                this.$t("Failed")
-              );
-            });
+          axios.post("sales", {
+            date: this.sale.date,
+            client_id: this.sale.client_id,
+            warehouse_id: this.sale.warehouse_id,
+            statut: this.sale.statut,
+            notes: this.sale.notes,
+            tax_rate: this.sale.tax_rate?this.sale.tax_rate:0,
+            TaxNet: this.sale.TaxNet?this.sale.TaxNet:0,
+            discount: this.sale.discount?this.sale.discount:0,
+            shipping: this.sale.shipping?this.sale.shipping:0,
+            GrandTotal: this.GrandTotal,
+            details: this.details,
+            payment: this.payment,
+            amount: parseFloat(this.payment.amount).toFixed(2),
+            received_amount: parseFloat(this.payment.received_amount).toFixed(2),
+            change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
+            is_new_credit_card: this.is_new_credit_card,
+            selectedCard: this.selectedCard,
+            card_id: this.card_id,
+            representative_id: this.representative_id
+          }).then(response => {
+            this.makeToast(
+              "success",
+              this.$t("Create.TitleSale"),
+              this.$t("Success")
+            );
+            NProgress.done();
+            this.paymentProcessing = false;
+            this.$router.push({ name: "index_sales" });
+          }).catch(error => {
+            NProgress.done();
+            this.paymentProcessing = false;
+            this.makeToast(
+              "danger",
+              this.$t("InvalidData"),
+              this.$t("Failed")
+            );
+          });
         }
       }
     },
@@ -1526,19 +1547,17 @@ export default {
 
     //---------------------------------------Get Elements ------------------------------\\
     GetElements() {
-      axios
-        .get("sales/create")
-        .then(response => {
-          this.clients = response.data.clients;
-          this.warehouses = response.data.warehouses;
-          this.stripe_key = response.data.stripe_key;
+      axios.get("sales/create").then(response => {
+        this.clients = response.data.clients;
+        this.warehouses = response.data.warehouses;
+        this.stripe_key = response.data.stripe_key;
+        this.representatives = response.data.representatives;
+        this.isLoading = false;
+      }).catch(response => {
+        setTimeout(() => {
           this.isLoading = false;
-        })
-        .catch(response => {
-          setTimeout(() => {
-            this.isLoading = false;
-          }, 500);
-        });
+        }, 500);
+      });
     }
   },
 

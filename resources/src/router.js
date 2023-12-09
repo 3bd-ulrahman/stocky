@@ -334,19 +334,13 @@ const routes = [
       //Sale
       {
         path: "/app/sales",
-        component: () =>
-          import(
-                        /* webpackChunkName: "sales" */ "./views/app/pages/sales"
-          ),
+        component: () => import("./views/app/pages/sales"),
         redirect: "/app/sales/list",
         children: [
           {
             name: "index_sales",
             path: "list",
-            component: () =>
-              import(
-                                /* webpackChunkName: "index_sales" */ "./views/app/pages/sales/index_sale"
-              )
+            component: () => import("./views/app/pages/sales/index_sale")
           },
           {
             name: "store_sale",
@@ -383,10 +377,7 @@ const routes = [
           {
             name: "shipment",
             path: "shipment",
-            component: () =>
-              import(
-                                /* webpackChunkName: "shipment" */ "./views/app/pages/sales/shipments"
-              )
+            component: () => import("./views/app/pages/sales/shipments")
           }
         ]
       },
@@ -659,10 +650,7 @@ const routes = [
           {
             name: "user",
             path: "Users",
-            component: () =>
-              import(
-                                /* webpackChunkName: "Users" */ "./views/app/pages/people/users"
-              )
+            component: () => import("./views/app/pages/people/users")
           }
         ]
       },
@@ -1062,10 +1050,7 @@ const routes = [
       {
         name: "profile",
         path: "/app/profile",
-        component: () =>
-          import(
-                        /* webpackChunkName: "profile" */ "./views/app/pages/profile"
-          )
+        component: () => import("./views/app/pages/profile")
       }
     ]
   },

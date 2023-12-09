@@ -10,14 +10,13 @@ use App\Models\product_warehouse;
 use App\Models\Warehouse;
 use App\Models\UserWarehouse;
 use App\Utils\Helpers;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
-use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\ImageManagerStatic as Image;
-use \Nwidart\Modules\Facades\Module;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends BaseController
 {
@@ -26,7 +25,6 @@ class UserController extends BaseController
 
     public function index(request $request)
     {
-
         $this->authorizeForUser($request->user('api'), 'view', User::class);
         // How many items do you want to display.
         $perPage = $request->limit;
@@ -71,8 +69,8 @@ class UserController extends BaseController
             ->orderBy($order, $dir)
             ->get();
 
-        $roles = Role::where('deleted_at', null)->get(['id', 'name']);
-        $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
+        $roles = Role::query()->get(['id', 'name']);
+        $warehouses = Warehouse::query()->get(['id', 'name']);
 
         return response()->json([
             'users' => $users,
@@ -131,12 +129,15 @@ class UserController extends BaseController
     public function store(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'create', User::class);
+
+        $request->merge(json_decode($request->payload, true));
         $this->validate($request, [
             'email' => 'required|unique:users',
         ], [
             'email.unique' => 'This Email already taken.',
         ]);
-        \DB::transaction(function () use ($request) {
+
+        DB::transaction(function () use ($request) {
             if ($request->hasFile('avatar')) {
 
                 $image = $request->file('avatar');
@@ -150,36 +151,34 @@ class UserController extends BaseController
                 $filename = 'no_avatar.png';
             }
 
-            if($request['is_all_warehouses'] == '1' || $request['is_all_warehouses'] == 'true'){
+            if($request->is_all_warehouses == '1' || $request->is_all_warehouses == 'true'){
                 $is_all_warehouses = 1;
             }else{
                 $is_all_warehouses = 0;
             }
 
-            $User = new User;
-            $User->firstname = $request['firstname'];
-            $User->lastname  = $request['lastname'];
-            $User->username  = $request['username'];
-            $User->email     = $request['email'];
-            $User->phone     = $request['phone'];
-            $User->password  = Hash::make($request['password']);
-            $User->avatar    = $filename;
-            $User->role_id   = $request['role'];
-            $User->is_all_warehouses   = $is_all_warehouses;
-            $User->save();
+            $user = User::create([
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
+                'username' => $request->username,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'password' => Hash::make($request->password),
+                'is_representative'  => (bool)$request->is_representative,
+                'avatar' => $filename,
+                'role_id' => $request->role,
+                'is_all_warehouses' => $is_all_warehouses
+            ]);
 
-            $role_user = new role_user;
-            $role_user->user_id = $User->id;
-            $role_user->role_id = $request['role'];
-            $role_user->save();
+            $user->roles()->sync($request->role);
 
-            if(!$User->is_all_warehouses){
-                $User->assignedWarehouses()->sync($request['assigned_to']);
+            if(!$user->is_all_warehouses){
+                $user->assignedWarehouses()->sync($request->assigned_to);
             }
 
         }, 10);
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true], Response::HTTP_CREATED);
     }
 
     //------------ function show -----------\\
@@ -194,7 +193,7 @@ class UserController extends BaseController
         $this->authorizeForUser($request->user('api'), 'update', User::class);
 
         $assigned_warehouses = UserWarehouse::where('user_id', $id)->pluck('warehouse_id')->toArray();
-        $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $assigned_warehouses)->pluck('id')->toArray();
+        $warehouses = Warehouse::query()->whereIn('id', $assigned_warehouses)->pluck('id')->toArray();
 
         return response()->json([
             'assigned_warehouses' => $warehouses,
@@ -207,27 +206,15 @@ class UserController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'update', User::class);
 
+        $request->merge(json_decode($request->payload, true));
         $this->validate($request, [
-            'email' => 'required|email|unique:users',
-            'email' => Rule::unique('users')->ignore($id),
+            'email' => ['required', 'email', Rule::unique('users')->ignore($id)]
         ], [
             'email.unique' => 'This Email already taken.',
         ]);
 
-        \DB::transaction(function () use ($id ,$request) {
+        DB::transaction(function () use ($id ,$request) {
             $user = User::findOrFail($id);
-            $current = $user->password;
-
-            if ($request->NewPassword != 'null') {
-                if ($request->NewPassword != $current) {
-                    $pass = Hash::make($request->NewPassword);
-                } else {
-                    $pass = $user->password;
-                }
-
-            } else {
-                $pass = $user->password;
-            }
 
             $currentAvatar = $user->avatar;
             if ($request->avatar != $currentAvatar) {
@@ -256,13 +243,14 @@ class UserController extends BaseController
                 $is_all_warehouses = 0;
             }
 
+            $password = $request->NewPassword === null ? $user->password : Hash::make($request->NewPassword);
             User::whereId($id)->update([
                 'firstname' => $request['firstname'],
                 'lastname' => $request['lastname'],
                 'username' => $request['username'],
                 'email' => $request['email'],
                 'phone' => $request['phone'],
-                'password' => $pass,
+                'password' => $password,
                 'avatar' => $filename,
                 'statut' => $request['statut'],
                 'is_all_warehouses' => $is_all_warehouses,
@@ -275,13 +263,12 @@ class UserController extends BaseController
                 'role_id' => $request['role'],
             ]);
 
-            $user_saved = User::where('deleted_at', '=', null)->findOrFail($id);
+            $user_saved = User::query()->findOrFail($id);
             $user_saved->assignedWarehouses()->sync($request['assigned_to']);
 
         }, 10);
 
         return response()->json(['success' => true]);
-
     }
 
 

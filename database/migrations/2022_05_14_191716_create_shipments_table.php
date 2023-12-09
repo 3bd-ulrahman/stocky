@@ -19,9 +19,9 @@ class CreateShipmentsTable extends Migration {
 			$table->engine = 'InnoDB';
 			$table->integer('id', true);
 			$table->integer('user_id')->index('shipment_user_id');
+			$table->integer('sale_id')->index('shipment_sale_id');
 			$table->timestamp('date')->default(DB::raw('CURRENT_TIMESTAMP'));
 			$table->string('Ref', 192);
-			$table->integer('sale_id')->index('shipment_sale_id');
 			$table->string('delivered_to', 192)->nullable();
 			$table->text('shipping_address')->nullable();
 			$table->string('status', 192);

@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Shipment;
 use App\Models\Sale;
+use App\Models\User;
 use App\Utils\Helpers;
 use Carbon\Carbon;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,9 +30,9 @@ class ShipmentController extends BaseController
         $helpers = new Helpers();
         $data = array();
 
-        $shipments = Shipment::with('sale','sale.client','sale.warehouse')
+        $shipments = Shipment::with('sale', 'sale.client', 'sale.warehouse', 'representative')
 
-        // Search With Multiple Param
+            // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
                     return $query->where('Ref', 'LIKE', "%{$request->search}%")
@@ -52,11 +53,10 @@ class ShipmentController extends BaseController
                                 $q->where('name', 'LIKE', "%{$request->search}%");
                             });
                         });
-
                 });
             });
         $totalRows = $shipments->count();
-        if($perPage == "-1"){
+        if ($perPage == "-1") {
             $perPage = $totalRows;
         }
         $shipments_data = $shipments->offset($offSet)
@@ -77,19 +77,19 @@ class ShipmentController extends BaseController
             $item['sale_id'] = $shipment['sale']['id'];
             $item['warehouse_name'] = $shipment['sale']['warehouse']->name;
             $item['customer_name'] = $shipment['sale']['client']->name;
+            $item['representative'] = $shipment['representative'];
 
             $data[] = $item;
         }
 
+        $representatives = User::query()->where('is_representative', true)->get();
+
         return response()->json([
             'shipments' => $data,
             'totalRows' => $totalRows,
+            'representatives' => $representatives
         ]);
     }
-
-
-
-    //----------- Store new Shipment -------\\
 
     public function store(Request $request)
     {
@@ -99,58 +99,41 @@ class ShipmentController extends BaseController
             'status' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request) {
-            $shipment = Shipment::firstOrNew([ 'Ref' => $request['Ref']]);
+        DB::transaction(function () use ($request) {
+            Shipment::query()->updateOrCreate(['id' => $request->id], [
+                'user_id' => Auth::user()->id,
+                'sale_id' => $request->sale_id,
+                'delivered_to' => $request->delivered_to,
+                'shipping_address' => $request->shipping_address,
+                'shipping_details' => $request->shipping_details,
+                'status' => $request->status,
+                'Ref' => $request->Ref
+            ]);
 
-            $shipment->user_id = Auth::user()->id;
-            $shipment->sale_id = $request['sale_id'];
-            $shipment->delivered_to = $request['delivered_to'];
-            $shipment->shipping_address = $request['shipping_address'];
-            $shipment->shipping_details = $request['shipping_details'];
-            $shipment->status = $request['status'];
-            $shipment->save();
-
-            $sale = Sale::findOrFail($request['sale_id']);
+            $sale = Sale::findOrFail($request->sale_id);
             $sale->update([
-                'shipping_status' => $request['status'],
+                'shipping_status' => $request->status,
+                'representative_id' => $request->representative['id']
             ]);
 
         }, 10);
 
         return response()->json(['success' => true]);
-
     }
 
-    public function show($id){
+    public function show($id)
+    {
+        $shipment = Shipment::query()->with('representative')->where('sale_id', $id)->firstOr(function () use ($id) {
+            $shipment = new Shipment;
+            $shipment->sale_id = $id;
+            $shipment->Ref = $this->getNumberOrder();
+            return $shipment;
+        });
 
-        $get_shipment = Shipment::where('sale_id', $id)->first();
-
-        if($get_shipment){
-
-            $shipment_data['Ref'] = $get_shipment->Ref;
-            $shipment_data['sale_id'] = $get_shipment->sale_id;
-            $shipment_data['delivered_to'] = $get_shipment->delivered_to;
-            $shipment_data['shipping_address'] = $get_shipment->shipping_address;
-            $shipment_data['status'] = $get_shipment->status;
-            $shipment_data['shipping_details'] = $get_shipment->shipping_details;
-
-        }else{
-
-            $shipment_data['Ref'] = $this->getNumberOrder();
-            $shipment_data['sale_id'] = $id;
-            $shipment_data['delivered_to'] = '';
-            $shipment_data['shipping_address'] = '';
-            $shipment_data['status'] = '';
-            $shipment_data['shipping_details'] = '';
-        }
         return response()->json([
-            'shipment' => $shipment_data,
-        ]);
-
+            'shipment' => $shipment,
+        ], );
     }
-
-
-    //----------- Update Shipment-------\\
 
     public function update(Request $request, $id)
     {
@@ -160,11 +143,11 @@ class ShipmentController extends BaseController
             'status' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request , $id) {
+        DB::transaction(function () use ($request, $id) {
 
             Shipment::whereId($id)->update($request->all());
 
-            $sale = Sale::findOrFail($request['sale_id']);
+            $sale = Sale::findOrFail($request->sale_id);
             $sale->update([
                 'shipping_status' => $request['status'],
             ]);
@@ -172,7 +155,6 @@ class ShipmentController extends BaseController
         }, 10);
 
         return response()->json(['success' => true]);
-
     }
 
     //----------- delete Shipment-------\\
@@ -181,7 +163,7 @@ class ShipmentController extends BaseController
     {
         $this->authorizeForUser($request->user('api'), 'delete', Shipment::class);
 
-        \DB::transaction(function () use ($request , $id) {
+        \DB::transaction(function () use ($request, $id) {
 
             $shipment = Shipment::find($id);
             $shipment->delete();
@@ -198,23 +180,23 @@ class ShipmentController extends BaseController
     }
 
 
-   //------------- Reference Number Order SALE -----------\\
+    //------------- Reference Number Order SALE -----------\\
 
-   public function getNumberOrder()
-   {
+    public function getNumberOrder()
+    {
 
-       $last = DB::table('shipments')->latest('id')->first();
+        $last = DB::table('shipments')->latest('id')->first();
 
-       if ($last) {
-           $item = $last->Ref;
-           $nwMsg = explode("_", $item);
-           $inMsg = $nwMsg[1] + 1;
-           $code = $nwMsg[0] . '_' . $inMsg;
-       } else {
-           $code = 'SM_1111';
-       }
-       return $code;
-   }
+        if ($last) {
+            $item = $last->Ref;
+            $nwMsg = explode("_", $item);
+            $inMsg = $nwMsg[1] + 1;
+            $code = $nwMsg[0] . '_' . $inMsg;
+        } else {
+            $code = 'SM_1111';
+        }
+        return $code;
+    }
 
 
 

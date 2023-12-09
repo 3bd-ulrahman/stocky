@@ -14,7 +14,7 @@
         @on-search="onSearch"
         :search-options="{
         enabled: true,
-        placeholder: $t('Search_this_table'),  
+        placeholder: $t('Search_this_table'),
       }"
         :pagination-options="{
         enabled: true,
@@ -222,7 +222,7 @@
             <b-col md="6" sm="12">
               <validation-provider
                 name="Email"
-                :rules="{ required: true}"
+                :rules="{ required: true, email: true}"
                 v-slot="validationContext"
               >
                 <b-form-group :label="$t('Email') + ' ' + '*'">
@@ -265,39 +265,6 @@
               </validation-provider>
             </b-col>
 
-            <!-- role -->
-            <b-col md="6" sm="12" class="mb-3">
-              <validation-provider name="role" :rules="{ required: true}">
-                <b-form-group slot-scope="{ valid, errors }" :label="$t('RoleName') + ' ' + '*'">
-                  <v-select
-                    :class="{'is-invalid': !!errors.length}"
-                    :state="errors[0] ? false : (valid ? true : null)"
-                    v-model="user.role_id"
-                    :reduce="label => label.value"
-                    :placeholder="$t('PleaseSelect')"
-                    :options="roles.map(roles => ({label: roles.name, value: roles.id}))"
-                  />
-                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
-                </b-form-group>
-              </validation-provider>
-            </b-col>
-
-            <!-- Avatar -->
-            <b-col md="6" sm="12" class="mb-3">
-              <validation-provider name="Avatar" ref="Avatar" rules="mimes:image/*|size:200">
-                <b-form-group slot-scope="{validate, valid, errors }" :label="$t('UserImage')">
-                  <input
-                    :state="errors[0] ? false : (valid ? true : null)"
-                    :class="{'is-invalid': !!errors.length}"
-                    @change="onFileSelected"
-                    label="Choose Avatar"
-                    type="file"
-                  >
-                  <b-form-invalid-feedback id="Avatar-feedback">{{ errors[0] }}</b-form-invalid-feedback>
-                </b-form-group>
-              </validation-provider>
-            </b-col>
-
             <!-- New Password -->
             <b-col md="6" v-if="editmode" class="mb-3">
               <validation-provider
@@ -320,6 +287,56 @@
               </validation-provider>
             </b-col>
 
+            <!-- role -->
+            <b-col md="6" sm="12" class="mb-3">
+              <validation-provider name="role" :rules="{ required: true}">
+                <b-form-group slot-scope="{ valid, errors }" :label="$t('RoleName') + ' ' + '*'">
+                  <v-select
+                    :class="{'is-invalid': !!errors.length}"
+                    :state="errors[0] ? false : (valid ? true : null)"
+                    v-model="user.role_id"
+                    :reduce="label => label.value"
+                    :placeholder="$t('PleaseSelect')"
+                    :options="roles.map(roles => ({label: roles.name, value: roles.id}))"
+                  />
+                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                </b-form-group>
+              </validation-provider>
+            </b-col>
+
+            <!-- representitve -->
+            <b-col md="6" sm="12" class="mb-3">
+              <validation-provider name="role" :rules="{ required: true}">
+                <b-form-group slot-scope="{ valid, errors }" :label="$t('Representitve') + ' ' + '*'">
+                  <b-form-checkbox
+                    id="checkbox-1"
+                    v-model="user.is_representative"
+                    value="1"
+                    unchecked-value="0"
+                  >
+                    representitve
+                  </b-form-checkbox>
+                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                </b-form-group>
+              </validation-provider>
+            </b-col>
+
+            <!-- Avatar -->
+            <b-col md="6" sm="12" class="mb-3">
+              <validation-provider name="Avatar" ref="Avatar" rules="mimes:image/*|size:200">
+                <b-form-group slot-scope="{validate, valid, errors }" :label="$t('UserImage')">
+                  <input
+                    :state="errors[0] ? false : (valid ? true : null)"
+                    :class="{'is-invalid': !!errors.length}"
+                    @change="onFileSelected"
+                    label="Choose Avatar"
+                    type="file"
+                  >
+                  <b-form-invalid-feedback id="Avatar-feedback">{{ errors[0] }}</b-form-invalid-feedback>
+                </b-form-group>
+              </validation-provider>
+            </b-col>
+
             <!-- assigned_warehouses -->
             <b-col md="4" sm="4">
               <h5>{{$t('Assigned_warehouses')}}</h5>
@@ -327,7 +344,7 @@
 
             <b-col md="8" sm="8">
               <label class="checkbox checkbox-primary mb-3"><input type="checkbox" v-model="user.is_all_warehouses"><h5>{{$t('All_Warehouses')}} <i v-b-tooltip.hover.bottom title="If 'All Warehouses' Selected , User Can access all data for the selected Warehouses" class="text-info font-weight-bold i-Speach-BubbleAsking"></i></h5><span class="checkmark"></span></label>
-               
+
                <b-form-group class="mt-2" :label="$t('Some_warehouses')">
                   <v-select
                     multiple
@@ -402,9 +419,10 @@ export default {
         statut: "",
         role_id: "",
         avatar: "",
+        is_representative: false,
         is_all_warehouses:1,
       },
-      assigned_warehouses:[],
+      assigned_warehouses:[]
     };
   },
 
@@ -676,6 +694,7 @@ export default {
 
     //------------------------------ Show Modal (Update User) -------------------------------\\
     Edit_User(user) {
+      console.log(user);
       this.Get_Users(this.serverParams.page);
       this.reset_Form();
       this.Get_Data_Edit(user.id);
@@ -687,16 +706,12 @@ export default {
 
     //---------------------- Get_Data_Edit  ------------------------------\\
       Get_Data_Edit(id) {
-        axios
-            .get("/users/"+id+"/edit")
-            .then(response => {
-                this.assigned_warehouses   = response.data.assigned_warehouses;
-            })
-            .catch(error => {
-            });
+        axios.get("/users/"+id+"/edit").then(response => {
+          this.assigned_warehouses   = response.data.assigned_warehouses;
+        }).catch(error => {});
     },
 
-        
+
     //------------------------------ Event Upload Avatar -------------------------------\\
     async onFileSelected(e) {
       const { valid } = await this.$refs.Avatar.validate(e);
@@ -710,91 +725,91 @@ export default {
 
     //------------------------ Create User ---------------------------\\
     Create_User() {
-      var self = this;
-      self.SubmitProcessing = true;
-      self.data.append("firstname", self.user.firstname);
-      self.data.append("lastname", self.user.lastname);
-      self.data.append("username", self.user.username);
-      self.data.append("email", self.user.email);
-      self.data.append("password", self.user.password);
-      self.data.append("phone", self.user.phone);
-      self.data.append("role", self.user.role_id);
-      self.data.append("is_all_warehouses", self.user.is_all_warehouses);
-      self.data.append("avatar", self.user.avatar);
+      this.SubmitProcessing = true;
+
+      let payload = JSON.stringify({
+        firstname: this.user.firstname,
+        lastname: this.user.lastname,
+        username: this.user.username,
+        email: this.user.email,
+        password: this.user.password,
+        is_representative: this.user.is_representative,
+        phone: this.user.phone,
+        role: this.user.role_id,
+        is_all_warehouses: this.user.is_all_warehouses
+      });
+
+      let formData = new FormData();
+      formData.append("avatar", this.user.avatar);
+      formData.append('payload', payload);
 
       // append array assigned_warehouses
-      if (self.assigned_warehouses.length) {
-        for (var i = 0; i < self.assigned_warehouses.length; i++) {
-          self.data.append("assigned_to[" + i + "]", self.assigned_warehouses[i]);
+      this.assigned_warehouses.length
+        ? this.assigned_warehouses.forEach((item) => formData.append("assigned_to[]", item))
+        : formData.append("assigned_to", []);
+
+      axios.post("users", formData).then(response => {
+        this.SubmitProcessing = false;
+        Fire.$emit("Event_User");
+
+        this.makeToast(
+          "success",
+          this.$t("Create.TitleUser"),
+          this.$t("Success")
+        );
+      })
+      .catch(error => {
+        this.SubmitProcessing = false;
+        if (error.errors.email.length > 0) {
+          this.email_exist = error.errors.email[0];
         }
-      }else{
-        self.data.append("assigned_to", []);
-      }
-
-      axios
-        .post("users", self.data)
-        .then(response => {
-          self.SubmitProcessing = false;
-          Fire.$emit("Event_User");
-
-          this.makeToast(
-            "success",
-            this.$t("Create.TitleUser"),
-            this.$t("Success")
-          );
-        })
-        .catch(error => {
-          self.SubmitProcessing = false;
-          if (error.errors.email.length > 0) {
-            self.email_exist = error.errors.email[0];
-          }
-          this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-        });
+        this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+      });
     },
 
     //----------------------- Update User ---------------------------\\
     Update_User() {
-      var self = this;
-      self.SubmitProcessing = true;
-      self.data.append("firstname", self.user.firstname);
-      self.data.append("lastname", self.user.lastname);
-      self.data.append("username", self.user.username);
-      self.data.append("email", self.user.email);
-      self.data.append("NewPassword", self.user.NewPassword);
-      self.data.append("phone", self.user.phone);
-      self.data.append("role", self.user.role_id);
-      self.data.append("statut", self.user.statut);
-      self.data.append("is_all_warehouses", self.user.is_all_warehouses);
-      self.data.append("avatar", self.user.avatar);
+      this.SubmitProcessing = true;
+
+      let payload = JSON.stringify({
+        firstname: this.user.firstname,
+        lastname: this.user.lastname,
+        username: this.user.username,
+        email: this.user.email,
+        NewPassword: this.user.NewPassword,
+        is_representative: this.user.is_representative,
+        phone: this.user.phone,
+        role: this.user.role_id,
+        statut: this.user.statut,
+        is_all_warehouses: this.user.is_all_warehouses
+      });
+
+      let formData = new FormData();
+      formData.append("_method", "put");
+      formData.append("avatar", this.user.avatar);
+      formData.append('payload', payload);
 
        // append array assigned_warehouses
-      if (self.assigned_warehouses.length) {
-        for (var i = 0; i < self.assigned_warehouses.length; i++) {
-          self.data.append("assigned_to[" + i + "]", self.assigned_warehouses[i]);
-        }
-      }else{
-        self.data.append("assigned_to", []);
-      }
-      self.data.append("_method", "put");
+      this.assigned_warehouses.length
+        ? this.assigned_warehouses.forEach((item) => formData.append("assigned_to[]", item))
+        : formData.append("assigned_to", []);
 
-      axios
-        .post("users/" + this.user.id, self.data)
-        .then(response => {
-          this.makeToast(
-            "success",
-            this.$t("Update.TitleUser"),
-            this.$t("Success")
-          );
-          Fire.$emit("Event_User");
-          self.SubmitProcessing = false;
-        })
-        .catch(error => {
-          if (error.errors.email.length > 0) {
-            self.email_exist = error.errors.email[0];
-          }
-          this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-          self.SubmitProcessing = false;
-        });
+
+      axios.post(`users/${this.user.id}`, formData).then(response => {
+        this.makeToast(
+          "success",
+          this.$t("Update.TitleUser"),
+          this.$t("Success")
+        );
+        Fire.$emit("Event_User");
+        this.SubmitProcessing = false;
+      }).catch(error => {
+        if (error.errors.email.length > 0) {
+          this.email_exist = error.errors.email[0];
+        }
+        this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+        this.SubmitProcessing = false;
+      });
     },
 
     //----------------------------- Reset Form ---------------------------\\
@@ -811,6 +826,7 @@ export default {
         statut: "",
         role_id: "",
         avatar: "",
+        is_representative: 0,
         is_all_warehouses:1,
       };
       this.data= new FormData();

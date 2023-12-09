@@ -17,7 +17,7 @@ class WarehouseSeeder extends Seeder
     {
         $warehouses = [];
 
-        for ($i=0; $i < 5; $i++) {
+        for ($i=0; $i < 10; $i++) {
             array_push($warehouses, [
                 'name' => fake()->name(),
                 'city' => fake()->city(),

@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    protected $table = 'products';
+    use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
+    protected $table = 'products';
 
     protected $fillable = [
         'code',
@@ -48,6 +49,7 @@ class Product extends Model
         'TaxNet' => 'double',
     ];
 
+    // Relationships
     public function ProductVariant()
     {
         return $this->belongsTo('App\Models\ProductVariant');
@@ -92,5 +94,4 @@ class Product extends Model
     {
         return $this->belongsTo('App\Models\Brand');
     }
-
 }

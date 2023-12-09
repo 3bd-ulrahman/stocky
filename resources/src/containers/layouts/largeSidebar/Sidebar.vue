@@ -784,7 +784,7 @@
           </li>
 
           <li class="nav-item"
-            v-if="currentUserPermissions.includes('backup')"
+            v-if="currentUserPermissions && currentUserPermissions.includes('locales')"
           >
             <router-link tag="a" class to="/app/settings/locales">
               <i class="nav-icon i-Data-Backup"></i>

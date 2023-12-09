@@ -1,21 +1,21 @@
 <template>
   <div class="main-content">
-    <breadcumb :page="$t('SalesReport')" :folder="$t('Reports')"/>
+    <breadcumb :page="$t('SalesReport')" :folder="$t('Reports')" />
 
     <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
-      <b-col md="12" class="text-center" v-if="!isLoading">
-        <date-range-picker 
-          v-model="dateRange" 
-          :startDate="startDate" 
-          :endDate="endDate" 
-           @update="Submit_filter_dateRange"
-          :locale-data="locale" > 
+    <b-col md="12" class="text-center" v-if="!isLoading">
+      <date-range-picker
+        v-model="dateRange"
+        :startDate="startDate"
+        :endDate="endDate"
+        @update="Submit_filter_dateRange"
+        :locale-data="locale">
 
-          <template v-slot:input="picker" style="min-width: 350px;">
-              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}
-          </template>        
-        </date-range-picker>
-      </b-col>
+        <template v-slot:input="picker" style="min-width: 350px;">
+          {{ picker.startDate.toJSON().slice(0, 10) }} - {{ picker.endDate.toJSON().slice(0, 10) }}
+        </template>
+      </date-range-picker>
+    </b-col>
 
     <b-card class="wrapper" v-if="!isLoading">
       <vue-good-table
@@ -32,17 +32,16 @@
         @on-sort-change="onSortChange"
         @on-search="onSearch"
         :search-options="{
-        placeholder: $t('Search_this_table'),
-        enabled: true,
-      }"
+          placeholder: $t('Search_this_table'),
+          enabled: true,
+        }"
         :pagination-options="{
-        enabled: true,
-        mode: 'records',
-        nextLabel: 'next',
-        prevLabel: 'prev',
-      }"
-        :styleClass="'mt-5 order-table vgt-table'"
-      >
+          enabled: true,
+          mode: 'records',
+          nextLabel: 'next',
+          prevLabel: 'prev',
+        }"
+        :styleClass="'mt-5 order-table vgt-table'">
         <div slot="table-actions" class="mt-2 mb-3">
           <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>
             <i class="i-Filter-2"></i>
@@ -51,15 +50,14 @@
           <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">
             <i class="i-File-Copy"></i> PDF
           </b-button>
-           <vue-excel-xlsx
-              class="btn btn-sm btn-outline-danger ripple m-1"
-              :data="sales"
-              :columns="columns"
-              :file-name="'sales_report'"
-              :file-type="'xlsx'"
-              :sheet-name="'sales_report'"
-              >
-              <i class="i-File-Excel"></i> EXCEL
+          <vue-excel-xlsx
+            class="btn btn-sm btn-outline-danger ripple m-1"
+            :data="sales"
+            :columns="columns"
+            :file-name="'sales_report'"
+            :file-type="'xlsx'"
+            :sheet-name="'sales_report'">
+            <i class="i-File-Excel"></i> EXCEL
           </vue-excel-xlsx>
         </div>
 
@@ -67,25 +65,21 @@
           <div v-if="props.column.field == 'statut'">
             <span
               v-if="props.row.statut == 'completed'"
-              class="badge badge-outline-success"
-            >{{$t('complete')}}</span>
+              class="badge badge-outline-success">{{ $t('complete') }}</span>
             <span
               v-else-if="props.row.statut == 'pending'"
-              class="badge badge-outline-info"
-            >{{$t('Pending')}}</span>
-            <span v-else class="badge badge-outline-warning">{{$t('Ordered')}}</span>
+              class="badge badge-outline-info">{{ $t('Pending') }}</span>
+            <span v-else class="badge badge-outline-warning">{{ $t('Ordered') }}</span>
           </div>
 
           <div v-else-if="props.column.field == 'payment_status'">
             <span
               v-if="props.row.payment_status == 'paid'"
-              class="badge badge-outline-success"
-            >{{$t('Paid')}}</span>
+              class="badge badge-outline-success">{{ $t('Paid') }}</span>
             <span
               v-else-if="props.row.payment_status == 'partial'"
-              class="badge badge-outline-primary"
-            >{{$t('partial')}}</span>
-            <span v-else class="badge badge-outline-warning">{{$t('Unpaid')}}</span>
+              class="badge badge-outline-primary">{{ $t('partial') }}</span>
+            <span v-else class="badge badge-outline-warning">{{ $t('Unpaid') }}</span>
           </div>
         </template>
       </vue-good-table>
@@ -95,10 +89,22 @@
     <b-sidebar id="sidebar-right" :title="$t('Filter')" bg-variant="white" right shadow>
       <div class="px-3 py-2">
         <b-row>
+
           <!-- Reference -->
           <b-col md="12">
             <b-form-group :label="$t('Reference')">
               <b-form-input label="Reference" :placeholder="$t('Reference')" v-model="Filter_Ref"></b-form-input>
+            </b-form-group>
+          </b-col>
+
+          <!-- representative -->
+          <b-col md="12">
+            <b-form-group :label="$t('Representative')">
+              <v-select
+                v-model="filter.representative_id"
+                :reduce="label => label.value"
+                :placeholder="$t('Choose_Status')"
+                :options="representatives.map(representative => ({ label: representative.username, value: representative.id }))" />
             </b-form-group>
           </b-col>
 
@@ -109,20 +115,18 @@
                 :reduce="label => label.value"
                 :placeholder="$t('Choose_Customer')"
                 v-model="Filter_Client"
-                :options="customers.map(customers => ({label: customers.name, value: customers.id}))"
-              />
+                :options="customers.map(customers => ({ label: customers.name, value: customers.id }))" />
             </b-form-group>
           </b-col>
 
-           <!-- warehouse -->
+          <!-- warehouse -->
           <b-col md="12">
             <b-form-group :label="$t('warehouse')">
               <v-select
                 v-model="Filter_warehouse"
                 :reduce="label => label.value"
                 :placeholder="$t('Choose_Warehouse')"
-                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"
-              />
+                :options="warehouses.map(warehouses => ({ label: warehouses.name, value: warehouses.id }))" />
             </b-form-group>
           </b-col>
 
@@ -173,35 +177,36 @@
 import NProgress from "nprogress";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import DateRangePicker from 'vue2-daterange-picker'
+import DateRangePicker from 'vue2-daterange-picker';
 //you need to import the CSS manually
-import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
-import moment from 'moment'
+import 'vue2-daterange-picker/dist/vue2-daterange-picker.css';
+import moment from 'moment';
 
 export default {
   metaInfo: {
     title: "Report Sales"
   },
-components: { DateRangePicker },
+  components: { DateRangePicker },
   data() {
     return {
-     startDate: "", 
-     endDate: "", 
-     dateRange: { 
-       startDate: "", 
-       endDate: "" 
-     }, 
-      locale:{ 
-          //separator between the two ranges apply
-          Label: "Apply", 
-          cancelLabel: "Cancel", 
-          weekLabel: "W", 
-          customRangeLabel: "Custom Range", 
-          daysOfWeek: moment.weekdaysMin(), 
-          //array of days - see moment documenations for details 
-          monthNames: moment.monthsShort(), //array of month names - see moment documenations for details 
-          firstDay: 1 //ISO first day of week - see moment documenations for details
-        },
+      representatives: [],
+      startDate: "",
+      endDate: "",
+      dateRange: {
+        startDate: "",
+        endDate: ""
+      },
+      locale: {
+        //separator between the two ranges apply
+        Label: "Apply",
+        cancelLabel: "Cancel",
+        weekLabel: "W",
+        customRangeLabel: "Custom Range",
+        daysOfWeek: moment.weekdaysMin(),
+        //array of days - see moment documenations for details
+        monthNames: moment.monthsShort(), //array of month names - see moment documenations for details
+        firstDay: 1 //ISO first day of week - see moment documenations for details
+      },
       isLoading: true,
       serverParams: {
         sort: {
@@ -214,6 +219,7 @@ components: { DateRangePicker },
       limit: "10",
       search: "",
       totalRows: "",
+      filter: {},
       Filter_Client: "",
       Filter_warehouse: "",
       Filter_Ref: "",
@@ -222,11 +228,11 @@ components: { DateRangePicker },
       customers: [],
       warehouses: [],
       rows: [{
-          statut: 'Total',
-         
-          children: [
-             
-          ],
+        statut: 'Total',
+
+        children: [
+
+        ],
       },],
       sales: [],
       today_mode: true,
@@ -307,24 +313,24 @@ components: { DateRangePicker },
   methods: {
 
     sumCount(rowObj) {
-     
-    	let sum = 0;
+
+      let sum = 0;
       for (let i = 0; i < rowObj.children.length; i++) {
         sum += rowObj.children[i].GrandTotal;
       }
       return sum;
     },
     sumCount2(rowObj) {
-     
-    	let sum = 0;
+
+      let sum = 0;
       for (let i = 0; i < rowObj.children.length; i++) {
         sum += rowObj.children[i].paid_amount;
       }
       return sum;
     },
     sumCount3(rowObj) {
-     
-    	let sum = 0;
+
+      let sum = 0;
       for (let i = 0; i < rowObj.children.length; i++) {
         sum += rowObj.children[i].due;
       }
@@ -427,15 +433,15 @@ components: { DateRangePicker },
       // Simply replaces null values with strings=''
       if (this.Filter_Client === null) {
         this.Filter_Client = "";
-      }else if (this.Filter_warehouse === null) {
+      } else if (this.Filter_warehouse === null) {
         this.Filter_warehouse = "";
       }
     },
 
-     //----------------------------- Submit Date Picker -------------------\\
+    //----------------------------- Submit Date Picker -------------------\\
     Submit_filter_dateRange() {
       var self = this;
-      self.startDate =  self.dateRange.startDate.toJSON().slice(0, 10);
+      self.startDate = self.dateRange.startDate.toJSON().slice(0, 10);
       self.endDate = self.dateRange.endDate.toJSON().slice(0, 10);
       self.Get_Sales(1);
     },
@@ -446,12 +452,12 @@ components: { DateRangePicker },
       if (self.today_mode) {
         let today = new Date()
 
-        self.startDate = today.getFullYear();
+        self.startDate = moment(0).format('YYYY-MM-DD');
         self.endDate = new Date().toJSON().slice(0, 10);
 
         self.dateRange.startDate = today.getFullYear();
         self.dateRange.endDate = new Date().toJSON().slice(0, 10);
-        
+
       }
     },
 
@@ -462,53 +468,42 @@ components: { DateRangePicker },
       NProgress.set(0.1);
       this.setToStrings();
       this.get_data_loaded();
-      axios
-        .get(
-          "/report/sales?page=" +
-            page +
-            "&Ref=" +
-            this.Filter_Ref +
-            "&client_id=" +
-            this.Filter_Client +
-            "&warehouse_id=" +
-            this.Filter_warehouse +
-            "&statut=" +
-            this.Filter_status +
-            "&payment_statut=" +
-            this.Filter_Payment +
-            "&SortField=" +
-            this.serverParams.sort.field +
-            "&SortType=" +
-            this.serverParams.sort.type +
-            "&search=" +
-            this.search +
-            "&limit=" +
-            this.limit+
-            "&to=" +
-            this.endDate +
-            "&from=" +
-            this.startDate
-        )
-        .then(response => {
-          this.sales = response.data.sales;
-          this.customers = response.data.customers;
-          this.warehouses = response.data.warehouses;
-          this.totalRows = response.data.totalRows;
-          this.rows[0].children = this.sales;
+      axios.get('report/sales', {
+        params: {
+          page: page,
+          Ref: this.Filter_Ref,
+          representative_id: this.filter.representative_id,
+          client_id: this.Filter_Client,
+          warehouse_id: this.Filter_warehouse,
+          statut: this.Filter_status,
+          payment_statut: this.Filter_Payment,
+          SortField: this.serverParams.sort.field,
+          SortType: this.serverParams.sort.type,
+          search: this.search,
+          limit: this.limit,
+          from: this.startDate,
+          to: this.endDate
+        }
+      }).then(response => {
+        this.sales = response.data.sales;
+        this.customers = response.data.customers;
+        this.warehouses = response.data.warehouses;
+        this.totalRows = response.data.totalRows;
+        this.rows[0].children = this.sales;
+        this.representatives = response.data.representatives;
 
-          // Complete the animation of theprogress bar.
-          NProgress.done();
+        // Complete the animation of theprogress bar.
+        NProgress.done();
+        this.isLoading = false;
+        this.today_mode = false;
+      }).catch(response => {
+        // Complete the animation of theprogress bar.
+        NProgress.done();
+        setTimeout(() => {
           this.isLoading = false;
           this.today_mode = false;
-        })
-        .catch(response => {
-          // Complete the animation of theprogress bar.
-          NProgress.done();
-          setTimeout(() => {
-            this.isLoading = false;
-            this.today_mode = false;
-          }, 500);
-        });
+        }, 500);
+      });
     }
   },
   //----------------------------- Created function-------------------\\

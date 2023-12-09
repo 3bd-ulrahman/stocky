@@ -32,7 +32,6 @@ class PosController extends BaseController
 
     public function CreatePOS(Request $request)
     {
-        // dd($request->all());
         $this->authorizeForUser($request->user('api'), 'Sales_pos', Sale::class);
 
         request()->validate([

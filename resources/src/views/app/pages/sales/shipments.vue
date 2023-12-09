@@ -16,7 +16,7 @@
         placeholder: $t('Search_this_table'),
         enabled: true,
       }"
-        :select-options="{ 
+        :select-options="{
           enabled: true ,
           clearSelectionText: '',
         }"
@@ -109,15 +109,32 @@
                     v-model="shipment.status"
                     :reduce="label => label.value"
                     :placeholder="$t('Choose_Status')"
-                    :options="
-                                [
-                                  {label: 'Ordered', value: 'ordered'},
-                                  {label: 'Packed', value: 'packed'},
-                                  {label: 'Shipped', value: 'shipped'},
-                                  {label: 'Delivered', value: 'delivered'},
-                                  {label: 'Cancelled', value: 'cancelled'},
-                                ]"
+                    :options="[
+                      {label: 'Ordered', value: 'ordered'},
+                      {label: 'Packed', value: 'packed'},
+                      {label: 'Shipped', value: 'shipped'},
+                      {label: 'Delivered', value: 'delivered'},
+                      {label: 'Cancelled', value: 'cancelled'},
+                    ]"
                   ></v-select>
+                  <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
+                </b-form-group>
+              </validation-provider>
+            </b-col>
+
+            <!-- representative -->
+            <b-col md="12">
+              <validation-provider name="representative" :rules="{ required: true}">
+                <b-form-group slot-scope="{ valid, errors }" :label="`${$t('representative')} *`">
+                  <v-select
+                    :class="{'is-invalid': !!errors.length}"
+                    :state="errors[0] ? false : (valid ? true : null)"
+                    :value="shipment.representative?.id"
+                    @input="shipment.representative = {id: $event}"
+                    :reduce="label => label.value"
+                    :placeholder="$t('Choose_Status')"
+                    :options="representatives.map(representative => ({label: representative.username, value: representative.id}))"
+                  />
                   <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
                 </b-form-group>
               </validation-provider>
@@ -185,6 +202,10 @@ export default {
   },
   data() {
     return {
+      // Api
+      shipments: [],
+      representatives: [],
+
       isLoading: true,
       SubmitProcessing: false,
       ImportProcessing: false,
@@ -200,7 +221,6 @@ export default {
       totalRows: "",
       search: "",
       limit: "10",
-      shipments: [],
       shipment: {}
     };
   },
@@ -284,7 +304,7 @@ export default {
     onPageChange({ currentPage }) {
       if (this.serverParams.page !== currentPage) {
         this.updateParams({ page: currentPage });
-        this.Get_shipments(currentPage);
+        this.indexShipments(currentPage);
       }
     },
 
@@ -293,7 +313,7 @@ export default {
       if (this.limit !== currentPerPage) {
         this.limit = currentPerPage;
         this.updateParams({ page: 1, perPage: currentPerPage });
-        this.Get_shipments(1);
+        this.indexShipments(1);
       }
     },
 
@@ -313,13 +333,13 @@ export default {
           field: params[0].field
         }
       });
-      this.Get_shipments(this.serverParams.page);
+      this.indexShipments(this.serverParams.page);
     },
 
     //------ Event Search
     onSearch(value) {
       this.search = value.searchTerm;
-      this.Get_shipments(this.serverParams.page);
+      this.indexShipments(this.serverParams.page);
     },
 
     //------ Event Validation State
@@ -355,38 +375,34 @@ export default {
     },
 
     //--------------------------------------- Get All Shipments -------------------------------\\
-    Get_shipments(page) {
+    indexShipments(page) {
       // Start the progress bar.
       NProgress.start();
       NProgress.set(0.1);
-      axios
-        .get(
-          "shipments?page=" +
-            page +
-            "&SortField=" +
-            this.serverParams.sort.field +
-            "&SortType=" +
-            this.serverParams.sort.type +
-            "&search=" +
-            this.search +
-            "&limit=" +
-            this.limit
-        )
-        .then(response => {
-          this.shipments = response.data.shipments;
-          this.totalRows = response.data.totalRows;
 
-          // Complete the animation of theprogress bar.
-          NProgress.done();
+      axios.get('shipments', {
+        params: {
+          page: page,
+          SortField: this.serverParams.sort.field,
+          SortType: this.serverParams.sort.type,
+          search: this.search,
+          limit: this.limit
+        }
+      }).then(response => {
+        this.shipments = response.data.shipments;
+        this.totalRows = response.data.totalRows;
+        this.representatives = response.data.representatives;
+
+        // Complete the animation of theprogress bar.
+        NProgress.done();
+        this.isLoading = false;
+      }).catch(response => {
+        // Complete the animation of theprogress bar.
+        NProgress.done();
+        setTimeout(() => {
           this.isLoading = false;
-        })
-        .catch(response => {
-          // Complete the animation of theprogress bar.
-          NProgress.done();
-          setTimeout(() => {
-            this.isLoading = false;
-          }, 500);
-        });
+        }, 500);
+      });
     },
 
 
@@ -394,7 +410,6 @@ export default {
     Edit_Shipment(shipment) {
       NProgress.start();
       NProgress.set(0.1);
-      this.Get_shipments(this.serverParams.page);
       this.reset_Form();
       this.shipment = shipment;
 
@@ -402,34 +417,26 @@ export default {
         NProgress.done();
         this.$bvModal.show("modal_shipment");
       }, 800);
-     
     },
 
     //----------------------- Update_Shipment ---------------------------\\
     Update_Shipment() {
-      var self = this;
-      self.SubmitProcessing = true;
-      axios
-        .put("shipments/" + self.shipment.id, {
-          sale_id: self.shipment.sale_id,
-          shipping_address: self.shipment.shipping_address,
-          delivered_to: self.shipment.delivered_to,
-          shipping_details: self.shipment.shipping_details,
-          status: self.shipment.status
-        })
-        .then(response => {
-          this.makeToast(
-            "success",
-            this.$t("Updated_in_successfully"),
-            this.$t("Success")
-          );
-          Fire.$emit("event_update_shipment");
-          self.SubmitProcessing = false;
-        })
-        .catch(error => {
-          this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-          self.SubmitProcessing = false;
-        });
+      this.SubmitProcessing = true;
+
+      axios.put(`shipments/${this.shipment.id}`, {
+        ...this.shipment
+      }).then(response => {
+        this.makeToast(
+          "success",
+          this.$t("Updated_in_successfully"),
+          this.$t("Success")
+        );
+        Fire.$emit("event_update_shipment");
+        this.SubmitProcessing = false;
+      }).catch(error => {
+        this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+        this.SubmitProcessing = false;
+      });
     },
 
     //-------------------------------- Reset Form -------------------------------\\
@@ -485,18 +492,18 @@ export default {
   //----------------------------- Created function-------------------
 
   created: function() {
-    this.Get_shipments(1);
+    this.indexShipments(1);
 
     Fire.$on("event_update_shipment", () => {
       setTimeout(() => {
-        this.Get_shipments(this.serverParams.page);
+        this.indexShipments(this.serverParams.page);
         this.$bvModal.hide("modal_shipment");
       }, 500);
     });
 
     Fire.$on("event_delete_shipment", () => {
       setTimeout(() => {
-        this.Get_shipments(this.serverParams.page);
+        this.indexShipments(this.serverParams.page);
       }, 500);
     });
   }

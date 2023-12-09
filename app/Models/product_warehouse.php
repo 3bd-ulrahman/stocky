@@ -9,7 +9,10 @@ class product_warehouse extends Model
     protected $table = 'product_warehouse';
 
     protected $fillable = [
-        'product_id', 'warehouse_id', 'qte','manage_stock'
+        'product_id',
+        'warehouse_id',
+        'qte',
+        'manage_stock'
     ];
 
     protected $casts = [
@@ -19,6 +22,9 @@ class product_warehouse extends Model
         'qte' => 'double',
     ];
 
+    /**
+     * Relationships
+     */
     public function warehouse()
     {
         return $this->belongsTo('App\Models\Warehouse');
@@ -33,5 +39,4 @@ class product_warehouse extends Model
     {
         return $this->belongsTo('App\Models\ProductVariant');
     }
-
 }

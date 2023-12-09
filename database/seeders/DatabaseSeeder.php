@@ -28,7 +28,10 @@ class DatabaseSeeder extends Seeder
             PermissionRoleSeeder::class,
             WarehouseSeeder::class,
             SaleSeeder::class,
-            LocaleSeeder::class
+            LocaleSeeder::class,
+            UserWarehouseSeeder::class,
+            ProductSeeder::class,
+            ProductWarehouseSeeder::class
         ]);
         Schema::enableForeignKeyConstraints();
     }

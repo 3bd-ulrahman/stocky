@@ -18,10 +18,12 @@ class CreateSalesTable extends Migration {
 			$table->engine = 'InnoDB';
 			$table->integer('id', true);
 			$table->integer('user_id')->index('user_id_sales');
+            $table->integer('representative_id');
+            $table->foreign('representative_id')->references('id')->on('users');
+            $table->integer('client_id')->index('sale_client_id');
 			$table->date('date');
 			$table->string('Ref', 192);
 			$table->boolean('is_pos')->nullable()->default(0);
-			$table->integer('client_id')->index('sale_client_id');
 			$table->integer('warehouse_id')->index('warehouse_id_sale');
 			$table->float('tax_rate', 10, 0)->nullable()->default(0);
 			$table->float('TaxNet', 10, 0)->nullable()->default(0);

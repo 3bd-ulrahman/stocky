@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ReportController;
 use Settings\LocaleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -54,7 +55,7 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     Route::get("report/provider_purchases", "ReportController@Purchases_Provider");
     Route::get("report/provider_payments", "ReportController@Payments_Provider");
     Route::get("report/provider_returns", "ReportController@Returns_Provider");
-    Route::get("report/sales", "ReportController@Report_Sales");
+    Route::get("report/sales", [ReportController::class, 'Report_Sales']);
     Route::get("report/purchases", "ReportController@Report_Purchases");
     Route::get("report/get_last_sales", "ReportController@Get_last_Sales");
     Route::get("report/stock_alert", "ReportController@Products_Alert");

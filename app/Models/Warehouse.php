@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Warehouse extends Model
@@ -20,10 +21,14 @@ class Warehouse extends Model
         'zip',
     ];
 
-    protected $dates = ['deleted_at'];
-
+    // Relationships
     public function assignedUsers()
     {
         return $this->belongsToMany('App\Models\User');
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class);
     }
 }

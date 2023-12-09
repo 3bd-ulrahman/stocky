@@ -11,9 +11,9 @@ class Sale extends Model
 
     protected $table = 'sales';
 
-    protected $dates = ['deleted_at'];
-
     protected $fillable = [
+        'user_id',
+        'representative_id',
         'date',
         'Ref',
         'is_pos',
@@ -25,7 +25,6 @@ class Sale extends Model
         'notes',
         'total_retturn',
         'warehouse_id',
-        'user_id',
         'statut',
         'discount',
         'shipping',
@@ -52,7 +51,9 @@ class Sale extends Model
         'paid_amount' => 'double',
     ];
 
-    // Relationships
+    /**
+     * Relationships
+     */
     public function user()
     {
         return $this->belongsTo('App\Models\User');

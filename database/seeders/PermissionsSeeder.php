@@ -16,174 +16,62 @@ class PermissionsSeeder extends Seeder
     {
         // Insert some stuff
         DB::table('permissions')->insert([
-            [
-                'name' => 'users_view',
-            ],
-            [
-                'name' => 'users_edit',
-            ],
-            [
-                'name' => 'record_view',
-            ],
-            [
-                'name' => 'users_delete',
-            ],
-            [
-                'name' => 'users_add',
-            ],
-            [
-                'name' => 'permissions_edit',
-            ],
-            [
-                'name' => 'permissions_view',
-            ],
-            [
-                'name' => 'permissions_delete',
-            ],
-            [
-                'name' => 'permissions_add',
-            ],
-            [
-                'name' => 'products_delete',
-            ],
-            [
-                'name' => 'products_view',
-            ],
-            [
-                'name' => 'barcode_view',
-            ],
-            [
-                'name' => 'products_edit',
-            ],
-            [
-                'name' => 'products_add',
-            ],
-            [
-                'name' => 'expense_add',
-            ],
-            [
-                'name' => 'expense_delete',
-            ],
-            [
-                'name' => 'expense_edit',
-            ],
-            [
-                'name' => 'expense_view',
-            ],
-            [
-                'name' => 'transfer_delete',
-            ],
-            [
-                'name' => 'transfer_add',
-            ],
-            [
-                'name' => 'transfer_view',
-            ],
-            [
-                'name' => 'transfer_edit',
-            ],
-            [
-                'name' => 'adjustment_delete',
-            ],
-            [
-                'name' => 'adjustment_add',
-            ],
-            [
-                'name' => 'adjustment_edit',
-            ],
-            [
-                'name' => 'adjustment_view',
-            ],
-            [
-                'name' => 'Sales_edit',
-            ],
-            [
-                'name' => 'Sales_view',
-            ],
-            [
-                'name' => 'Sales_delete',
-            ],
-            [
-                'name' => 'Sales_add',
-            ],
-            [
-                'name' => 'Purchases_edit',
-            ],
-            [
-                'name' => 'Purchases_view',
-            ],
-            [
-                'name' => 'Purchases_delete',
-            ],
-            [
-                'name' => 'Purchases_add',
-            ],
-            [
-                'name' => 'Quotations_edit',
-            ],
-            [
-                'name' => 'Quotations_delete',
-            ],
-            [
-                'name' => 'Quotations_add',
-            ],
-            [
-                'name' => 'Quotations_view',
-            ],
-            [
-                'name' => 'payment_sales_delete',
-            ],
-            [
-                'name' => 'payment_sales_add',
-            ],
-            [
-                'name' => 'payment_sales_edit',
-            ],
-            [
-                'name' => 'payment_sales_view',
-            ],
-            [
-                'name' => 'Purchase_Returns_delete',
-            ],
-            [
-                'name' => 'Purchase_Returns_add',
-            ],
-            [
-                'name' => 'Purchase_Returns_view',
-            ],
-            [
-                'name' => 'Purchase_Returns_edit',
-            ],
-            [
-                'name' => 'Sale_Returns_delete',
-            ],
-            [
-                'name' => 'Sale_Returns_add',
-            ],
-            [
-                'name' => 'Sale_Returns_edit',
-            ],
-            [
-                'name' => 'Sale_Returns_view',
-            ],
-            [
-                'name' => 'payment_purchases_edit',
-            ],
-            [
-                'name' => 'payment_purchases_view',
-            ],
-            [
-                'name' => 'payment_purchases_delete',
-            ],
-            [
-                'name' => 'payment_purchases_add',
-            ],
-            [
-                'name' => 'payment_returns_edit',
-            ],
-            [
-                'name' => 'payment_returns_view',
-            ],
+            ['name' => 'users_view',],
+            ['name' => 'users_edit',],
+            ['name' => 'record_view',],
+            ['name' => 'users_delete',],
+            ['name' => 'users_add',],
+            ['name' => 'permissions_edit',],
+            ['name' => 'permissions_view',],
+            ['name' => 'permissions_delete',],
+            ['name' => 'permissions_add',],
+            ['name' => 'products_delete',],
+            ['name' => 'products_view',],
+            ['name' => 'barcode_view',],
+            ['name' => 'products_edit',],
+            ['name' => 'products_add',],
+            ['name' => 'expense_add',],
+            ['name' => 'expense_delete',],
+            ['name' => 'expense_edit',],
+            ['name' => 'expense_view',],
+            ['name' => 'transfer_delete',],
+            ['name' => 'transfer_add',],
+            ['name' => 'transfer_view',],
+            ['name' => 'transfer_edit',],
+            ['name' => 'adjustment_delete',],
+            ['name' => 'adjustment_add',],
+            ['name' => 'adjustment_edit',],
+            ['name' => 'adjustment_view',],
+            ['name' => 'Sales_edit',],
+            ['name' => 'Sales_view',],
+            ['name' => 'Sales_delete',],
+            ['name' => 'Sales_add',],
+            ['name' => 'Purchases_edit',],
+            ['name' => 'Purchases_view',],
+            ['name' => 'Purchases_delete',],
+            ['name' => 'Purchases_add',],
+            ['name' => 'Quotations_edit',],
+            ['name' => 'Quotations_delete',],
+            ['name' => 'Quotations_add',],
+            ['name' => 'Quotations_view',],
+            ['name' => 'payment_sales_delete',],
+            ['name' => 'payment_sales_add',],
+            ['name' => 'payment_sales_edit',],
+            ['name' => 'payment_sales_view',],
+            ['name' => 'Purchase_Returns_delete',],
+            ['name' => 'Purchase_Returns_add',],
+            ['name' => 'Purchase_Returns_view',],
+            ['name' => 'Purchase_Returns_edit',],
+            ['name' => 'Sale_Returns_delete',],
+            ['name' => 'Sale_Returns_add',],
+            ['name' => 'Sale_Returns_edit',],
+            ['name' => 'Sale_Returns_view',],
+            ['name' => 'payment_purchases_edit',],
+            ['name' => 'payment_purchases_view',],
+            ['name' => 'payment_purchases_delete',],
+            ['name' => 'payment_purchases_add',],
+            ['name' => 'payment_returns_edit',],
+            ['name' => 'payment_returns_view',],
             [
                 'name' => 'payment_returns_delete',
             ],
@@ -386,7 +274,8 @@ class PermissionsSeeder extends Seeder
             ],
             [
                 'name' => 'edit_tax_discount_shipping_quotation',
-            ]
+            ],
+            ['name' => 'locales']
         ]);
     }
 }
