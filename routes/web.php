@@ -1,9 +1,8 @@
 <?php
 
-use App\Models\Locale;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Nafezly\Payments\Classes\PaymobPayment;
 
 /*
 |--------------------------------------------------------------------------

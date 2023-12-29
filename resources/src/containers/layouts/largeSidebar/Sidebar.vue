@@ -733,11 +733,10 @@
             </router-link>
           </li>
 
-           <li
-            class="nav-item"
+           <li class="nav-item"
             v-if="currentUserPermissions && currentUserPermissions.includes('payment_gateway')"
           >
-            <router-link tag="a" class to="/app/settings/payment_gateway">
+            <router-link tag="a" class to="/app/settings/payment-gateway">
               <i class="nav-icon i-Money-2"></i>
               <span class="item-name">{{$t('payment_gateway')}}</span>
             </router-link>

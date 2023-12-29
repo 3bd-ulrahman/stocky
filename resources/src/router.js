@@ -20,8 +20,7 @@ const routes = [
       {
         path: "/app/dashboard",
         name: "dashboard",
-        component: () =>
-          import("./views/app/dashboard/Index")
+        component: () => import("./views/app/dashboard/Index")
       },
 
       //Products
@@ -334,13 +333,13 @@ const routes = [
       //Sale
       {
         path: "/app/sales",
-        component: () => import("./views/app/pages/sales"),
+        component: () => import("./views/app/pages/sales/Router.vue"),
         redirect: "/app/sales/list",
         children: [
           {
             name: "index_sales",
             path: "list",
-            component: () => import("./views/app/pages/sales/index_sale")
+            component: () => import("./views/app/pages/sales/Index.vue")
           },
           {
             name: "store_sale",
@@ -743,11 +742,8 @@ const routes = [
           // payment_gateway
           {
             name: "payment_gateway",
-            path: "payment_gateway",
-            component: () =>
-              import(
-                                /* webpackChunkName: "payment_gateway" */ "./views/app/pages/settings/payment_gateway"
-              )
+            path: "payment-gateway",
+            component: () => import("./views/app/pages/settings/paymentGateway")
           },
 
           // mail_settings
@@ -1056,11 +1052,10 @@ const routes = [
   },
 
   {
-    name: "pos",
     path: "/app/pos",
+    name: "pos",
     // beforeEnter: authenticate,
-    component: () =>
-      import(/* webpackChunkName: "pos" */ "./views/app/pages/pos")
+    component: () => import("./views/app/pages/pos")
   },
 
   {

@@ -3,9 +3,19 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import Auth from './auth/index.js';
-window.auth = new Auth();
 import { ValidationObserver, ValidationProvider, extend, localize } from 'vee-validate';
 import * as rules from "vee-validate/dist/rules";
+import StockyKit from "./plugins/stocky.kit";
+import VueCookies from 'vue-cookies';
+import VueExcelXlsx from "vue-excel-xlsx";
+import vSelect from 'vue-select';
+import 'vue-select/dist/vue-select.css';
+import '@trevoreyre/autocomplete-vue/dist/style.css';
+import Breadcumb from "./components/breadcumb";
+import { i18n } from "./plugins/i18n";
+import VueCookie from "vue-cookie";
+
+window.auth = new Auth();
 
 localize({
   en: {
@@ -28,16 +38,13 @@ Object.keys(rules).forEach(rule => {
 // Register it globally
 Vue.component("ValidationObserver", ValidationObserver);
 Vue.component('ValidationProvider', ValidationProvider);
+Vue.component('v-select', vSelect)
+Vue.component("breadcumb", Breadcumb);
 
-import StockyKit from "./plugins/stocky.kit";
+
 Vue.use(StockyKit);
-import VueCookies from 'vue-cookies'
 Vue.use(VueCookies);
-
-var VueCookie = require('vue-cookie');
 Vue.use(VueCookie);
-
-import VueExcelXlsx from "vue-excel-xlsx";
 Vue.use(VueExcelXlsx);
 
 window.axios = require('axios');
@@ -67,18 +74,7 @@ axios.interceptors.response.use((response) => {
   return Promise.reject(error.message);
 });
 
-import vSelect from 'vue-select'
-Vue.component('v-select', vSelect)
-import 'vue-select/dist/vue-select.css';
-
-import '@trevoreyre/autocomplete-vue/dist/style.css';
-
 window.Fire = new Vue();
-
-import Breadcumb from "./components/breadcumb";
-import { i18n } from "./plugins/i18n";
-
-Vue.component("breadcumb", Breadcumb);
 
 Vue.config.productionTip = true;
 Vue.config.silent = true;

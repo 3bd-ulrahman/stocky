@@ -57,6 +57,13 @@
       'Clockwork' => 'Clockwork\\Support\\Laravel\\Facade',
     ),
   ),
+  'laravel/cashier' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laravel\\Cashier\\CashierServiceProvider',
+    ),
+  ),
   'laravel/passport' => 
   array (
     'providers' => 
@@ -107,15 +114,15 @@
       'Zip' => 'Macellan\\Zip\\ZipFacade',
     ),
   ),
-  'mcamara/laravel-localization' => 
+  'nafezly/payments' => 
   array (
     'providers' => 
     array (
-      0 => 'Mcamara\\LaravelLocalization\\LaravelLocalizationServiceProvider',
+      0 => 'Nafezly\\Payments\\NafezlyPaymentsServiceProvider',
     ),
     'aliases' => 
     array (
-      'LaravelLocalization' => 'Mcamara\\LaravelLocalization\\Facades\\LaravelLocalization',
+      'NafezlyPayments' => 'Nafezly\\Payments\\Facades',
     ),
   ),
   'nesbot/carbon' => 

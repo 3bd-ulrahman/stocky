@@ -21,8 +21,7 @@ class UserWarehouseSeeder extends Seeder
         foreach ($userIds as $userId) {
             array_push($userWarehouse, [
                 'user_id' => $userId,
-                'warehouse_id' => fake()->randomElement($warehouseIds),
-                'created_at' - now()->format('Y-m-d H:i:s'),
+                'warehouse_id' => fake()->randomElement($warehouseIds)
             ]);
         }
 

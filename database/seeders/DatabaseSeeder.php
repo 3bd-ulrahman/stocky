@@ -16,22 +16,23 @@ class DatabaseSeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints();
         $this->call([
-            ClientSeeder::class,
-            CategorySeeder::class,
-            CurrencySeeder::class,
-            SettingSeeder::class,
-            ServerSeeder::class,
-            PermissionsSeeder::class,
-            RoleSeeder::class,
-            UserSeeder::class,
-            RoleUserSeeder::class,
-            PermissionRoleSeeder::class,
-            WarehouseSeeder::class,
-            SaleSeeder::class,
-            LocaleSeeder::class,
+            // ClientSeeder::class,
+            // CategorySeeder::class,
+            // CurrencySeeder::class,
+            // SettingSeeder::class,
+            // ServerSeeder::class,
+            // PermissionsSeeder::class,
+            // RoleSeeder::class,
+            // UserSeeder::class,
+            // RoleUserSeeder::class,
+            // PermissionRoleSeeder::class,
+            // WarehouseSeeder::class,
+            // SaleSeeder::class,
+            // LocaleSeeder::class,
             UserWarehouseSeeder::class,
             ProductSeeder::class,
-            ProductWarehouseSeeder::class
+            ProductWarehouseSeeder::class,
+            PaymentGatewaySeeder::class
         ]);
         Schema::enableForeignKeyConstraints();
     }

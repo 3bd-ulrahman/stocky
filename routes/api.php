@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\PosController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Settings\PaymentGatewayController;
 use Settings\LocaleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -205,9 +207,9 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     //---------------------- POS (point of sales) ----------------------\\
     //------------------------------------------------------------------\\
 
-    Route::post('pos/create_pos', 'PosController@CreatePOS');
+    Route::get('pos', [PosController::class, 'index']);
+    Route::post('pos', [PosController::class, 'store']);
     Route::get('pos/get_products_pos', 'PosController@GetProductsByParametre');
-    Route::get('pos/data_create_pos', 'PosController@GetELementPos');
 
     //------------------------------- PRODUCTS --------------------------\\
     //------------------------------------------------------------------\\
@@ -383,6 +385,12 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
     Route::resource('roles/check/create_page', 'PermissionsController@Check_Create_Page');
     Route::post('roles/delete/by_selection', 'PermissionsController@delete_by_selection');
 
+    //------------------------------- Payment_gateway Settings ------------------------\\
+    Route::prefix('settings')->group(function () {
+        Route::post('payment-gateway', [PaymentGatewayController::class, 'store']);
+        Route::get('payment-gateway', [PaymentGatewayController::class, 'index']);
+    });
+
 
     //------------------------------- Settings ------------------------\\
     //------------------------------------------------------------------\\
@@ -416,12 +424,6 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
 
     Route::get('get_emails_template', 'Notifications_Template@get_emails_template');
     Route::put('update_custom_email', 'Notifications_Template@update_custom_email');
-
-
-    //------------------------------- Payment_gateway Settings ------------------------\\
-
-    Route::post('payment_gateway', 'Payment_gateway_SettingsController@Update_payment_gateway');
-    Route::get('get_payment_gateway', 'Payment_gateway_SettingsController@Get_payment_gateway');
 
     //------------------------------- Update Settings ------------------------\\
 

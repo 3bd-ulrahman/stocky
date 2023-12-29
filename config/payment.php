@@ -1,0 +1,12 @@
+<?php
+
+return [
+    # STRIPE
+    'STRIPE_KEY' => env('STRIPE_KEY'),
+    'STRIPE_SECRET' => env('STRIPE_SECRET'),
+
+    # CHECKOUT
+    'CHECKOUT_PUBLIC_KEY' => env('CHECKOUT_PUBLIC_KEY'),
+    'CHECKOUT_SECRET_KEY' => env('CHECKOUT_SECRET_KEY'),
+    'CHECKOUT_CHANNEL_ID' => env('CHECKOUT_CHANNEL_ID')
+];

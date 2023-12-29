@@ -113,8 +113,7 @@ class ClientController extends BaseController
 
         $this->validate($request, [
             'name' => 'required',
-            ]
-        );
+        ]);
 
         Client::create([
             'name' => $request['name'],
@@ -126,6 +125,7 @@ class ClientController extends BaseController
             'city' => $request['city'],
             'tax_number' => $request['tax_number'],
         ]);
+
         return response()->json(['success' => true]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PaymentGateway;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Response;
@@ -45,9 +46,6 @@ use ArPHP\I18N\Arabic;
 
 class SalesController extends BaseController
 {
-
-    //------------- GET ALL SALES -----------\\
-
     public function index(request $request)
     {
         $this->authorizeForUser($request->user('api'), 'view', Sale::class);
@@ -176,13 +174,16 @@ class SalesController extends BaseController
 
         $representatives = User::query()->where('is_representative', true)->get();
 
+        $paymentGateway = PaymentGateway::query()->where('is_active', true)->pluck('name')->first();
+
         return response()->json([
             'stripe_key' => $stripe_key,
             'totalRows' => $totalRows,
             'sales' => $data,
             'customers' => $customers,
             'warehouses' => $warehouses,
-            'representatives' => $representatives
+            'representatives' => $representatives,
+            'paymentGateway' => $paymentGateway
         ]);
     }
 

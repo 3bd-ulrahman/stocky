@@ -25,18 +25,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Models\PaymentWithCreditCard;
-use \Nwidart\Modules\Facades\Module;
 use App\Models\sms_gateway;
 use Stripe;
-use DB;
+use Illuminate\Support\Facades\DB;
 use PDF;
 use ArPHP\I18N\Arabic;
 
 class PaymentSalesController extends BaseController
 {
-
     //------------- Get All Payments Sales --------------\\
-
     public function index(request $request)
     {
         $this->authorizeForUser($request->user('api'), 'Reports_payments_Sales', PaymentSale::class);
@@ -114,7 +111,7 @@ class PaymentSalesController extends BaseController
             $data[] = $item;
         }
 
-        $clients = Client::where('deleted_at', '=', null)->get(['id', 'name']);
+        $clients = Client::query()->get(['id', 'name']);
         $sales = Sale::get(['Ref', 'id']);
 
         return response()->json([
@@ -123,16 +120,14 @@ class PaymentSalesController extends BaseController
             'sales' => $sales,
             'clients' => $clients,
         ]);
-
     }
 
     //----------- Store new Payment Sale --------------\\
-
     public function store(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'create', PaymentSale::class);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $helpers = new Helpers();
             $role = Auth::user()->roles()->first();
             $view_records = Role::findOrFail($role->id)->inRole('record_view');

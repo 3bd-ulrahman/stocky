@@ -18,7 +18,7 @@ class CreateSalesTable extends Migration {
 			$table->engine = 'InnoDB';
 			$table->integer('id', true);
 			$table->integer('user_id')->index('user_id_sales');
-            $table->integer('representative_id');
+            $table->integer('representative_id')->nullable();
             $table->foreign('representative_id')->references('id')->on('users');
             $table->integer('client_id')->index('sale_client_id');
 			$table->date('date');
