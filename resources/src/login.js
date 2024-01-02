@@ -85,10 +85,8 @@ Vue.config.silent = true;
 Vue.config.devtools = false;
 
 var login = new Vue({
-
   el: '#login',
   store,
   i18n,
   router: router,
 });
-

@@ -2847,9 +2847,6 @@ class ReportController extends BaseController
 
                 $data[] = $item;
             }
-
-
-
         }
 
 

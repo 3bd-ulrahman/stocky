@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Translatable;
+use App\Models\Translations\ProductTranslation;
+use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Product extends Model
+class Product extends Model implements TranslatableContract
 {
-    use SoftDeletes;
+    use SoftDeletes, Translatable;
 
     protected $table = 'products';
 
     protected $fillable = [
         'code',
         'Type_barcode',
-        'name',
         'cost',
         'price',
         'unit_id',
@@ -32,6 +35,10 @@ class Product extends Model
         'note',
         'type'
     ];
+
+    public $translatedAttributes = ['name'];
+
+    public $translationModel = ProductTranslation::class;
 
     protected $casts = [
         'category_id' => 'integer',
@@ -92,6 +99,8 @@ class Product extends Model
 
     public function brand()
     {
-        return $this->belongsTo('App\Models\Brand');
+        return $this->belongsTo(Brand::class)->withDefault([
+            'name' => 'N/D'
+        ]);
     }
 }

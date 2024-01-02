@@ -25,9 +25,7 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-
     //----------------- dashboard_data -----------------------\\
-
     public function dashboard_data(Request $request)
     {
         $user_auth = auth()->user();
@@ -46,7 +44,6 @@ class DashboardController extends Controller
         }
 
 
-
         $dataSales = $this->SalesChart($warehouse_id, $array_warehouses_id);
         $datapurchases = $this->PurchasesChart($warehouse_id, $array_warehouses_id);
         $Payment_chart = $this->Payment_chart($warehouse_id, $array_warehouses_id);
@@ -54,6 +51,7 @@ class DashboardController extends Controller
         $Top_Products_Year = $this->Top_Products_Year($warehouse_id, $array_warehouses_id);
         $report_dashboard = $this->report_dashboard($warehouse_id, $array_warehouses_id);
 
+        // return \App\Models\Category::get();
         return response()->json([
             'warehouses' => $warehouses,
             'sales' => $dataSales,
@@ -67,7 +65,6 @@ class DashboardController extends Controller
     }
 
     //----------------- Sales Chart js -----------------------\\
-
     public function SalesChart($warehouse_id, $array_warehouses_id)
     {
         $role = Auth::user()->roles()->first();
@@ -123,7 +120,6 @@ class DashboardController extends Controller
     }
 
     //----------------- Purchases Chart -----------------------\\
-
     public function PurchasesChart($warehouse_id, $array_warehouses_id)
     {
 
@@ -177,7 +173,6 @@ class DashboardController extends Controller
     }
 
     //-------------------- Get Top 5 Customers -------------\\
-
     public function TopCustomers($warehouse_id, $array_warehouses_id)
     {
         $role = Auth::user()->roles()->first();
@@ -213,7 +208,6 @@ class DashboardController extends Controller
 
 
     //-------------------- Get Top 5 Products This YEAR -------------\\
-
     public function Top_Products_Year($warehouse_id, $array_warehouses_id)
     {
         $role = Auth::user()->roles()->first();
@@ -221,6 +215,7 @@ class DashboardController extends Controller
 
         $products = SaleDetail::query()->join('sales', 'sale_details.sale_id', '=', 'sales.id')
             ->join('products', 'sale_details.product_id', '=', 'products.id')
+            ->join('product_translations', 'products.id', '=', 'product_translations.product_id')
             ->whereBetween('sale_details.date', [
                 Carbon::now()->startOfYear(),
                 Carbon::now()->endOfYear(),
@@ -234,10 +229,10 @@ class DashboardController extends Controller
                 $query->whereIn('sales.warehouse_id', $array_warehouses_id);
             })
             ->select(
-                DB::raw('products.name as name'),
+                DB::raw('product_translations.name as name'),
                 DB::raw('count(*) as value'),
             )
-            ->groupBy('products.name')
+            ->groupBy('product_translations.name')
             ->orderBy('value', 'desc')
             ->take(5)
             ->get();
@@ -245,9 +240,7 @@ class DashboardController extends Controller
         return response()->json($products);
     }
 
-
     //-------------------- General Report dashboard -------------\\
-
     public function report_dashboard($warehouse_id, $array_warehouses_id)
     {
         $Role = Auth::user()->roles()->first();
@@ -256,6 +249,7 @@ class DashboardController extends Controller
         // top selling product this month
         $products = SaleDetail::join('sales', 'sale_details.sale_id', '=', 'sales.id')
             ->join('products', 'sale_details.product_id', '=', 'products.id')
+            ->join('product_translations', 'products.id', '=', 'product_translations.product_id')
             ->whereBetween('sale_details.date', [
                 Carbon::now()->startOfMonth(),
                 Carbon::now()->endOfMonth(),
@@ -273,11 +267,11 @@ class DashboardController extends Controller
                 }
             })
             ->select(
-                DB::raw('products.name as name'),
+                DB::raw('product_translations.name as name'),
                 DB::raw('count(*) as total_sales'),
                 DB::raw('sum(total) as total'),
             )
-            ->groupBy('products.name')
+            ->groupBy('product_translations.name')
             ->orderBy('total_sales', 'desc')
             ->take(5)
             ->get();
@@ -285,6 +279,7 @@ class DashboardController extends Controller
         // Stock Alerts
         $product_warehouse_data = product_warehouse::with('warehouse', 'product', 'productVariant')
             ->join('products', 'product_warehouse.product_id', '=', 'products.id')
+            ->join('product_translations', 'products.id', '=', 'product_translations.product_id')
             ->where('manage_stock', true)
             ->whereRaw('qte <= stock_alert')
             ->where('product_warehouse.deleted_at', null)
@@ -445,7 +440,6 @@ class DashboardController extends Controller
     }
 
     //----------------- Payment Chart js -----------------------\\
-
     public function Payment_chart($warehouse_id, $array_warehouses_id)
     {
         $role = Auth::user()->roles()->first();
@@ -612,7 +606,6 @@ class DashboardController extends Controller
     }
 
     //----------------- array merge -----------------------\\
-
     public function array_merge_numeric_values()
     {
         $arrays = func_get_args();

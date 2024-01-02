@@ -23,15 +23,6 @@ class PaymentGatewaySeeder extends Seeder
                 ])
             ],
             [
-                'name' => 'paymob',
-                'keys' => json_encode([
-                    'PAYMOB_API_KEY' => '',
-                    'PAYMOB_INTEGRATION_ID' => '',
-                    'PAYMOB_IFRAME_ID' => '',
-                    'PAYMOB_HMAC' => ''
-                ])
-            ],
-            [
                 'name' => 'checkout',
                 'keys' => json_encode([
                     'CHECKOUT_PUBLIC_KEY' => '',

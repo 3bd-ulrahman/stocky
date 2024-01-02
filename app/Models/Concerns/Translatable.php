@@ -3,7 +3,6 @@
 namespace App\Models\Concerns;
 
 use Astrotomic\Translatable\Translatable as BaseTranslatable;
-use Illuminate\Support\Facades\DB;
 
 trait Translatable
 {

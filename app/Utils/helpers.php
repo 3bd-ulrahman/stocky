@@ -45,8 +45,8 @@ if (! function_exists('getNumberOrder')) {
     }
 }
 
-if (! function_exists('setEnvValue')) {
-    function setEnvValue($key, $value)
+if (! function_exists('setEnvFile')) {
+    function setEnvFile($key, $value)
     {
         $envFilePath = base_path('.env');
 
@@ -57,5 +57,18 @@ if (! function_exists('setEnvValue')) {
 
         // Write the updated contents back to the .env file
         file_put_contents($envFilePath, $contents);
+    }
+}
+
+if (! function_exists('setConfigFile')) {
+    function setConfigFile($file, $key, $value)
+    {
+        $configFilePath = config_path('app.php');
+        $contents = file_get_contents($configFilePath);
+        $pattern = "/^(\\s*)['\"]" . preg_quote($key, '/') . "['\"]\\s*=>.*$/m";
+
+        $replacement = "$1'$key' => '$value',";
+        $contents = preg_replace($pattern, $replacement, $contents);
+        file_put_contents($configFilePath, $contents);
     }
 }
