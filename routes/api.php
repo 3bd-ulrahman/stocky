@@ -23,7 +23,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 //--------------------------- Reset Password  ---------------------------
-
 Route::group([
     'prefix' => 'password',
 ], function () {
@@ -33,7 +32,8 @@ Route::group([
 
 
 Route::post('getAccessToken', 'AuthController@getAccessToken');
-Route::middleware(['auth:api', 'Is_Active'])->group(function () {
+Route::middleware(['auth:api', 'Is_Active', 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath'])->group(function () {
+
 
     Route::get("dashboard_data", "DashboardController@dashboard_data");
 
@@ -213,15 +213,14 @@ Route::middleware(['auth:api', 'Is_Active'])->group(function () {
 
     //------------------------------- PRODUCTS --------------------------\\
     //------------------------------------------------------------------\\
-
-    Route::resource('products', 'ProductsController');
-    Route::post('products/import/csv', 'ProductsController@import_products');
-    Route::get('get_Products_by_warehouse/{id}', 'ProductsController@Products_by_Warehouse');
-    Route::get('get_product_detail/{id}', 'ProductsController@Get_Products_Details');
-    Route::get('get_products_stock_alerts', 'ProductsController@Products_Alert');
-    Route::get('barcode_create_page', 'ProductsController@Get_element_barcode');
-    Route::post('products/delete/by_selection', 'ProductsController@delete_by_selection');
-    Route::get('show_product_data/{id}/{variant_id}', 'ProductsController@show_product_data');
+    Route::resource('products', 'ProductController');
+    Route::post('products/import/csv', 'ProductController@import_products');
+    Route::get('get_Products_by_warehouse/{id}', 'ProductController@Products_by_Warehouse');
+    Route::get('get_product_detail/{id}', 'ProductController@Get_Products_Details');
+    Route::get('get_products_stock_alerts', 'ProductController@Products_Alert');
+    Route::get('barcode_create_page', 'ProductController@Get_element_barcode');
+    Route::post('products/delete/by_selection', 'ProductController@delete_by_selection');
+    Route::get('show_product_data/{id}/{variant_id}', 'ProductController@show_product_data');
 
 
     //------------------------------- Category --------------------------\\

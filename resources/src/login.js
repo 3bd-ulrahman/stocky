@@ -43,16 +43,13 @@ localize({
     }
   },
 });
+
 // Install VeeValidate rules and localization
 Object.keys(rules).forEach(rule => {
   extend(rule, rules[rule]);
 });
 
 // Register it globally
-
-
-
-
 axios.interceptors.response.use((response) => {
 
   return response;
@@ -61,7 +58,6 @@ axios.interceptors.response.use((response) => {
     if (error.response.status === 401) {
       window.location.href = '/login';
     }
-
     if (error.response.status === 404) {
       router.push({ name: 'NotFound' });
     }
@@ -84,9 +80,10 @@ Vue.config.productionTip = true;
 Vue.config.silent = true;
 Vue.config.devtools = false;
 
-var login = new Vue({
+const initializedI18n = await i18n();
+let login = new Vue({
   el: '#login',
   store,
-  i18n,
+  i18n: initializedI18n,
   router: router,
 });

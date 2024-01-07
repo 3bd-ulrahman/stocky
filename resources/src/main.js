@@ -15,6 +15,7 @@ import Breadcumb from "./components/breadcumb";
 import { i18n } from "./plugins/i18n";
 import VueCookie from "vue-cookie";
 
+const initializedI18n = await i18n();
 window.auth = new Auth();
 
 localize({
@@ -48,7 +49,7 @@ Vue.use(VueCookie);
 Vue.use(VueExcelXlsx);
 
 window.axios = require('axios');
-window.axios.defaults.baseURL = '/api/';
+window.axios.defaults.baseURL = `/${initializedI18n.locale}/api/`;
 
 window.axios.defaults.withCredentials = true;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -84,6 +85,11 @@ new Vue({
   store,
   router,
   VueCookie,
-  i18n,
+  i18n: initializedI18n,
   render: h => h(App),
 }).$mount("#app");
+
+// console.log(store.dispatch('language/setLanguage', 'ar'));
+// console.log(Vue.localStorage.get('language'));
+// console.log(store.state.language.language);
+// console.log(i18n.locale);

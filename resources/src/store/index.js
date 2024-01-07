@@ -5,6 +5,7 @@ import compactSidebar from "./modules/compactSidebar";
 import config from "./modules/config";
 import auth from "./modules/auth";
 import language from './modules/language';
+
 // Load Vuex
 Vue.use(Vuex);
 
@@ -16,5 +17,5 @@ export default new Vuex.Store({
     largeSidebar,
     compactSidebar,
     config,
-  }
+  },
 });

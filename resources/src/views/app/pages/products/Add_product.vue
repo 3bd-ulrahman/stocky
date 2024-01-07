@@ -409,7 +409,7 @@
                 </div>
               </b-row>
             </b-card>
-           
+
             <b-card class="mt-3">
               <b-row>
                 <!-- Product_Has_Imei_Serial_number -->
@@ -576,7 +576,7 @@ export default {
       });
     },
 
-    
+
 
     add_variant(tag) {
       if (
@@ -603,13 +603,13 @@ export default {
               "Please Enter the Variant",
               this.$t("Warning")
             );
-            
+
           }
       }
     },
     //-----------------------------------Delete variant------------------------------\\
     delete_variant(var_id) {
-      
+
       for (var i = 0; i < this.variants.length; i++) {
         if (var_id === this.variants[i].var_id) {
           this.variants.splice(i, 1);
@@ -650,20 +650,17 @@ export default {
 
     //-------------- Product Get Elements
     GetElements() {
-      axios
-        .get("products/create")
-        .then(response => {
-          this.categories = response.data.categories;
-          this.brands = response.data.brands;
-          this.units = response.data.units;
+      axios.get("products/create").then(response => {
+        this.categories = response.data.categories;
+        this.brands = response.data.brands;
+        this.units = response.data.units;
+        this.isLoading = false;
+      }).catch(response => {
+        setTimeout(() => {
           this.isLoading = false;
-        })
-        .catch(response => {
-          setTimeout(() => {
-            this.isLoading = false;
-          }, 500);
-          this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-        });
+        }, 500);
+        this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+      });
     },
 
     //---------------------- Get Sub Units with Unit id ------------------------------\\
@@ -695,7 +692,7 @@ export default {
         self.product.is_variant = false;
       }
 
-           
+
       // append objet product
       Object.entries(self.product).forEach(([key, value]) => {
           self.data.append(key, value);
@@ -706,7 +703,7 @@ export default {
       if (self.variants.length) {
         self.data.append("variants", JSON.stringify(self.variants));
       }
-      
+
       //append array images
       if (self.images.length > 0) {
         for (var k = 0; k < self.images.length; k++) {

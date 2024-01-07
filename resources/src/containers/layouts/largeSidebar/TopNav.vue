@@ -15,7 +15,7 @@
     <div style="margin: auto"></div>
 
     <div class="header-part-right">
-      <router-link 
+      <router-link
         v-if="currentUserPermissions && currentUserPermissions.includes('Pos_view')"
         class="btn btn-outline-primary tn-sm btn-rounded"
         to="/app/pos"
@@ -118,7 +118,7 @@
                 <i title="sa" class="flag-icon flag-icon-squared flag-icon-kr"></i>
                 <span class="title-lang">Korean</span>
               </a>
-             
+
               <a @click="SetLocal('ba')">
                 <i title="sa" class="flag-icon flag-icon-squared flag-icon-bd"></i>
                 <span class="title-lang">Bangla</span>
@@ -141,7 +141,7 @@
       <!-- Notificaiton -->
       <div class="dropdown">
         <b-dropdown
-          id="dropdown-1" 
+          id="dropdown-1"
           text="Dropdown Button"
           class="m-md-2 badge-top-container d-none  d-sm-inline-block"
           toggle-class="text-decoration-none"
@@ -172,7 +172,7 @@
                </router-link>
               </div>
             </div>
-           
+
           </vue-perfect-scrollbar>
         </b-dropdown>
       </div>
@@ -234,7 +234,7 @@ export default {
   },
 
   data() {
-  
+
     return {
       langs: [
         "en",
@@ -256,19 +256,19 @@ export default {
         "br",
         "da",
       ],
-      
+
       isDisplay: true,
       isStyle: true,
       isSearchOpen: false,
       isMouseOnMegaMenu: true,
       isMegaMenuOpen: false,
       is_Load:false,
-     
+
     };
   },
- 
+
    computed: {
-     
+
      ...mapGetters([
        "currentUser",
       "getSideBarToggleProperties",
@@ -280,7 +280,7 @@ export default {
   },
 
   methods: {
-    
+
     ...mapActions([
       "changeSecondarySidebarProperties",
       "changeSidebarProperties",

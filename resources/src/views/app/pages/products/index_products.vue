@@ -12,14 +12,14 @@
         @on-per-page-change="onPerPageChange"
         @on-sort-change="onSortChange"
         @on-search="onSearch"
-        :select-options="{ 
+        :select-options="{
           enabled: true ,
           clearSelectionText: '',
         }"
         @on-selected-rows-change="selectionChanged"
         :search-options="{
           enabled: true,
-          placeholder: $t('Search_this_table'),  
+          placeholder: $t('Search_this_table'),
         }"
         :pagination-options="{
         enabled: true,
@@ -383,7 +383,7 @@ export default {
           tdClass: "text-left",
           thClass: "text-left"
         },
-       
+
         {
           label: this.$t("Cost"),
           field: "cost",
@@ -522,11 +522,11 @@ export default {
               this.$t("Failed")
             );
             }
-         
+
         });
     },
 
-    
+
     //------ Toast
     makeToast(variant, msg, title) {
       this.$root.$bvToast.toast(msg, {
@@ -616,45 +616,36 @@ export default {
       NProgress.start();
       NProgress.set(0.1);
       this.setToStrings();
-      axios
-        .get(
-          "products?page=" +
-            page +
-            "&code=" +
-            this.Filter_code +
-            "&name=" +
-            this.Filter_name +
-            "&category_id=" +
-            this.Filter_category +
-            "&brand_id=" +
-            this.Filter_brand +
-            "&SortField=" +
-            this.serverParams.sort.field +
-            "&SortType=" +
-            this.serverParams.sort.type +
-            "&search=" +
-            this.search +
-            "&limit=" +
-            this.limit
-        )
-        .then(response => {
-          this.products = response.data.products;
-          this.warehouses = response.data.warehouses;
-          this.categories = response.data.categories;
-          this.brands = response.data.brands;
-          this.totalRows = response.data.totalRows;
 
-          // Complete the animation of theprogress bar.
-          NProgress.done();
+      axios.get('products', {
+        params: {
+          page: page,
+          code: this.Filter_code,
+          name: this.Filter_name,
+          category_id: this.Filter_category,
+          brand_id: this.Filter_brand,
+          SortField: this.serverParams.sort.field,
+          SortType: this.serverParams.sort.type,
+          search: this.search,
+          limit: this.limit
+        }
+      }).then(response => {
+        this.products = response.data.products;
+        this.warehouses = response.data.warehouses;
+        this.categories = response.data.categories;
+        this.brands = response.data.brands;
+        this.totalRows = response.data.totalRows;
+
+        // Complete the animation of theprogress bar.
+        NProgress.done();
+        this.isLoading = false;
+      }).catch(response => {
+        // Complete the animation of theprogress bar.
+        NProgress.done();
+        setTimeout(() => {
           this.isLoading = false;
-        })
-        .catch(response => {
-          // Complete the animation of theprogress bar.
-          NProgress.done();
-          setTimeout(() => {
-            this.isLoading = false;
-          }, 500);
-        });
+        }, 500);
+      });
     },
 
     //----------------------------------- Remove Product ------------------------------\\

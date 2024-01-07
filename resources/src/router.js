@@ -43,10 +43,7 @@ const routes = [
           {
             path: "store",
             name: "store_product",
-            component: () =>
-              import(
-                                /* webpackChunkName: "store_product" */ "./views/app/pages/products/Add_product"
-              )
+            component: () => import("./views/app/pages/products/Add_product")
           },
           {
             path: "edit/:id",

@@ -3719,7 +3719,7 @@ class ReportController extends BaseController
         }
 
 
-        $products_data = Product::where('deleted_at', '=', null)->select('id', 'name', 'code', 'is_variant', 'unit_id', 'type')
+        $products_data = Product::query()->select('id', 'code', 'is_variant', 'unit_id', 'type')
 
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {

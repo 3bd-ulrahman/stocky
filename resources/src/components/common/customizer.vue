@@ -103,9 +103,9 @@ export default {
     ]),
 
     SetLocal(locale) {
-      this.$i18n.locale = locale;
       this.$store.dispatch("language/setLanguage", locale);
       Fire.$emit("ChangeLanguage");
+      this.$router.go(this.$router.currentRoute)
     },
 
     indexLocales() {
@@ -116,9 +116,7 @@ export default {
   },
 
   created: function () {
-    axios.get('settings/locales').then(response => {
-      this.locales = response.data.locales;
-    });
+    this.indexLocales();
   }
 };
 </script>

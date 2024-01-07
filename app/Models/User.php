@@ -13,7 +13,7 @@ use Laravel\Cashier\Billable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable, Billable, SoftDeletes;
+    use HasApiTokens, Notifiable, SoftDeletes;
 
     protected $table = 'users';
 
