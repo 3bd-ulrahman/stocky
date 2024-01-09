@@ -28,28 +28,16 @@ export default {
     }
   },
   mounted() {
-    var payButton = document.getElementById("pay-button");
     var form = document.getElementById("checkout-payment-form");
     var errorStack = [];
 
     Frames.init(this.CHECKOUT_PUBLIC_KEY);
 
     Frames.addEventHandler(
-      Frames.Events.CARD_VALIDATION_CHANGED,
-      onCardValidationChanged
-    );
-    function onCardValidationChanged(event) {
-      console.log("CARD_VALIDATION_CHANGED: %o", event);
-      // payButton.disabled = !Frames.isCardValid();
-    }
-
-    Frames.addEventHandler(
       Frames.Events.FRAME_VALIDATION_CHANGED,
       onValidationChanged
     );
     function onValidationChanged(event) {
-      console.log("FRAME_VALIDATION_CHANGED: %o", event);
-
       var errorMessageElement = document.querySelector(".error-message");
       var hasError = !event.isValid && !event.isEmpty;
 

@@ -100,6 +100,11 @@ if ($installed === false) {
     });
 
 } else {
+    Route::get('test', function () {
+        return $productCategories = \App\Models\Product::with(['roles' => function ($query) {
+            $query->select('role_id');
+        }])->get();
+    });
     Route::any('/setup/{vue}', function () {
         abort(403);
     });

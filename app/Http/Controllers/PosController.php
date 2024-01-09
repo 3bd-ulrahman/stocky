@@ -10,28 +10,17 @@ use App\Models\PaymentSale;
 use App\Models\Setting;
 use App\Models\ProductVariant;
 use App\Models\product_warehouse;
-use App\Models\PaymentWithCreditCard;
 use App\Models\Role;
 use App\Models\Sale;
 use App\Models\Unit;
 use App\Models\SaleDetail;
 use App\Models\Warehouse;
+use App\Services\PaymentGatewayService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PaymentGateway;
-use Stripe\Stripe;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use Checkout\CheckoutSdk;
-use Checkout\Environment;
-use Checkout\CheckoutException;
-use Checkout\Payments\Request\Source\RequestTokenSource;
-use Checkout\Payments\Request\PaymentRequest;
-use Checkout\Common\Currency;
-use Illuminate\Http\Response;
-use Checkout\CheckoutApiException;
 
 class PosController extends BaseController
 {
@@ -93,26 +82,24 @@ class PosController extends BaseController
 
         $STRIPE_KEY = config('payment.STRIPE_KEY');
         $CHECKOUT_PUBLIC_KEY = config('payment.CHECKOUT_PUBLIC_KEY');
-
         $paymentGateway = PaymentGateway::query()->where('is_active', true)->pluck('name')->first();
 
         return response()->json([
             'STRIPE_KEY' => $STRIPE_KEY,
             'CHECKOUT_PUBLIC_KEY' => $CHECKOUT_PUBLIC_KEY,
+            'paymentGateway' => $paymentGateway,
             'brands' => $brands,
             'defaultWarehouse' => $defaultWarehouse,
             'defaultClient' => $defaultClient,
             'default_client_name' => $default_client_name,
             'clients' => $clients,
             'warehouses' => $warehouses,
-            'categories' => $categories,
-            'paymentGateway' => $paymentGateway
+            'categories' => $categories
         ]);
     }
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $this->authorizeForUser($request->user('api'), 'Sales_pos', Sale::class);
 
         request()->validate([
@@ -163,24 +150,20 @@ class PosController extends BaseController
                     'imei_number' => $value['imei_number'],
                 ];
 
-                if ($value['product_variant_id'] !== null) {
-                    $product_warehouse = product_warehouse::where('warehouse_id', $order->warehouse_id)
-                        ->where('product_id', $value['product_id'])
-                        ->where('product_variant_id', $value['product_variant_id'])
-                        ->first();
-                } else {
-                    $product_warehouse = product_warehouse::where('warehouse_id', $order->warehouse_id)
-                        ->where('product_id', $value['product_id'])
-                        ->first();
-                }
+                $productWarehouse = product_warehouse::where('warehouse_id', $order->warehouse_id)
+                    ->where('product_id', $value['product_id'])
+                    ->when($value['product_variant_id'] !== null, function ($query) use($value) {
+                        $query->where('product_variant_id', $value['product_variant_id']);
+                    })
+                    ->first();
 
-                if ($unit && $product_warehouse) {
+                if ($unit && $productWarehouse) {
                     if ($unit->operator == '/') {
-                        $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
+                        $productWarehouse->qte -= $value['quantity'] / $unit->operator_value;
                     } else {
-                        $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
+                        $productWarehouse->qte -= $value['quantity'] * $unit->operator_value;
                     }
-                    $product_warehouse->save();
+                    $productWarehouse->save();
                 }
             }
 
@@ -211,24 +194,24 @@ class PosController extends BaseController
                     $paymentGateway = PaymentGateway::query()->where('is_active', true)->pluck('name')->first();
 
                     if ($paymentGateway === 'stripe') {
-                        $this->stripePay($request);
+                        (new PaymentGatewayService)->stripe()->pay($request);
                     }
 
                     if ($paymentGateway === 'checkout') {
-                        $this->checkoutPay();
+                        (new PaymentGatewayService)->checkout()->pay($request);
                     }
 
 
-                    $PaymentSale = new PaymentSale();
-                    $PaymentSale->sale_id = $order->id;
-                    $PaymentSale->Ref = getNumberOrder();
-                    $PaymentSale->date = Carbon::now();
-                    $PaymentSale->Reglement = $request->payment['Reglement'];
-                    $PaymentSale->montant = $request['amount'];
-                    $PaymentSale->change = $request['change'];
-                    $PaymentSale->notes = $request->payment['notes'];
-                    $PaymentSale->user_id = Auth::user()->id;
-                    $PaymentSale->save();
+                    PaymentSale::query()->create([
+                        'sale_id' => $order->id,
+                        'Ref' => getNumberOrder(),
+                        'date' => Carbon::now(),
+                        'Reglement' => $request->payment['Reglement'],
+                        'montant' => $request['amount'],
+                        'change' => $request['change'],
+                        'notes' => $request->payment['notes'],
+                        'user_id' => Auth::user()->id
+                    ]);
 
                     $sale->update([
                         'paid_amount' => $total_paid,
@@ -395,52 +378,5 @@ class PosController extends BaseController
             'products' => $data,
             'totalRows' => $totalRows,
         ]);
-    }
-
-    private function stripePay(Request $request): void
-    {
-        Stripe::setApiKey(config('payment.STRIPE_SECRET'));
-        \Stripe\Charge::create([
-            'amount' => $request->amount * 100,
-            'currency' => 'usd',
-            'source' => $request->token]
-        );
-    }
-
-    private function checkoutPay(): void
-    {
-        $log = new Logger("checkout-sdk-php-sample");
-        $log->pushHandler(new StreamHandler("php://stdout"));
-
-        // Initialize Checkout API
-        try {
-            $api = CheckoutSdk::builder()->staticKeys()
-                ->environment(Environment::sandbox())
-                ->secretKey(config('payment.CHECKOUT_SECRET_KEY'))
-                ->build();
-        } catch (CheckoutException $e) {
-            $log->error("An exception occurred while initializing Checkout SDK : {$e->getMessage()}");
-            http_response_code(400);
-        }
-
-        $postData = file_get_contents("php://input");
-        $request = json_decode($postData);
-
-        // The token generated by Frames on the client side
-        $requestTokenSource = new RequestTokenSource();
-        $requestTokenSource->token = $request->token;
-
-        $request = new PaymentRequest();
-        $request->source = $requestTokenSource;
-        $request->currency = Currency::$USD;
-        $request->amount = 2499;
-        $request->processing_channel_id = config('payment.CHECKOUT_CHANNEL_ID');
-
-        try {
-            json_encode($api->getPaymentsClient()->requestPayment($request));
-        } catch (CheckoutApiException $e) {
-            $log->error("An exception occurred while processing payment request");
-            http_response_code(400);
-        }
     }
 }

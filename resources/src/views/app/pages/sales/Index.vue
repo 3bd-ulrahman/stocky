@@ -13,20 +13,20 @@
         @on-sort-change="onSortChange"
         @on-search="onSearch"
         :search-options="{
-        placeholder: $t('Search_this_table'),
-        enabled: true,
-      }"
+          placeholder: $t('Search_this_table'),
+          enabled: true,
+        }"
         :select-options="{
           enabled: true ,
           clearSelectionText: '',
         }"
         @on-selected-rows-change="selectionChanged"
         :pagination-options="{
-        enabled: true,
-        mode: 'records',
-        nextLabel: 'next',
-        prevLabel: 'prev',
-      }"
+          enabled: true,
+          mode: 'records',
+          nextLabel: 'next',
+          prevLabel: 'prev',
+        }"
         :styleClass="showDropdown?'tableOne table-hover vgt-table full-height':'tableOne table-hover vgt-table non-height'"
       >
         <div slot="selected-row-actions">
@@ -169,61 +169,76 @@
               </b-dropdown>
             </div>
           </span>
+
           <div v-else-if="props.column.field == 'statut'">
-            <span
-              v-if="props.row.statut == 'completed'"
+            <span v-if="props.row.statut == 'completed'"
               class="badge badge-outline-success"
-            >{{$t('complete')}}</span>
-            <span
-              v-else-if="props.row.statut == 'pending'"
+            >
+              {{$t('complete')}}
+            </span>
+            <span v-else-if="props.row.statut == 'pending'"
               class="badge badge-outline-info"
-            >{{$t('Pending')}}</span>
-            <span v-else class="badge badge-outline-warning">{{$t('Ordered')}}</span>
+            >
+              {{$t('Pending')}}
+            </span>
+            <span v-else class="badge badge-outline-warning">
+              {{$t('Ordered')}}
+            </span>
           </div>
 
           <div v-else-if="props.column.field == 'payment_status'">
-            <span
-              v-if="props.row.payment_status == 'paid'"
+            <span v-if="props.row.payment_status == 'paid'"
               class="badge badge-outline-success"
-            >{{$t('Paid')}}</span>
-            <span
-              v-else-if="props.row.payment_status == 'partial'"
+            >
+              {{$t('Paid')}}
+            </span>
+            <span v-else-if="props.row.payment_status == 'partial'"
               class="badge badge-outline-primary"
-            >{{$t('partial')}}</span>
-            <span v-else class="badge badge-outline-warning">{{$t('Unpaid')}}</span>
+            >
+              {{$t('partial')}}
+            </span>
+            <span v-else class="badge badge-outline-warning">
+              {{$t('Unpaid')}}
+            </span>
           </div>
+
           <div v-else-if="props.column.field == 'shipping_status'">
-            <span
-              v-if="props.row.shipping_status == 'ordered'"
+            <span v-if="props.row.shipping_status == 'ordered'"
               class="badge badge-outline-warning"
-            >{{$t('Ordered')}}</span>
-
-            <span
-              v-else-if="props.row.shipping_status == 'packed'"
+            >
+              {{$t('Ordered')}}
+            </span>
+            <span v-else-if="props.row.shipping_status == 'packed'"
               class="badge badge-outline-info"
-            >{{$t('Packed')}}</span>
-
-            <span
-              v-else-if="props.row.shipping_status == 'shipped'"
+            >
+              {{$t('Packed')}}
+            </span>
+            <span v-else-if="props.row.shipping_status == 'shipped'"
               class="badge badge-outline-secondary"
-            >{{$t('Shipped')}}</span>
-
-             <span
-              v-else-if="props.row.shipping_status == 'delivered'"
+            >
+              {{$t('Shipped')}}
+            </span>
+            <span v-else-if="props.row.shipping_status == 'delivered'"
               class="badge badge-outline-success"
-            >{{$t('Delivered')}}</span>
-
-            <span v-else-if="props.row.shipping_status == 'cancelled'" class="badge badge-outline-danger">{{$t('Cancelled')}}</span>
+            >
+              {{$t('Delivered')}}
+            </span>
+            <span v-else-if="props.row.shipping_status == 'cancelled'"
+              class="badge badge-outline-danger"
+            >
+              {{$t('Cancelled')}}
+            </span>
           </div>
-           <div v-else-if="props.column.field == 'Ref'">
-              <router-link
-                :to="'/app/sales/detail/'+props.row.id"
-              >
-                <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
-              </router-link> <br>
-              <small v-if="props.row.sale_has_return == 'yes'"><i class="text-15 text-danger i-Back"></i></small>
 
-            </div>
+          <div v-else-if="props.column.field == 'Ref'">
+            <router-link
+              :to="'/app/sales/detail/'+props.row.id"
+            >
+              <span class="ul-btn__text ml-1">{{props.row.Ref}}</span>
+            </router-link> <br>
+            <small v-if="props.row.sale_has_return == 'yes'"><i class="text-15 text-danger i-Back"></i></small>
+
+          </div>
         </template>
       </vue-good-table>
     </div>
@@ -476,20 +491,18 @@
                     :class="{'is-invalid': !!errors.length}"
                     :state="errors[0] ? false : (valid ? true : null)"
                     v-model="payment.Reglement"
-                    @input="Selected_PaymentMethod"
                     :disabled="EditPaiementMode"
                     :reduce="label => label.value"
                     :placeholder="$t('PleaseSelect')"
-                    :options="
-                          [
-                          {label: 'Cash', value: 'Cash'},
-                          {label: 'credit card', value: 'credit card'},
-                          {label: 'TPE', value: 'tpe'},
-                          {label: 'cheque', value: 'cheque'},
-                          {label: 'Western Union', value: 'Western Union'},
-                          {label: 'bank transfer', value: 'bank transfer'},
-                          {label: 'other', value: 'other'},
-                          ]"
+                    :options="[
+                      {label: 'Cash', value: 'Cash'},
+                      {label: 'credit card', value: 'credit card'},
+                      {label: 'TPE', value: 'tpe'},
+                      {label: 'cheque', value: 'cheque'},
+                      {label: 'Western Union', value: 'Western Union'},
+                      {label: 'bank transfer', value: 'bank transfer'},
+                      {label: 'other', value: 'other'},
+                    ]"
                   ></v-select>
                   <b-form-invalid-feedback>{{ errors[0] }}</b-form-invalid-feedback>
                 </b-form-group>
@@ -550,71 +563,25 @@
               >{{parseFloat(payment.received_amount - payment.montant).toFixed(2)}}</p>
             </b-col>
 
-
-
-          <b-col md="12">
+            <b-col md="12">
               <b-card v-show="payment.Reglement == 'credit card' && !EditPaiementMode">
-                <div v-once class="typo__p" v-if="submit_showing_credit_card">
-                  <div class="spinner sm spinner-primary mt-3"></div>
-                </div>
-                <div v-if="displaySavedPaymentMethods && !submit_showing_credit_card">
-                  <div class="mt-3"><span class="mr-3">Saved Credit Card Info For This Client </span>
-                  <b-button variant="outline-info" @click="show_new_credit_card()">
-                      <span>
-                        <i class="i-Two-Windows"></i>
-                        New Credit Card
-                      </span>
-                  </b-button>
-
-                  </div>
-                  <table class="table table-hover mt-3">
-                    <thead>
-                      <tr>
-                        <th>Last 4 digits</th>
-                        <th>Type</th>
-                        <th>Exp</th>
-                        <th>Action</th>
-
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      <tr v-for="card in savedPaymentMethods" :class="{ 'bg-selected-card': isSelectedCard(card) }">
-                        <td>**** {{card.last4}}</td>
-                        <td>{{card.type}}</td>
-                        <td>{{card.exp}}</td>
-                        <td>
-                            <b-button variant="outline-primary" @click="selectCard(card)" v-if="!isSelectedCard(card) && card_id != card.card_id">
-                              <span>
-                                <i class="i-Drag-Up"></i>
-                                Use This
-                              </span>
-                            </b-button>
-                              <i v-if="isSelectedCard(card) || card_id == card.card_id" class="i-Yes" style=" font-size: 20px; "></i>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
                 <div v-if="displayFormNewCard && !submit_showing_credit_card">
                   <form id="payment-form">
                     <label for="card-element" class="leading-7 text-sm text-gray-600">
                       {{$t('Credit_Card_Info')}}
-                      <b-button variant="outline-info" @click="show_saved_credit_card()" v-if="savedPaymentMethods.length > 0">
-                        <span>
-                              <i class="i-Two-Windows"></i>
-                              Use Saved Credit Card
-                            </span>
-                        </b-button>
-                      </label>
-                    <div id="card-element">
-                    </div>
-                    <div id="card-errors" class="is-invalid" role="alert"></div>
+                    </label>
+                    <Stripe v-if="paymentGateway === 'stripe'"
+                      :STRIPE_KEY="STRIPE_KEY"
+                      ref="stripe"
+                    />
+                    <Checkout v-if="paymentGateway === 'checkout'"
+                      :CHECKOUT_PUBLIC_KEY="CHECKOUT_PUBLIC_KEY"
+                      ref="checkout"
+                    />
                   </form>
                 </div>
               </b-card>
-          </b-col>
+            </b-col>
 
             <!-- Note -->
             <b-col lg="12" md="12" sm="12" class="mt-3">
@@ -864,16 +831,25 @@ import "jspdf-autotable";
 import vueEasyPrint from "vue-easy-print";
 import VueBarcode from "vue-barcode";
 import { loadStripe } from "@stripe/stripe-js";
+import Stripe from "../../../../components/Stripe.vue";
+import Checkout from "../../../../components/Checkout.vue";
+
 export default {
   components: {
     vueEasyPrint,
-    barcode: VueBarcode
+    barcode: VueBarcode,
+    Stripe,
+    Checkout
   },
   metaInfo: {
     title: "Sales"
   },
   data() {
     return {
+      sales: [],
+      paymentGateway: '',
+      STRIPE_KEY: '',
+      CHECKOUT_PUBLIC_KEY: '',
       stripe_key:'',
       stripe: {},
       cardElement: {},
@@ -915,7 +891,6 @@ export default {
       customers: [],
       warehouses: [],
       shipment: {},
-      sales: [],
       sale_due:'',
       due:0,
       client_name:'',
@@ -1081,56 +1056,6 @@ export default {
     }
   },
   methods: {
-    test() {
-      alert('asdasda');
-    },
-
-     async Selected_PaymentMethod(value) {
-      if (value === 'credit card') {
-        this.savedPaymentMethods = [];
-        this.submit_showing_credit_card = true;
-        this.selectedCard = null
-        this.card_id = '';
-        // Check if the customer has saved payment methods
-        await axios.get(`/retrieve-customer?customerId=${this.sale.client_id}`)
-            .then(response => {
-                // If the customer has saved payment methods, display them
-                this.savedPaymentMethods = response.data.data;
-                this.card_id = response.data.customer_default_source;
-                this.hasSavedPaymentMethod = true;
-                this.useSavedPaymentMethod = true;
-                this.is_new_credit_card = false;
-                this.submit_showing_credit_card = false;
-            })
-            .catch(error => {
-                // If the customer does not have saved payment methods, show the card element for them to enter their payment information
-                this.hasSavedPaymentMethod = false;
-                this.useSavedPaymentMethod = false;
-                this.is_new_credit_card = true;
-                this.card_id = '';
-
-                setTimeout(() => {
-                    this.loadStripe_payment();
-                }, 1000);
-                this.submit_showing_credit_card = false;
-            });
-
-
-        }else{
-          this.hasSavedPaymentMethod = false;
-          this.useSavedPaymentMethod = false;
-          this.is_new_credit_card = false;
-        }
-
-    },
-
-    show_saved_credit_card() {
-      this.hasSavedPaymentMethod = true;
-      this.useSavedPaymentMethod = true;
-      this.is_new_credit_card = false;
-      this.Selected_PaymentMethod('credit card');
-    },
-
     show_new_credit_card() {
       this.selectedCard = null;
       this.card_id = '';
@@ -1485,8 +1410,10 @@ export default {
         this.customers = response.data.customers;
         this.warehouses = response.data.warehouses;
         this.totalRows = response.data.totalRows;
-        this.stripe_key = response.data.stripe_key;
         this.representatives = response.data.representatives;
+        this.STRIPE_KEY = response.data.STRIPE_KEY,
+        this.CHECKOUT_PUBLIC_KEY = response.data.CHECKOUT_PUBLIC_KEY,
+        this.paymentGateway = response.data.paymentGateway
         // Complete the animation of theprogress bar.
         NProgress.done();
         this.isLoading = false;

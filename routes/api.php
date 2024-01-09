@@ -275,7 +275,8 @@ Route::middleware(['auth:api', 'Is_Active', 'localeSessionRedirect', 'localizati
     //-------------------------------  Sales --------------------------\\
     //------------------------------------------------------------------\\
 
-    Route::resource('sales', 'SalesController');
+    Route::resource('sales', SalesController::class);
+
     Route::get('convert_to_sale_data/{id}', 'SalesController@Elemens_Change_To_Sale');
     Route::get('get_payments_by_sale/{id}', 'SalesController@Payments_Sale');
     Route::post('sales_send_email', 'SalesController@Send_Email');

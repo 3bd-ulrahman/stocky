@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PaymentGateway;
 use App\Models\User;
+use App\Services\PaymentGatewayService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Response;
 use Twilio\Rest\Client as Client_Twilio;
@@ -39,7 +40,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Stripe;
 use App\Models\PaymentWithCreditCard;
 use PDF;
 use ArPHP\I18N\Arabic;
@@ -59,26 +59,7 @@ class SalesController extends BaseController
         $offSet = ($pageStart * $perPage) - $perPage;
         $order = $request->SortField;
         $dir = $request->SortType;
-        $helpers = new Helpers();
-        // Filter fields With Params to retrieve
-        $param = array(
-            0 => 'like',
-            1 => 'like',
-            2 => '=',
-            3 => 'like',
-            4 => '=',
-            5 => '=',
-            6 => 'like',
-        );
-        $columns = array(
-            0 => 'Ref',
-            1 => 'statut',
-            2 => 'client_id',
-            3 => 'payment_statut',
-            4 => 'warehouse_id',
-            5 => 'date',
-            6 => 'shipping_status'
-        );
+
         $data = array();
 
         // Check If User Has Permission View  All Records
@@ -90,39 +71,36 @@ class SalesController extends BaseController
             ->when($request->payment_statut, fn ($query) => $query->where('payment_statut', 'like', $request->payment_statut))
             ->when($request->warehouse_id, fn ($query) => $query->where('warehouse_id', $request->warehouse_id))
             ->when($request->date, fn ($query) => $query->where('date', $request->date))
-            ->when($request->shipping_status, fn ($query) => $query->where('shipping_status', 'like', $request->shipping_status));
+            ->when($request->shipping_status, fn ($query) => $query->where('shipping_status', 'like', $request->shipping_status))
 
-        //Multiple Filter
-        $Filtred = $helpers->filter($Sales, $columns, $param, $request)
             // Search With Multiple Param
-            ->where(function ($query) use ($request) {
-                return $query->when($request->filled('search'), function ($query) use ($request) {
-                    return $query->where('Ref', 'LIKE', "%{$request->search}%")
-                        ->orWhere('statut', 'LIKE', "%{$request->search}%")
-                        ->orWhere('GrandTotal', $request->search)
-                        ->orWhere('payment_statut', 'like', "%{$request->search}%")
-                        ->orWhere('shipping_status', 'like', "%{$request->search}%")
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('client', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
-                        })
-                        ->orWhere(function ($query) use ($request) {
-                            return $query->whereHas('warehouse', function ($q) use ($request) {
-                                $q->where('name', 'LIKE', "%{$request->search}%");
-                            });
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $query->where('Ref', 'LIKE', "%{$request->search}%")
+                    ->orWhere('statut', 'LIKE', "%{$request->search}%")
+                    ->orWhere('GrandTotal', $request->search)
+                    ->orWhere('payment_statut', 'like', "%{$request->search}%")
+                    ->orWhere('shipping_status', 'like', "%{$request->search}%")
+                    ->orWhere(function ($query) use ($request) {
+                        return $query->whereHas('client', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%{$request->search}%");
                         });
-                });
-            })->when($request->representative, function ($query) {
+                    })
+                    ->orWhere(function ($query) use ($request) {
+                        return $query->whereHas('warehouse', function ($q) use ($request) {
+                            $q->where('name', 'LIKE', "%{$request->search}%");
+                        });
+                    });
+            })
+            ->when($request->representative, function ($query) {
                 $query->where('representative_id', request()->representative);
             });
 
-        $totalRows = $Filtred->count();
+        $totalRows = $Sales->count();
         if ($perPage == "-1") {
             $perPage = $totalRows;
         }
 
-        $Sales = $Filtred->offset($offSet)
+        $Sales = $Sales->offset($offSet)
             ->limit($perPage)
             ->orderBy($order, $dir)
             ->get();
@@ -149,8 +127,8 @@ class SalesController extends BaseController
             $item['due'] = number_format($item['GrandTotal'] - $item['paid_amount'], 2, '.', '');
             $item['payment_status'] = $Sale['payment_statut'];
 
-            if (SaleReturn::where('sale_id', $Sale['id'])->where('deleted_at', '=', null)->exists()) {
-                $sellReturn = SaleReturn::where('sale_id', $Sale['id'])->where('deleted_at', '=', null)->first();
+            if (SaleReturn::query()->where('sale_id', $Sale['id'])->exists()) {
+                $sellReturn = SaleReturn::query()->where('sale_id', $Sale['id'])->first();
                 $item['salereturn_id'] = $sellReturn->id;
                 $item['sale_has_return'] = 'yes';
             } else {
@@ -160,8 +138,7 @@ class SalesController extends BaseController
             $data[] = $item;
         }
 
-        $stripe_key = config('app.STRIPE_KEY');
-        $customers = client::where('deleted_at', '=', null)->get(['id', 'name']);
+        $customers = client::query()->get(['id', 'name']);
 
         //get warehouses assigned to user
         $user_auth = auth()->user();
@@ -174,20 +151,21 @@ class SalesController extends BaseController
 
         $representatives = User::query()->where('is_representative', true)->get();
 
+        $STRIPE_KEY = config('payment.STRIPE_KEY');
+        $CHECKOUT_PUBLIC_KEY = config('payment.CHECKOUT_PUBLIC_KEY');
         $paymentGateway = PaymentGateway::query()->where('is_active', true)->pluck('name')->first();
 
         return response()->json([
-            'stripe_key' => $stripe_key,
+            'STRIPE_KEY' => $STRIPE_KEY,
+            'CHECKOUT_PUBLIC_KEY' => $CHECKOUT_PUBLIC_KEY,
+            'paymentGateway' => $paymentGateway,
             'totalRows' => $totalRows,
             'sales' => $data,
             'customers' => $customers,
             'warehouses' => $warehouses,
-            'representatives' => $representatives,
-            'paymentGateway' => $paymentGateway
+            'representatives' => $representatives
         ]);
     }
-
-    //------------- STORE NEW SALE-----------\\
 
     public function store(Request $request)
     {
@@ -196,6 +174,7 @@ class SalesController extends BaseController
         request()->validate([
             'client_id' => 'required',
             'warehouse_id' => 'required',
+            'amount' => ['required', 'gt:0']
         ]);
 
         DB::transaction(function () use ($request) {
@@ -239,36 +218,20 @@ class SalesController extends BaseController
                 ];
 
                 if ($order->statut == "completed") {
-                    if ($value['product_variant_id'] !== null) {
-                        $product_warehouse = product_warehouse::where('deleted_at', '=', null)
-                            ->where('warehouse_id', $order->warehouse_id)
-                            ->where('product_id', $value['product_id'])
-                            ->where('product_variant_id', $value['product_variant_id'])
-                            ->first();
+                    $productWarehouse = product_warehouse::where('warehouse_id', $order->warehouse_id)
+                        ->where('product_id', $value['product_id'])
+                        ->when($value['product_variant_id'] !== null, function ($query) use($value) {
+                            $query->where('product_variant_id', $value['product_variant_id']);
+                        })
+                        ->first();
 
-                        if ($unit && $product_warehouse) {
-                            if ($unit->operator == '/') {
-                                $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
-                            } else {
-                                $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
-                            }
-                            $product_warehouse->save();
+                    if ($unit && $productWarehouse) {
+                        if ($unit->operator == '/') {
+                            $productWarehouse->qte -= $value['quantity'] / $unit->operator_value;
+                        } else {
+                            $productWarehouse->qte -= $value['quantity'] * $unit->operator_value;
                         }
-
-                    } else {
-                        $product_warehouse = product_warehouse::where('deleted_at', '=', null)
-                            ->where('warehouse_id', $order->warehouse_id)
-                            ->where('product_id', $value['product_id'])
-                            ->first();
-
-                        if ($unit && $product_warehouse) {
-                            if ($unit->operator == '/') {
-                                $product_warehouse->qte -= $value['quantity'] / $unit->operator_value;
-                            } else {
-                                $product_warehouse->qte -= $value['quantity'] * $unit->operator_value;
-                            }
-                            $product_warehouse->save();
-                        }
+                        $productWarehouse->save();
                     }
                 }
             }
@@ -299,111 +262,55 @@ class SalesController extends BaseController
                         $payment_statut = 'unpaid';
                     }
 
-                    if ($request['amount'] > 0) {
-                        if ($request->payment['Reglement'] == 'credit card') {
-                            $Client = Client::whereId($request->client_id)->first();
-                            Stripe\Stripe::setApiKey(config('app.STRIPE_SECRET'));
 
-                            // Check if the payment record exists
-                            $PaymentWithCreditCard = PaymentWithCreditCard::where('customer_id', $request->client_id)->first();
-                            if (!$PaymentWithCreditCard) {
+                    if ($request->payment['Reglement'] == 'credit card') {
+                        $paymentGateway = PaymentGateway::query()->where('is_active', true)->pluck('name')->first();
 
-                                // Create a new customer and charge the customer with a new credit card
-                                $customer = \Stripe\Customer::create([
-                                    'source' => $request->token,
-                                    'email' => $Client->email,
-                                    'name' => $Client->name,
-                                ]);
-
-                                // Charge the Customer instead of the card:
-                                $charge = \Stripe\Charge::create([
-                                    'amount' => $request['amount'] * 100,
-                                    'currency' => 'usd',
-                                    'customer' => $customer->id,
-                                ]);
-                                $PaymentCard['customer_stripe_id'] = $customer->id;
-
-                                // Check if the payment record not exists
-                            } else {
-
-                                // Retrieve the customer ID and card ID
-                                $customer_id = $PaymentWithCreditCard->customer_stripe_id;
-                                $card_id = $request->card_id;
-
-                                // Charge the customer with the new credit card or the selected card
-                                if ($request->is_new_credit_card || $request->is_new_credit_card == 'true' || $request->is_new_credit_card === 1) {
-                                    // Retrieve the customer
-                                    $customer = \Stripe\Customer::retrieve($customer_id);
-
-                                    // Create New Source
-                                    $card = \Stripe\Customer::createSource(
-                                        $customer_id,
-                                        [
-                                            'source' => $request->token,
-                                        ]
-                                    );
-
-                                    $charge = \Stripe\Charge::create([
-                                        'amount' => $request['amount'] * 100,
-                                        'currency' => 'usd',
-                                        'customer' => $customer_id,
-                                        'source' => $card->id,
-                                    ]);
-                                    $PaymentCard['customer_stripe_id'] = $customer_id;
-
-                                } else {
-                                    $charge = \Stripe\Charge::create([
-                                        'amount' => $request['amount'] * 100,
-                                        'currency' => 'usd',
-                                        'customer' => $customer_id,
-                                        'source' => $card_id,
-                                    ]);
-                                    $PaymentCard['customer_stripe_id'] = $customer_id;
-                                }
-                            }
-
-                            $PaymentSale = new PaymentSale();
-                            $PaymentSale->sale_id = $order->id;
-                            $PaymentSale->Ref = app('App\Http\Controllers\PaymentSalesController')->getNumberOrder();
-                            $PaymentSale->date = Carbon::now();
-                            $PaymentSale->Reglement = $request->payment['Reglement'];
-                            $PaymentSale->montant = $request['amount'];
-                            $PaymentSale->change = $request['change'];
-                            $PaymentSale->notes = NULL;
-                            $PaymentSale->user_id = Auth::user()->id;
-                            $PaymentSale->save();
-
-                            $sale->update([
-                                'paid_amount' => $total_paid,
-                                'payment_statut' => $payment_statut,
-                            ]);
-
-                            $PaymentCard['customer_id'] = $request->client_id;
-                            $PaymentCard['payment_id'] = $PaymentSale->id;
-                            $PaymentCard['charge_id'] = $charge->id;
-                            PaymentWithCreditCard::create($PaymentCard);
-
-                            // Paying Method Cash
-                        } else {
-
-                            PaymentSale::create([
-                                'sale_id' => $order->id,
-                                'Ref' => app('App\Http\Controllers\PaymentSalesController')->getNumberOrder(),
-                                'date' => Carbon::now(),
-                                'Reglement' => $request->payment['Reglement'],
-                                'montant' => $request['amount'],
-                                'change' => $request['change'],
-                                'notes' => NULL,
-                                'user_id' => Auth::user()->id,
-                            ]);
-
-                            $sale->update([
-                                'paid_amount' => $total_paid,
-                                'payment_statut' => $payment_statut,
-                            ]);
+                        if ($paymentGateway === 'stripe') {
+                            (new PaymentGatewayService)->stripe()->pay($request);
                         }
 
+                        if ($paymentGateway === 'checkout') {
+                            (new PaymentGatewayService)->checkout()->pay($request);
+                        }
+
+                        PaymentSale::query()->create([
+                            'sale_id' => $order->id,
+                            'Ref' => getNumberOrder(),
+                            'date' => Carbon::now(),
+                            'Reglement' => $request->payment['Reglement'],
+                            'montant' => $request['amount'],
+                            'change' => $request['change'],
+                            'notes' => NULL,
+                            'user_id' => Auth::user()->id
+                        ]);
+
+                        $sale->update([
+                            'paid_amount' => $total_paid,
+                            'payment_statut' => $payment_statut,
+                        ]);
+
+                        // Paying Method Cash
+                    } else {
+
+                        PaymentSale::create([
+                            'sale_id' => $order->id,
+                            'Ref' => app('App\Http\Controllers\PaymentSalesController')->getNumberOrder(),
+                            'date' => Carbon::now(),
+                            'Reglement' => $request->payment['Reglement'],
+                            'montant' => $request['amount'],
+                            'change' => $request['change'],
+                            'notes' => NULL,
+                            'user_id' => Auth::user()->id,
+                        ]);
+
+                        $sale->update([
+                            'paid_amount' => $total_paid,
+                            'payment_statut' => $payment_statut,
+                        ]);
                     }
+
+
                 } catch (\Exception $e) {
                     return response()->json(['message' => $e->getMessage()], 500);
                 }

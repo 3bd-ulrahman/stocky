@@ -1081,16 +1081,16 @@
                                   <i class="i-Two-Windows"></i>
                                   Use Saved Credit Card
                                 </span>
-                                </b-button>
-                              </label>
-                              <Stripe v-if="paymentGateway === 'stripe'"
-                                :STRIPE_KEY="STRIPE_KEY"
-                                ref="stripe"
-                              />
-                              <Checkout v-if="paymentGateway === 'checkout'"
-                                :CHECKOUT_PUBLIC_KEY="CHECKOUT_PUBLIC_KEY"
-                                ref="checkout"
-                              />
+                              </b-button>
+                            </label>
+                            <Stripe v-if="paymentGateway === 'stripe'"
+                              :STRIPE_KEY="STRIPE_KEY"
+                              ref="stripe"
+                            />
+                            <Checkout v-if="paymentGateway === 'checkout'"
+                              :CHECKOUT_PUBLIC_KEY="CHECKOUT_PUBLIC_KEY"
+                              ref="checkout"
+                            />
                           </form>
                         </div>
                      </b-card>
@@ -2054,14 +2054,16 @@ export default {
     async storePos() {
       let paymentToken = '';
 
-      if (this.paymentGateway === 'stripe') {
-        let {token} = await this.$refs.stripe.payment();
-        paymentToken = token.id;
-      }
+      if (this.payment.Reglement == "credit card") {
+        if (this.paymentGateway === 'stripe') {
+          let {token} = await this.$refs.stripe.payment();
+          paymentToken = token.id;
+        }
 
-      if (this.paymentGateway === 'checkout') {
-        let {token} = await this.$refs.checkout.payment();
-        paymentToken = token;
+        if (this.paymentGateway === 'checkout') {
+          let {token} = await this.$refs.checkout.payment();
+          paymentToken = token;
+        }
       }
 
       NProgress.start();

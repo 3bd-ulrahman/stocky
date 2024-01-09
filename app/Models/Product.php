@@ -84,7 +84,7 @@ class Product extends Model implements TranslatableContract
 
     public function unit()
     {
-        return $this->belongsTo('App\Models\Unit', 'unit_id');
+        return $this->belongsTo(Unit::class, 'unit_id');
     }
 
     public function unitPurchase()
