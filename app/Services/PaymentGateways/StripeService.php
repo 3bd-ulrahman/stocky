@@ -13,7 +13,7 @@ class StripeService
         \Stripe\Charge::create([
             'amount' => $request->amount * 100,
             'currency' => 'usd',
-            'source' => $request->token]
-        );
+            'source' => $request->token
+        ]);
     }
 }
