@@ -842,14 +842,12 @@ class SalesController extends BaseController
     }
 
     //-------------- Print Invoice ---------------\\
-
     public function Print_Invoice_POS(Request $request, $id)
     {
         $helpers = new Helpers();
         $details = array();
 
-        $sale = Sale::with('details.product.unitSale')
-            ->where('deleted_at', '=', null)
+        $sale = Sale::query()->with('details.product.unitSale')
             ->findOrFail($id);
 
         $item['id'] = $sale->id;
@@ -911,7 +909,7 @@ class SalesController extends BaseController
             ->get();
 
         $settings = Setting::where('deleted_at', '=', null)->first();
-        $pos_settings = PosSetting::where('deleted_at', '=', null)->first();
+        $pos_settings = PosSetting::query()->first();
         $symbol = $helpers->Get_Currency_Code();
 
         return response()->json([
@@ -979,8 +977,7 @@ class SalesController extends BaseController
 
         $details = array();
         $helpers = new Helpers();
-        $sale_data = Sale::with('details.product.unitSale')
-            ->where('deleted_at', '=', null)
+        $sale_data = Sale::query()->with('details.product.unitSale')
             ->findOrFail($id);
 
         $sale['client_name'] = $sale_data['client']->name;
@@ -1062,7 +1059,7 @@ class SalesController extends BaseController
         $settings = Setting::where('deleted_at', '=', null)->first();
         $symbol = $helpers->Get_Currency_Code();
 
-        $Html = view('pdf.sale_pdf', [
+        $Html = view('pdf.sale', [
             'symbol' => $symbol,
             'setting' => $settings,
             'sale' => $sale,
@@ -1079,7 +1076,6 @@ class SalesController extends BaseController
 
         $pdf = PDF::loadHTML($Html);
         return $pdf->download('sale.pdf');
-
     }
 
     //----------------Show Form Create Sale ---------------\\
@@ -1787,9 +1783,5 @@ class SalesController extends BaseController
         }
 
         return response()->json(['success' => true]);
-
-
     }
-
-
 }

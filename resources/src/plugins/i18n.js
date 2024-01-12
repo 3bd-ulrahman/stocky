@@ -4,12 +4,9 @@ import messages from '../translations';
 
 Vue.use(VueI18n);
 
-export const i18n = async function () {
-  const store = await import('../store');
-
-  return new VueI18n({
-    locale: store.default.state.language.language,
-    fallbackLocale: 'en',
-    messages,
-  });
-};
+const storedLocale = window.localStorage.getItem('storedLocale');
+export const i18n = new VueI18n({
+  locale: storedLocale || 'en',
+  fallbackLocale: 'en',
+  messages,
+});

@@ -80,10 +80,11 @@ Vue.config.productionTip = true;
 Vue.config.silent = true;
 Vue.config.devtools = false;
 
-const initializedI18n = await i18n();
 let login = new Vue({
   el: '#login',
   store,
-  i18n: initializedI18n,
+  i18n,
   router: router,
 });
+
+console.log('login.js: ' + i18n.locale);

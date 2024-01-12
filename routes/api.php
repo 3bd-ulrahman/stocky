@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\Settings\PaymentGatewayController;
 use Settings\LocaleController;
 use Illuminate\Http\Request;
@@ -275,7 +276,7 @@ Route::middleware(['auth:api', 'Is_Active', 'localeSessionRedirect', 'localizati
     //-------------------------------  Sales --------------------------\\
     //------------------------------------------------------------------\\
 
-    Route::resource('sales', SalesController::class);
+    Route::resource('sales', \SalesController::class);
 
     Route::get('convert_to_sale_data/{id}', 'SalesController@Elemens_Change_To_Sale');
     Route::get('get_payments_by_sale/{id}', 'SalesController@Payments_Sale');
@@ -449,4 +450,4 @@ Route::get('payment_purchase_pdf/{id}', 'PaymentPurchasesController@Payment_purc
 Route::get('payment_return_sale_pdf/{id}', 'PaymentSaleReturnsController@payment_return');
 Route::get('payment_return_purchase_pdf/{id}', 'PaymentPurchaseReturnsController@payment_return');
 Route::get('payment_sale_pdf/{id}', 'PaymentSalesController@payment_sale');
-Route::get('sales_print_invoice/{id}', 'SalesController@Print_Invoice_POS');
+Route::get('sales_print_invoice/{id}', [SalesController::class, 'Print_Invoice_POS']);

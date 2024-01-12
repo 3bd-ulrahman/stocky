@@ -782,7 +782,7 @@ export default {
      view_employee:'مشاهدة الموظفين',
      edit_employee:'تحرير الموظفين',
      delete_employee:'حذف الموظفين',
-     
+
     Created_by : 'تمت الإضافة بواسطة',
     Add_product_IMEI_Serial_number:'أضف الرقم التسلسلي للمنتج',
     Product_Has_Imei_Serial_number:'المنتج له رقم تسلسلي',

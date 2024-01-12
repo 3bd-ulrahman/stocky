@@ -87,14 +87,11 @@ const actions = {
             context.commit('setPermissions', Permissions)
             context.commit('setUser', user)
             context.commit('Notifs_alert', notifs)
-
-            context.commit('SetDefaultLanguage', default_language)
         }).catch(() => {
             context.commit('setPermissions', null)
             context.commit('setallmodules', null)
             context.commit('setUser', null)
             context.commit('Notifs_alert', null)
-            context.commit('SetDefaultLanguage', 'en')
         });
     },
 

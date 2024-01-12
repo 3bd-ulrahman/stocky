@@ -773,17 +773,29 @@
         <b-modal hide-footer size="sm" scrollable id="Show_invoice" :title="$t('Invoice_POS')">
           <div id="invoice-POS">
             <div style="max-width:400px;margin:0px auto">
+
               <div class="info">
                 <div class="invoice_logo text-center mb-2">
                   <img :src="'/images/'+invoice_pos.setting.logo" alt width="60" height="60">
                 </div>
                 <p>
-                  <span>{{$t('date')}} : {{invoice_pos.sale.date}} <br></span>
-                  <span v-show="pos_settings.show_address">{{$t('Adress')}} : {{invoice_pos.setting.CompanyAdress}} <br></span>
-                  <span v-show="pos_settings.show_email">{{$t('Email')}} : {{invoice_pos.setting.email}} <br></span>
-                  <span v-show="pos_settings.show_phone">{{$t('Phone')}} : {{invoice_pos.setting.CompanyPhone}} <br></span>
-                  <span v-show="pos_settings.show_customer">{{$t('Customer')}} : {{invoice_pos.sale.client_name}} <br></span>
-                  <span v-show="pos_settings.show_Warehouse">{{$t('warehouse')}} : {{invoice_pos.sale.warehouse_name}} <br></span>
+                  <span>{{$t('date')}} : {{invoice_pos.sale.date}} <br>
+                  </span>
+                  <span v-show="pos_settings.show_address">
+                    {{$t('Adress')}} : {{invoice_pos.setting.CompanyAdress}} <br>
+                  </span>
+                  <span v-show="pos_settings.show_email">
+                    {{$t('Email')}} : {{invoice_pos.setting.email}} <br>
+                  </span>
+                  <span v-show="pos_settings.show_phone">
+                    {{$t('Phone')}} : {{invoice_pos.setting.CompanyPhone}} <br>
+                  </span>
+                  <span v-show="pos_settings.show_customer">
+                    {{$t('Customer')}} : {{invoice_pos.sale.client_name}} <br>
+                  </span>
+                  <span v-show="pos_settings.show_Warehouse">
+                    {{$t('warehouse')}} : {{invoice_pos.sale.warehouse_name}} <br>
+                  </span>
                 </p>
               </div>
 
@@ -855,7 +867,6 @@
                     <th style="text-align: right;" colspan="1">{{$t('Change')}}:</th>
                   </tr>
                 </thead>
-
                 <tbody>
                   <tr v-for="payment_pos in payments">
                     <td style="text-align: left;" colspan="1">{{payment_pos.Reglement}}</td>
@@ -1984,72 +1995,24 @@ export default {
       // Start the progress bar.
       NProgress.start();
       NProgress.set(0.1);
-      axios
-        .get("sales_print_invoice/" + id)
-        .then(response => {
-          this.invoice_pos = response.data;
-          this.payments = response.data.payments;
-          this.pos_settings = response.data.pos_settings;
-          setTimeout(() => {
-            // Complete the animation of the  progress bar.
-            NProgress.done();
-            this.$bvModal.show("Show_invoice");
-          }, 500);
-
-          if(response.data.pos_settings.is_printable){
-            setTimeout(() => this.print_pos(), 1000);
-          }
-        })
-        .catch(() => {
+      axios.get("sales_print_invoice/" + id).then(response => {
+        this.invoice_pos = response.data;
+        this.payments = response.data.payments;
+        this.pos_settings = response.data.pos_settings;
+        setTimeout(() => {
           // Complete the animation of the  progress bar.
-          setTimeout(() => NProgress.done(), 500);
-        });
-    },
-    //----------------------------------Process Payment ------------------------------\\
-    async processPayment() {
-      this.paymentProcessing = true;
-      const { token, error } = await this.stripe.createToken(this.cardElement);
-      if (error) {
-        this.paymentProcessing = false;
-        NProgress.done();
-        this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-      } else {
-
-        axios.post("pos", {
-          client_id: this.sale.client_id,
-          warehouse_id: this.sale.warehouse_id,
-          tax_rate: this.sale.tax_rate?this.sale.tax_rate:0,
-          TaxNet: this.sale.TaxNet?this.sale.TaxNet:0,
-          discount: this.sale.discount?this.sale.discount:0,
-          shipping: this.sale.shipping?this.sale.shipping:0,
-          details: this.details,
-          GrandTotal: this.GrandTotal,
-          payment: this.payment,
-          amount : parseFloat(this.payment.amount).toFixed(2),
-          received_amount : parseFloat(this.payment.received_amount).toFixed(2),
-          change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
-          token: token.id,
-          is_new_credit_card: this.is_new_credit_card,
-          selectedCard: this.selectedCard,
-          card_id: this.card_id,
-        }).then(response => {
-          this.paymentProcessing = false;
-          if (response.data.success === true) {
-            // Complete the animation of theprogress bar.
-            NProgress.done();
-            this.Invoice_POS(response.data.id);
-            this.$bvModal.hide("Add_Payment");
-            this.Reset_Pos();
-          }
-        }).catch(error => {
-          this.paymentProcessing = false;
-          // Complete the animation of theprogress bar.
           NProgress.done();
-          this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-        });
-      }
-    },
+          this.$bvModal.show("Show_invoice");
+        }, 500);
 
+        if(response.data.pos_settings.is_printable){
+          setTimeout(() => this.print_pos(), 1000);
+        }
+      }).catch(() => {
+        // Complete the animation of the  progress bar.
+        setTimeout(() => NProgress.done(), 500);
+      });
+    },
 
     async storePos() {
       let paymentToken = '';

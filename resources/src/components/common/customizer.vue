@@ -103,9 +103,10 @@ export default {
     ]),
 
     SetLocal(locale) {
+      window.localStorage.setItem("storedLocale", locale);
       this.$store.dispatch("language/setLanguage", locale);
       Fire.$emit("ChangeLanguage");
-      this.$router.go(this.$router.currentRoute)
+      this.$router.go(this.$router.currentRoute);
     },
 
     indexLocales() {

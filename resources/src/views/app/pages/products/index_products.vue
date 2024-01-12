@@ -431,7 +431,7 @@ export default {
 
       let pdf = new jsPDF("p", "pt");
       let columns = [
-        { title: "type", dataKey: "type" },
+        { title: 'type', dataKey: "type" },
         { title: "name", dataKey: "name" },
         { title: "code", dataKey: "code" },
         { title: "category", dataKey: "category" },
