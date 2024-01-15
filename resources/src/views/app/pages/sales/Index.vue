@@ -37,7 +37,7 @@
             <i class="i-Filter-2"></i>
             {{ $t("Filter") }}
           </b-button>
-          <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">
+          <b-button @click="salesPDF()" size="sm" variant="outline-success ripple m-1">
             <i class="i-File-Copy"></i> PDF
           </b-button>
           <vue-excel-xlsx
@@ -827,12 +827,13 @@
 import { mapActions, mapGetters } from "vuex";
 import NProgress from "nprogress";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from 'jspdf-autotable';
 import vueEasyPrint from "vue-easy-print";
 import VueBarcode from "vue-barcode";
 import { loadStripe } from "@stripe/stripe-js";
 import Stripe from "../../../../components/Stripe.vue";
 import Checkout from "../../../../components/Checkout.vue";
+import '@/assets/fonts/Amiri-Regular-normal.js';
 
 export default {
   components: {
@@ -1266,8 +1267,7 @@ export default {
       return `${value[0]}.${formated}`;
     },
     //----------------------------------- Sales PDF ------------------------------\\
-    Sales_PDF() {
-      var self = this;
+    salesPDF() {
       let pdf = new jsPDF("p", "pt");
       let columns = [
         { title: "Ref", dataKey: "Ref" },
@@ -1281,8 +1281,15 @@ export default {
         { title: "Status Payment", dataKey: "payment_status" },
         { title: "Shipping Status", dataKey: "shipping_status" }
       ];
-      pdf.autoTable(columns, self.sales);
-      pdf.text("Sale List", 40, 25);
+
+      autoTable(pdf, {
+        columns: columns,
+        body: this.products,
+        styles: {
+          font: "Amiri-Regular"
+        }
+      });
+
       pdf.save("Sale_List.pdf");
     },
     //-------------------------------- Invoice POS ------------------------------\\

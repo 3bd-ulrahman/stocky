@@ -26,19 +26,13 @@ const routes = [
       //Products
       {
         path: "/app/products",
-        component: () =>
-          import(
-                        /* webpackChunkName: "products" */ "./views/app/pages/products"
-          ),
+        component: () => import("./views/app/pages/products/Router.vue"),
         redirect: "app/products/list",
         children: [
           {
             name: "index_products",
             path: "list",
-            component: () =>
-              import(
-                                /* webpackChunkName: "index_products" */ "./views/app/pages/products/index_products"
-              )
+            component: () => import("./views/app/pages/products/Index.vue")
           },
           {
             path: "store",

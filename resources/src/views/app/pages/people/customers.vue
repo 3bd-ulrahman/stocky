@@ -14,9 +14,9 @@
         @on-search="onSearch"
         :search-options="{
         enabled: true,
-        placeholder: $t('Search_this_table'),  
+        placeholder: $t('Search_this_table'),
       }"
-        :select-options="{ 
+        :select-options="{
           enabled: true ,
           clearSelectionText: '',
         }"
@@ -110,7 +110,7 @@
                   <i class="nav-icon i-Eye font-weight-bold mr-2"></i>
                   {{$t('Customer_details')}}
                 </b-dropdown-item>
-               
+
                 <b-dropdown-item
                   @click="show_credit_card_details(props.row.id)"
                 >
@@ -200,7 +200,7 @@
       >
         <b-form @submit.prevent="Submit_Payment_sell_due">
           <b-row>
-          
+
             <!-- Paying Amount  -->
             <b-col lg="6" md="12" sm="12">
               <validation-provider
@@ -283,7 +283,7 @@
       >
         <b-form @submit.prevent="Submit_Payment_sell_return_due">
           <b-row>
-          
+
             <!-- Paying Amount -->
             <b-col lg="6" md="12" sm="12">
               <validation-provider
@@ -478,7 +478,7 @@
                 </b-form-group>
               </validation-provider>
             </b-col>
-            
+
              <!-- Customer Email -->
             <b-col md="6" sm="12">
                 <b-form-group :label="$t('Email')">
@@ -564,7 +564,7 @@
       <b-row>
 
         <b-col md="12" v-if="savedPaymentMethods && savedPaymentMethods.length > 0">
-            <div class="mt-3"><span >Saved Credit Card Info For This Client </span></div>    
+            <div class="mt-3"><span >Saved Credit Card Info For This Client </span></div>
             <table class="table table-hover mt-3">
               <thead>
                 <tr>
@@ -584,11 +584,11 @@
                   <td>
                       <b-button variant="outline-primary" @click="selectCard(card)" v-if="!isSelectedCard(card) && card_id != card.card_id">
                         <span>
-                          <i class="i-Drag-Up"></i> 
+                          <i class="i-Drag-Up"></i>
                           Set as default
                         </span>
                       </b-button>
-                        <span v-if="isSelectedCard(card) || card_id == card.card_id"><i class="i-Yes" style=" font-size: 20px; "></i> 
+                        <span v-if="isSelectedCard(card) || card_id == card.card_id"><i class="i-Yes" style=" font-size: 20px; "></i>
                         Default credit card  </span>
                   </td>
                 </tr>
@@ -598,10 +598,10 @@
         </b-col>
 
         <b-col md="12" v-else>
-            <div class="mt-3"><span >Customer don't have credit card saved </span></div>    
+            <div class="mt-3"><span >Customer don't have credit card saved </span></div>
         </b-col>
 
-       
+
       </b-row>
     </b-modal>
 
@@ -712,7 +712,7 @@
 
                 <tr>
                   <td>{{$t('Phone')}}</td>
-                 
+
                 </tr>
 
                 <tr>
@@ -749,7 +749,8 @@
 import { mapActions, mapGetters } from "vuex";
 import NProgress from "nprogress";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from 'jspdf-autotable';
+import '@/assets/fonts/Amiri-Regular-normal.js';
 
 export default {
   metaInfo: {
@@ -762,7 +763,7 @@ export default {
       selectedCard:null,
       card_id:'',
       customer_id:'',
-      
+
       isLoading: true,
       SubmitProcessing:false,
       ImportProcessing:false,
@@ -1169,7 +1170,7 @@ export default {
         .post("update-customer-stripe", {
           customer_id: this.customer_id,
           card_id: this.card_id,
-         
+
         })
         .then(response => {
 
@@ -1183,7 +1184,7 @@ export default {
         .catch(error => {
             this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
         });
-      
+
     },
 
     //----------------------------------- Show Details Client -------------------------------\\
@@ -1235,7 +1236,7 @@ export default {
           this.SubmitProcessing = false;
         })
         .catch(error => {
-          
+
           this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
           this.SubmitProcessing = false;
         });
@@ -1264,7 +1265,7 @@ export default {
           this.SubmitProcessing = false;
         })
         .catch(error => {
-         
+
           this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
           this.SubmitProcessing = false;
         });
@@ -1398,7 +1399,7 @@ export default {
           this.$t("Warning")
         );
         this.payment.amount = 0;
-      } 
+      }
     },
 
       //-------------------------------- reset_Form_payment-------------------------------\\
@@ -1424,7 +1425,7 @@ export default {
       setTimeout(() => {
         this.$bvModal.show("modal_Pay_due");
       }, 500);
-      
+
     },
 
      //------------------------------ Print Customer_Invoice -------------------------\\
@@ -1507,7 +1508,7 @@ export default {
           this.$t("Warning")
         );
         this.payment_return.amount = 0;
-      } 
+      }
     },
 
       //-------------------------------- reset_Form_payment-------------------------------\\
@@ -1533,7 +1534,7 @@ export default {
       setTimeout(() => {
         this.$bvModal.show("modal_Pay_return_due");
       }, 500);
-      
+
     },
 
      //------------------------------ Print Customer_Invoice -------------------------\\

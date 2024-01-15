@@ -14,9 +14,9 @@
         @on-search="onSearch"
         :search-options="{
         enabled: true,
-        placeholder: $t('Search_this_table'),  
+        placeholder: $t('Search_this_table'),
       }"
-        :select-options="{ 
+        :select-options="{
           enabled: true ,
           clearSelectionText: '',
         }"
@@ -202,7 +202,8 @@
 import { mapActions, mapGetters } from "vuex";
 import NProgress from "nprogress";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from 'jspdf-autotable';
+import '@/assets/fonts/Amiri-Regular-normal.js';
 
 export default {
   metaInfo: {
@@ -276,8 +277,6 @@ export default {
   methods: {
     //-------------------------------------- Adjustement PDF ------------------------------\\
     Adjustment_PDF() {
-      var self = this;
-
       let pdf = new jsPDF("p", "pt");
       let columns = [
         { title: "Date", dataKey: "date" },
@@ -285,8 +284,16 @@ export default {
         { title: "Warehouse", dataKey: "warehouse_name" },
         { title: "Total Products", dataKey: "items" }
       ];
-      pdf.autoTable(columns, self.adjustments);
+
+
       pdf.text("Adjustment List", 40, 25);
+      autoTable(pdf, {
+        columns: columns,
+        body: this.adjustments,
+        styles: {
+          font: "Amiri-Regular"
+        }
+      });
       pdf.save("Adjustment_List.pdf");
     },
 

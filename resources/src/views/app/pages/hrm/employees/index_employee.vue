@@ -15,9 +15,9 @@
         @on-search="onSearch"
         :search-options="{
         enabled: true,
-        placeholder: $t('Search_this_table'),  
+        placeholder: $t('Search_this_table'),
       }"
-        :select-options="{ 
+        :select-options="{
           enabled: true ,
           clearSelectionText: '',
         }"
@@ -31,9 +31,9 @@
         styleClass="tableOne table-hover vgt-table"
       >
         <div slot="selected-row-actions">
-          <button 
+          <button
             v-if="currentUserPermissions && currentUserPermissions.includes('delete_employee')"
-            class="btn btn-danger btn-sm" 
+            class="btn btn-danger btn-sm"
             @click="delete_by_selected()">{{$t('Del')}}
           </button>
         </div>
@@ -68,10 +68,10 @@
         </div>
 
         <template slot="table-row" slot-scope="props">
-         
+
           <span v-if="props.column.field == 'actions'">
 
-            <router-link 
+            <router-link
             v-if="currentUserPermissions && currentUserPermissions.includes('view_employee')"
             title="detail" :to="'/app/hrm/employees/detail/'+props.row.id">
               <i class="i-Eye text-25 text-info"></i>
@@ -132,7 +132,7 @@
             </b-form-group>
           </b-col>
 
-        
+
           <!-- Company  -->
           <b-col md="12">
             <b-form-group :label="$t('Company')">
@@ -172,7 +172,8 @@
 import { mapActions, mapGetters } from "vuex";
 import NProgress from "nprogress";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from 'jspdf-autotable';
+import '@/assets/fonts/Amiri-Regular-normal.js';
 
 export default {
   metaInfo: {

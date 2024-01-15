@@ -1,4 +1,5 @@
 const mix = require('laravel-mix');
+const path = require('path');
 
 
 /*
@@ -29,5 +30,10 @@ mix.webpackConfig({
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: ['./js/*']
     }),
-  ]
+  ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'resources/src'),
+    }
+  }
 });

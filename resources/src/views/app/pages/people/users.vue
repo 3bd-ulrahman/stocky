@@ -375,7 +375,8 @@
 import { mapActions, mapGetters } from "vuex";
 import NProgress from "nprogress";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from 'jspdf-autotable';
+import '@/assets/fonts/Amiri-Regular-normal.js';
 
 export default {
   metaInfo: {
