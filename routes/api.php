@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PosController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\Settings\PaymentGatewayController;
@@ -214,7 +215,7 @@ Route::middleware(['auth:api', 'Is_Active', 'localeSessionRedirect', 'localizati
 
     //------------------------------- PRODUCTS --------------------------\\
     //------------------------------------------------------------------\\
-    Route::resource('products', 'ProductController');
+    Route::resource('products', \ProductController::class);
     Route::post('products/import/csv', 'ProductController@import_products');
     Route::get('get_Products_by_warehouse/{id}', 'ProductController@Products_by_Warehouse');
     Route::get('get_product_detail/{id}', 'ProductController@Get_Products_Details');

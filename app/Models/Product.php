@@ -6,7 +6,7 @@ use App\Models\Concerns\Translatable;
 use App\Models\Translations\ProductTranslation;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model implements TranslatableContract
@@ -102,5 +102,10 @@ class Product extends Model implements TranslatableContract
         return $this->belongsTo(Brand::class)->withDefault([
             'name' => 'N/D'
         ]);
+    }
+
+    public function warehouses(): BelongsToMany
+    {
+        return $this->belongsToMany(Warehouse::class);
     }
 }
