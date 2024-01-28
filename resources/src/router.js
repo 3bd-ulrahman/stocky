@@ -645,7 +645,7 @@ const routes = [
       // Settings
       {
         path: "/app/settings",
-        component: () => import("./views/app/pages/settings"),
+        component: () => import("./views/app/pages/settings/Router.vue"),
         redirect: "/app/settings/System_settings",
         children: [
           // Permissions
@@ -768,30 +768,26 @@ const routes = [
           {
             name: "Backup",
             path: "Backup",
-            component: () =>
-              import(
-                                /* webpackChunkName: "Backup" */ "./views/app/pages/settings/backup"
-              )
+            component: () => import("./views/app/pages/settings/backup")
           },
 
           // Warehouses
           {
-            name: "Warehouses",
-            path: "Warehouses",
-            component: () =>
-              import(
-                                /* webpackChunkName: "Warehouses" */ "./views/app/pages/settings/warehouses"
-              )
+            name: "warehouses",
+            path: "warehouses",
+            component: () => import("./views/app/pages/settings/warehouses/Index.vue")
+          },
+          {
+            name: "warehouses.products.index",
+            path: "warehouses/:warehouse/products",
+            component: () => import("./views/app/pages/settings/warehouses/products/Index.vue")
           },
 
           // System Settings
           {
             name: "system_settings",
             path: "System_settings",
-            component: () =>
-              import(
-                                /* webpackChunkName: "System_settings" */ "./views/app/pages/settings/system_settings"
-              )
+            component: () => import("./views/app/pages/settings/system_settings")
           },
 
           // Locales

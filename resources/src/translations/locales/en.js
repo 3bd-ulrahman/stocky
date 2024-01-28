@@ -1,6 +1,7 @@
 //Language Anglais
 
 export default {
+    Category: 'Category',
     Receipt:'Receipt',
     Pos_Settings:'Pos Settings (Receipt)',
     Note_to_customer:'Note to customer',
@@ -365,6 +366,7 @@ export default {
     ChangeAvatar: 'Change Avatar',
     LeaveBlank: 'Please leave this field blank if you haven\'t changed it',
     type: 'Type',
+    Type: 'Type',
     UserPermissions: 'Users Permissions',
     RoleName: 'Role',
     RoleDescription: 'Role Description',

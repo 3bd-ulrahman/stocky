@@ -373,7 +373,7 @@ export default {
 
         {
           label: this.$t("Brand"),
-          field: "brand",
+          field: "brand.name",
           tdClass: "text-left",
           thClass: "text-left"
         },

@@ -72,31 +72,26 @@ class ProductController extends BaseController
             $item['code'] = $product->code;
             $item['name'] = $product->name;
             $item['category'] = $product['category']->name;
-            $item['brand'] = $product['brand'] ? $product['brand']->name : 'N/D';
+            $item['brand']['name'] = $product['brand']->name;
 
 
             $firstimage = explode(',', $product->image);
             $item['image'] = $firstimage[0];
 
-
-            if ($product->type == 'is_single') {
-
+            if ($product->type->value == 'is_single') {
                 $item['type'] = 'Single';
                 $item['cost'] = number_format($product->cost, 2, '.', ',');
                 $item['price'] = number_format($product->price, 2, '.', ',');
-                $item['unit'] = $product['unit']->ShortName;
+                $item['unit'] = $product['unit']->ShortName ?? '';
 
-                $product_warehouse_total_qty = product_warehouse::where('product_id', $product->id)
-                    ->where('deleted_at', '=', null)
+                $product_warehouse_total_qty = product_warehouse::query()->where('product_id', $product->id)
                     ->sum('qte');
 
-                $item['quantity'] = $product_warehouse_total_qty . ' ' . $product['unit']->ShortName;
+                $item['quantity'] = $product_warehouse_total_qty . ' ' . ($product['unit']->ShortName ?? '');
 
-            } elseif ($product->type == 'is_variant') {
-
+            } elseif ($product->type->value == 'is_variant') {
                 $item['type'] = 'Variable';
-                $product_variant_data = ProductVariant::where('product_id', $product->id)
-                    ->where('deleted_at', '=', null)
+                $product_variant_data = ProductVariant::query()->where('product_id', $product->id)
                     ->get();
 
                 $item['cost'] = '';
@@ -110,8 +105,7 @@ class ProductController extends BaseController
                     $item['price'] .= '<br>';
                 }
 
-                $product_warehouse_total_qty = product_warehouse::where('product_id', $product->id)
-                    ->where('deleted_at', '=', null)
+                $product_warehouse_total_qty = product_warehouse::query()->where('product_id', $product->id)
                     ->sum('qte');
 
                 $item['quantity'] = $product_warehouse_total_qty . ' ' . $product['unit']->ShortName;
@@ -765,7 +759,6 @@ class ProductController extends BaseController
         }, 10);
 
         return response()->json(['success' => true]);
-
     }
 
     //-------------- Delete by selection  ---------------\\
@@ -1540,7 +1533,4 @@ class ProductController extends BaseController
         }
 
     }
-
-
-
 }

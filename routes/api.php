@@ -5,6 +5,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\Settings\PaymentGatewayController;
+use App\Http\Controllers\Settings\Warehouses;
+use Settings\WarehouseController;
 use Settings\LocaleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -252,8 +254,9 @@ Route::middleware(['auth:api', 'Is_Active', 'localeSessionRedirect', 'localizati
 
     //------------------------------- WAREHOUSES --------------------------\\
 
-    Route::resource('warehouses', 'WarehouseController');
-    Route::post('warehouses/delete/by_selection', 'WarehouseController@delete_by_selection');
+    Route::resource('warehouses', WarehouseController::class);
+    Route::resource('warehouses.products', Settings\Warehouses\ProductController::class);
+    Route::post('warehouses/delete/by_selection', [WarehouseController::class, 'delete_by_selection']);
 
     //------------------------------- PURCHASES --------------------------\\
     //------------------------------------------------------------------\\

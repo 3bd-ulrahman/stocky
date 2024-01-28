@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\Translatable;
+use App\Models\Enums\ProductType;
 use App\Models\Translations\ProductTranslation;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Illuminate\Database\Eloquent\Model;
@@ -41,6 +42,7 @@ class Product extends Model implements TranslatableContract
     public $translationModel = ProductTranslation::class;
 
     protected $casts = [
+        'type' => ProductType::class,
         'category_id' => 'integer',
         'sub_category_id' => 'integer',
         'unit_id' => 'integer',
@@ -53,7 +55,7 @@ class Product extends Model implements TranslatableContract
         'cost' => 'double',
         'price' => 'double',
         'stock_alert' => 'double',
-        'TaxNet' => 'double',
+        'TaxNet' => 'double'
     ];
 
     // Relationships

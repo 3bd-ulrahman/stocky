@@ -753,11 +753,10 @@
               <span class="item-name">{{$t('GroupPermissions')}}</span>
             </router-link>
           </li>
-          <li
-            class="nav-item"
+          <li class="nav-item"
             v-if="currentUserPermissions && currentUserPermissions.includes('warehouse')"
           >
-            <router-link tag="a" class to="/app/settings/Warehouses">
+            <router-link tag="a" class to="/app/settings/warehouses">
               <i class="nav-icon i-Clothing-Store"></i>
               <span class="item-name">{{$t('Warehouses')}}</span>
             </router-link>

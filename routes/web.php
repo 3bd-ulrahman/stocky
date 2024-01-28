@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 /*
 |--------------------------------------------------------------------------
@@ -100,20 +99,6 @@ if ($installed === false) {
     });
 
 } else {
-    Route::get('test', function () {
-        $warehouses = [3, 5];
-        $Product_variants = \App\Models\ProductVariant::query()->where('product_id', 130)->get();
-        foreach ($warehouses as $warehouse) {
-            foreach ($Product_variants as $product_variant) {
-                $product_warehouse[$warehouse] = [
-                    'product_variant_id' => $product_variant->id,
-                    'manage_stock'       => 10
-                ];
-            }
-        }
-        $product = \App\Models\Product::query()->first();
-        return $product->warehouses()->attach($product_warehouse);
-    });
     Route::any('/setup/{vue}', function () {
         abort(403);
     });

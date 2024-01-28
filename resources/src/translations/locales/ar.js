@@ -1,7 +1,6 @@
 //Language Arabe
-
-
 export default {
+    Category: 'التصنيف',
     Pos_Settings:'إعدادات نقاط البيع',
     Receipt:'الإيصال',
     Note_to_customer:'ملاحظة للعميل',
@@ -350,6 +349,7 @@ export default {
     lastname: 'اسم العائلة',
     username: 'اسم المستخدم',
     type: 'النوع',
+    Type: 'النوع',
     UserPermissions: 'تراخيص المستخدمين',
     RoleName: 'اسم الدور',
     RoleDescription: 'وصف الدور',

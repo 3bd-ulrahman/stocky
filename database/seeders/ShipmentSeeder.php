@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Casts\ShipmentStatus;
+use App\Models\Enums\ShipmentStatus;
 use App\Models\Sale;
 use App\Models\Shipment;
 use Illuminate\Database\Seeder;

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Casts\ShipmentStatus;
+use App\Models\Enums\ShipmentStatus;
 use Illuminate\Database\Eloquent\Model;
 
 class Shipment extends Model
