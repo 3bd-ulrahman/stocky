@@ -21,8 +21,5 @@ class Category extends Model implements TranslatableContract
 
     public $translationModel = CategoryTranslation::class;
 
-    public function translations(): HasMany
-    {
-        return $this->hasMany(CategoryTranslation::class);
-    }
+    protected $with = ['translations'];
 }

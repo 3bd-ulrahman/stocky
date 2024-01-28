@@ -41,6 +41,8 @@ class Product extends Model implements TranslatableContract
 
     public $translationModel = ProductTranslation::class;
 
+    protected $with = ['translations'];
+
     protected $casts = [
         'type' => ProductType::class,
         'category_id' => 'integer',

@@ -22,4 +22,6 @@ class Brand extends Model implements TranslatableContract
     public $translatedAttributes = ['name'];
 
     public $translationModel = BrandTranslation::class;
+
+    protected $with = ['translations'];
 }

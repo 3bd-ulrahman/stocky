@@ -1,6 +1,6 @@
 <template>
   <div class="main-content">
-    <breadcumb :page="$t('productsList')" :folder="$t('Products')"/>
+    <breadcumb :page="$t('productsList')" :folder="$t('warehouse')"/>
     <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
     <div v-else>
       <vue-good-table
