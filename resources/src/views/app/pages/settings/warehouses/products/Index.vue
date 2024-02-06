@@ -61,8 +61,8 @@
           </b-button>
           <router-link
             class="btn-sm btn btn-primary btn-icon m-1"
-            v-if="currentUserPermissions && currentUserPermissions.includes('products_add')"
-            to="/app/products/store"
+            v-if="currentUserPermissions?.includes('products_add')"
+            :to="{name: 'settings.warehouses.products.create'}"
           >
             <span class="ul-btn__icon">
               <i class="i-Add"></i>
@@ -322,15 +322,14 @@ export default {
       totalRows: "",
       isLoading: true,
       spinner: false,
-      limit: "10",
+      limit: 10,
       Filter_brand: "",
       Filter_code: "",
       Filter_name: "",
       Filter_category: "",
       categories: [],
       brands: [],
-      products: {},
-      warehouses: []
+      products: {}
     };
   },
 
@@ -627,7 +626,6 @@ export default {
         }
       }).then(response => {
         this.products = response.data.products;
-        this.warehouses = response.data.warehouses;
         this.categories = response.data.categories;
         this.brands = response.data.brands;
         this.totalRows = response.data.totalRows;

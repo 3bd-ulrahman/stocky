@@ -215,15 +215,15 @@
 
           <li
             v-show="currentUserPermissions && (currentUserPermissions.includes('setting_system')
-                        || currentUserPermissions.includes('sms_settings')
-                        || currentUserPermissions.includes('notification_template')
-                        || currentUserPermissions.includes('pos_settings')
-                        || currentUserPermissions.includes('payment_gateway')
-                        || currentUserPermissions.includes('mail_settings')
-                        || currentUserPermissions.includes('warehouse')
-                        || currentUserPermissions.includes('backup')
-                        || currentUserPermissions.includes('currency')
-                        || currentUserPermissions.includes('permissions_view'))"
+              || currentUserPermissions.includes('sms_settings')
+              || currentUserPermissions.includes('notification_template')
+              || currentUserPermissions.includes('pos_settings')
+              || currentUserPermissions.includes('payment_gateway')
+              || currentUserPermissions.includes('mail_settings')
+              || currentUserPermissions.includes('warehouse')
+              || currentUserPermissions.includes('backup')
+              || currentUserPermissions.includes('currency')
+              || currentUserPermissions.includes('permissions_view'))"
             @mouseenter="toggleSubMenu"
             :class="{ active: selectedParentMenu == 'settings' }"
             class="nav-item"
@@ -756,7 +756,7 @@
           <li class="nav-item"
             v-if="currentUserPermissions && currentUserPermissions.includes('warehouse')"
           >
-            <router-link tag="a" class to="/app/settings/warehouses">
+            <router-link tag="a" class :to="{name: 'settings.warehouses.index'}">
               <i class="nav-icon i-Clothing-Store"></i>
               <span class="item-name">{{$t('Warehouses')}}</span>
             </router-link>

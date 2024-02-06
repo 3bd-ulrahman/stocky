@@ -65,7 +65,7 @@
                   <td>{{$t('TaxMethod')}}</td>
                   <th>{{product.tax_method}}</th>
                 </tr>
-                <tr v-if="product.type != 'is_service'"> 
+                <tr v-if="product.type != 'is_service'">
                   <td>{{$t('StockAlert')}}</td>
                   <th>
                     <span
@@ -73,7 +73,7 @@
                     >{{formatNumber(product.stock_alert ,2)}}</span>
                   </th>
                 </tr>
-              
+
               </tbody>
             </table>
           </b-col>
@@ -198,8 +198,6 @@ export default {
   },
 
   methods: {
-   
-
     //------------------------------Formetted Numbers -------------------------\\
     formatNumber(number, dec) {
       const value = (typeof number === "string"

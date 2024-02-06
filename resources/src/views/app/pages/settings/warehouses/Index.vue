@@ -49,7 +49,7 @@
             <router-link v-if="currentUserPermissions?.includes('warehouse')"
               v-b-tooltip.hover
               title="View"
-              :to="{ name:'warehouses.products.index', params: { warehouse: props.row.id} }"
+              :to="{ name:'settings.warehouses.products.index', params: { warehouse: props.row.id} }"
             >
               <i class="i-Eye text-25 text-info"></i>
             </router-link>

@@ -74,7 +74,7 @@
         <template slot="table-row" slot-scope="props">
           <span v-if="props.column.field == 'actions'">
             <router-link
-              v-if="currentUserPermissions && currentUserPermissions.includes('products_view')"
+              v-if="currentUserPermissions?.includes('products_view')"
               v-b-tooltip.hover
               title="View"
               :to="{ name:'detail_product', params: { id: props.row.id} }"
@@ -90,7 +90,7 @@
               <i class="i-Edit text-25 text-success"></i>
             </router-link>
             <a
-              v-if="currentUserPermissions && currentUserPermissions.includes('products_delete')"
+              v-if="currentUserPermissions?.includes('products_delete')"
               @click="Remove_Product(props.row.id)"
               v-b-tooltip.hover
               title="Delete"

@@ -40,10 +40,6 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends BaseController
 {
-
-
-    //----------- Get Last 5 Sales --------------\\
-
     public function Get_last_Sales()
     {
         $Role = Auth::user()->roles()->first();
@@ -75,12 +71,9 @@ class ReportController extends BaseController
         return response()->json($data);
     }
 
-
     //----------------- Customers Report -----------------------\\
-
     public function Client_Report(request $request)
     {
-
         $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
 
         // How many items do you want to display.
@@ -157,10 +150,8 @@ class ReportController extends BaseController
     }
 
     //----------------- Customers Report By ID-----------------------\\
-
     public function Client_Report_detail(request $request, $id)
     {
-
         $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
 
         $client = Client::where('deleted_at', '=', null)->findOrFail($id);
@@ -181,10 +172,8 @@ class ReportController extends BaseController
     }
 
     //----------------- Provider Report By ID-----------------------\\
-
     public function Provider_Report_detail(request $request, $id)
     {
-
         $this->authorizeForUser($request->user('api'), 'Reports_suppliers', Provider::class);
 
         $provider = Provider::where('deleted_at', '=', null)->findOrFail($id);
@@ -206,10 +195,8 @@ class ReportController extends BaseController
     }
 
     //-------------------- Get Sales By Clients -------------\\
-
     public function Sales_Client(request $request)
     {
-
         $this->authorizeForUser($request->user('api'), 'Reports_customers', Client::class);
         // How many items do you want to display.
         $perPage = $request->limit;
@@ -279,7 +266,6 @@ class ReportController extends BaseController
     }
 
     //-------------------- Get Payments By Clients -------------\\
-
     public function Payments_Client(request $request)
     {
 
@@ -2833,7 +2819,7 @@ class ReportController extends BaseController
                     })
                     ->sum('qte');
 
-                $item['quantity'] = $current_stock . ' ' . $product['unit']->ShortName;
+                $item['quantity'] = $current_stock . ' ' . ($product['unit']->ShortName ?? '');
 
                 $data[] = $item;
 
@@ -2862,7 +2848,6 @@ class ReportController extends BaseController
 
     public function get_sales_by_product(request $request)
     {
-
         $this->authorizeForUser($request->user('api'), 'stock_report', Product::class);
         // How many items do you want to display.
         $perPage = $request->limit;

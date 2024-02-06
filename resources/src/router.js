@@ -1,9 +1,7 @@
 import Vue from "vue";
 import store from "./store";
 import Router from "vue-router";
-import { i18n } from "./plugins/i18n";
 import authenticate from "./auth/authenticate";
-import IsConnected from "./auth/IsConnected";
 import NProgress from "nprogress";
 Vue.use(Router);
 
@@ -26,7 +24,10 @@ const routes = [
       //Products
       {
         path: "/app/products",
-        component: () => import("./views/app/pages/products/Router.vue"),
+        component: {
+          name: 'products',
+          render: (h) => h('router-view')
+        },
         redirect: "app/products/list",
         children: [
           {
@@ -321,7 +322,10 @@ const routes = [
       //Sale
       {
         path: "/app/sales",
-        component: () => import("./views/app/pages/sales/Router.vue"),
+        component: {
+          name: 'sales',
+          render: (h) => h('router-view')
+        },
         redirect: "/app/sales/list",
         children: [
           {
@@ -645,8 +649,10 @@ const routes = [
       // Settings
       {
         path: "/app/settings",
-        component: () => import("./views/app/pages/settings/Router.vue"),
-        redirect: "/app/settings/System_settings",
+        component: {
+          name: "settings",
+          render: (h) => h('router-view'),
+        },
         children: [
           // Permissions
           {
@@ -738,30 +744,21 @@ const routes = [
           {
             name: "mail_settings",
             path: "mail_settings",
-            component: () =>
-              import(
-                                /* webpackChunkName: "mail_settings" */ "./views/app/pages/settings/mail_settings"
-              )
+            component: () => import("./views/app/pages/settings/mail_settings")
           },
 
           // update_settings
           {
             name: "update_settings",
             path: "update_settings",
-            component: () =>
-              import(
-                                /* webpackChunkName: "update_settings" */ "./views/app/pages/settings/update_settings"
-              )
+            component: () => import("./views/app/pages/settings/update_settings")
           },
 
           // currencies
           {
             name: "currencies",
             path: "Currencies",
-            component: () =>
-              import(
-                                /* webpackChunkName: "Currencies" */ "./views/app/pages/settings/currencies"
-              )
+            component: () => import("./views/app/pages/settings/currencies")
           },
 
           // Backup
@@ -773,14 +770,38 @@ const routes = [
 
           // Warehouses
           {
-            name: "warehouses",
             path: "warehouses",
-            component: () => import("./views/app/pages/settings/warehouses/Index.vue")
-          },
-          {
-            name: "warehouses.products.index",
-            path: "warehouses/:warehouse/products",
-            component: () => import("./views/app/pages/settings/warehouses/products/Index.vue")
+            component: {
+              name: "warehouses",
+              render: (h) => h('router-view')
+            },
+            children: [
+              {
+                path: '',
+                name: "settings.warehouses.index",
+                component: () => import("./views/app/pages/settings/warehouses/Index.vue")
+              },
+              // Products
+              {
+                path: ':warehouse/products',
+                component: {
+                  name: "products",
+                  render: (h) => h('router-view')
+                },
+                children: [
+                  {
+                    path: '',
+                    name: "settings.warehouses.products.index",
+                    component: () => import("./views/app/pages/settings/warehouses/products/Index.vue")
+                  },
+                  {
+                    path: "create",
+                    name: "settings.warehouses.products.create",
+                    component: () => import("./views/app/pages/settings/warehouses/products/Create.vue")
+                  },
+                ]
+              },
+            ]
           },
 
           // System Settings

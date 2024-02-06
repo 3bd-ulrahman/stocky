@@ -61,9 +61,9 @@ class Product extends Model implements TranslatableContract
     ];
 
     // Relationships
-    public function ProductVariant()
+    public function productVariant()
     {
-        return $this->belongsTo('App\Models\ProductVariant');
+        return $this->hasMany(ProductVariant::class);
     }
 
     public function PurchaseDetail()
@@ -110,6 +110,6 @@ class Product extends Model implements TranslatableContract
 
     public function warehouses(): BelongsToMany
     {
-        return $this->belongsToMany(Warehouse::class);
+        return $this->belongsToMany(Warehouse::class, 'product_warehouse')->withPivot('qte');
     }
 }

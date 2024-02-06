@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Enums\ProductType;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -21,11 +22,11 @@ class ProductSeeder extends Seeder
             array_push($products, [
                 'en' => ['name' => fake()->name()],
                 'ar' => ['name' => fake('ar_JO')->name()],
-                'type' => Str::random(5),
+                'type' => fake()->randomElement(ProductType::cases())->value,
                 'code'=> fake()->randomNumber(5),
                 'Type_barcode'=> Str::random(10),
-                'cost'=> fake()->randomNumber(5),
-                'price'=> fake()->randomNumber(5),
+                'cost'=> fake()->randomNumber(3),
+                'price'=> fake()->randomNumber(3),
                 'category_id'=> fake()->numberBetween(1, 10)
             ]);
         }

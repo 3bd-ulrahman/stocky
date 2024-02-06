@@ -1,6 +1,7 @@
 //Language Anglais
 
 export default {
+    Locales: 'Locales',
     Category: 'Category',
     Receipt:'Receipt',
     Pos_Settings:'Pos Settings (Receipt)',
@@ -277,8 +278,8 @@ export default {
     ProductDetails: 'Product Details',
     CustomerName: 'Customer Name',
     CustomerManagement: 'Customer Management',
-    Add: 'Create',
-    add: 'Create',
+    Add: 'Add',
+    Create: 'Create',
     Edit: 'Edit',
     Close: 'Close',
     PleaseSelect: 'Please Select',

@@ -568,7 +568,6 @@ export default {
   },
 
   methods: {
-
      //------ Generate code
      generateNumber() {
       this.code_exist = "";

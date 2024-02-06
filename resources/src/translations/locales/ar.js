@@ -1,5 +1,6 @@
 //Language Arabe
 export default {
+    Locales: 'اللغات',
     Category: 'التصنيف',
     Pos_Settings:'إعدادات نقاط البيع',
     Receipt:'الإيصال',
