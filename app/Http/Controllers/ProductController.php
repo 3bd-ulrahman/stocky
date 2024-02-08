@@ -37,10 +37,10 @@ class ProductController extends BaseController
         $data = array();
 
         $products = Product::with('unit', 'category', 'brand')
-            ->when($request->name, fn($query) => $qyery->where('name', 'like', $request->name))
-            ->when($request->category_id, fn($query) => $qyery->where('category_id', $request->category_id))
-            ->when($request->brand_id, fn($query) => $qyery->where('brand_id', $request->brand_id))
-            ->when($request->code, fn($query) => $qyery->where('code', 'like', $request->code))
+            ->when($request->name, fn($query) => $query->where('name', 'like', $request->name))
+            ->when($request->category_id, fn($query) => $query->where('category_id', $request->category_id))
+            ->when($request->brand_id, fn($query) => $query->where('brand_id', $request->brand_id))
+            ->when($request->code, fn($query) => $query->where('code', 'like', $request->code))
             // Search With Multiple Param
             ->when($request->filled('search'), function ($query) use ($request) {
                 return $query->where('products.name', 'LIKE', "%{$request->search}%")
@@ -96,7 +96,7 @@ class ProductController extends BaseController
 
                 $item['cost'] = '';
                 $item['price'] = '';
-                $item['unit'] = $product['unit']->ShortName;
+                $item['unit'] = ($product['unit']->ShortName ?? '');
 
                 foreach ($product_variant_data as $product_variant) {
                     $item['cost'] .= number_format($product_variant->cost, 2, '.', ',');
@@ -108,7 +108,7 @@ class ProductController extends BaseController
                 $product_warehouse_total_qty = product_warehouse::query()->where('product_id', $product->id)
                     ->sum('qte');
 
-                $item['quantity'] = $product_warehouse_total_qty . ' ' . $product['unit']->ShortName;
+                $item['quantity'] = $product_warehouse_total_qty . ' ' . ($product['unit']->ShortName ?? '');
 
             } else {
                 $item['type'] = 'Service';

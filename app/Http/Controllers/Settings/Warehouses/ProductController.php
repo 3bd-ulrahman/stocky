@@ -51,8 +51,8 @@ class ProductController extends Controller
             })->offset($offSet)
             ->limit($perPage)
             ->when($request->SortField == 'name',
-                fn ($query) => $query->orderByTranslation('name', $request->SortType),
-                fn ($query) => $query->orderBy($request->SortField, $request->SortType)
+                fn($query) => $query->orderByTranslation('name', $request->SortType),
+                fn($query) => $query->orderBy($request->SortField, $request->SortType)
             )->get();
 
         $totalRows = $products->count();

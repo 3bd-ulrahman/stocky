@@ -14,6 +14,7 @@ import '@trevoreyre/autocomplete-vue/dist/style.css';
 import Breadcumb from "./components/breadcumb";
 import { i18n } from "./plugins/i18n";
 import VueCookie from "vue-cookie";
+import NProgress from 'nprogress';
 
 window.auth = new Auth();
 
@@ -51,6 +52,22 @@ window.axios = require('axios');
 window.axios.defaults.baseURL = `/${i18n.locale}/api/`;
 window.axios.defaults.withCredentials = true;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+// Request interceptor to start the progress bar
+axios.interceptors.request.use(config => {
+  NProgress.start();
+  NProgress.set(0.1);
+  return config;
+});
+
+// Response interceptor to complete the progress bar
+axios.interceptors.response.use(response => {
+  NProgress.done();
+  return response;
+}, error => {
+  NProgress.done();
+  return Promise.reject(error);
+});
 
 axios.interceptors.response.use((response) => response, (error) => {
   if (error.response && error.response.data) {

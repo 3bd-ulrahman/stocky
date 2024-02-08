@@ -285,7 +285,6 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import NProgress from "nprogress";
 import jsPDF from "jspdf";
 import autoTable from 'jspdf-autotable';
 import '@/assets/fonts/Amiri-Regular-normal.js';
@@ -469,9 +468,6 @@ export default {
 
     //----------------------------------------Submit  import products-----------------\\
     Submit_import() {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
       var self = this;
       self.ImportProcessing = true;
       self.data.append("products", self.import_products);
@@ -491,12 +487,8 @@ export default {
             this.$t("Failed")
           );
         }
-        // Complete the animation of theprogress bar.
-        NProgress.done();
       }).catch(error => {
         self.ImportProcessing = false;
-        // Complete the animation of theprogress bar.
-        NProgress.done();
         if (error.response && error.response.status === 422) {
             var errors = error.response.data.errors;
 
@@ -560,26 +552,29 @@ export default {
 
     //---- Event Sort Change
     onSortChange(params) {
-      let field = "";
-
       switch (params[0].field) {
         case 'brand':
-          field = "brand_id";
+          params[0].field = "brand_id";
           break;
 
         case 'category':
-          field = "category_id";
+          params[0].field = 'category_id';
           break;
 
         default:
-          field = params[0].field;
+          params[0].field;
           break;
+      }
+
+      if (params[0].type === 'none') {
+        params[0].type = this.serverParams.sort.type;
+        params[0].field = this.serverParams.sort.field;
       }
 
       this.updateParams({
         sort: {
           type: params[0].type,
-          field: field
+          field: params[0].field
         }
       });
       this.Get_Products(this.serverParams.page);
@@ -612,9 +607,6 @@ export default {
 
     //----------------------------------- Get All Products ------------------------------\\
     Get_Products(page) {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
       this.setToStrings();
 
       axios.get(`warehouses/${this.$route.params.warehouse}/products/create`, {
@@ -636,12 +628,8 @@ export default {
         this.brands = response.data.brands;
         this.totalRows = response.data.totalRows;
 
-        // Complete the animation of theprogress bar.
-        NProgress.done();
         this.isLoading = false;
       }).catch(response => {
-        // Complete the animation of theprogress bar.
-        NProgress.done();
         setTimeout(() => {
           this.isLoading = false;
         }, 500);
@@ -661,10 +649,6 @@ export default {
         confirmButtonText: this.$t("Delete.confirmButtonText")
       }).then(result => {
         if (result.value) {
-          // Start the progress bar.
-          NProgress.start();
-          NProgress.set(0.1);
-
           const warehouse = this.$route.params.warehouse;
           const product = id ?? this.selectedProducts;
 
@@ -677,8 +661,6 @@ export default {
 
             Fire.$emit("Delete_Product");
           }).catch(() => {
-            // Complete the animation of theprogress bar.
-            setTimeout(() => NProgress.done(), 500);
             this.$swal(
               this.$t("Delete.Failed"),
               this.$t("Delete.AlreadyLinked"),
@@ -697,8 +679,6 @@ export default {
 
     Fire.$on("Delete_Product", () => {
       this.Get_Products(this.serverParams.page);
-      // Complete the animation of theprogress bar.
-      setTimeout(() => NProgress.done(), 500);
     });
 
     Fire.$on("Event_import", () => {
