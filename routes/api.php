@@ -85,7 +85,7 @@ Route::middleware(['auth:api', 'Is_Active', 'localeSessionRedirect', 'localizati
     Route::get("report/product_purchases_report", "ReportController@product_purchases_report");
 
     Route::get("report/users", "ReportController@users_Report");
-    Route::get("report/stock", "ReportController@stock_Report");
+    Route::get("report/stock", Reports\StockController::class);
     Route::get("report/get_sales_by_user", "ReportController@get_sales_by_user");
     Route::get("report/get_quotations_by_user", "ReportController@get_quotations_by_user");
     Route::get("report/get_sales_return_by_user", "ReportController@get_sales_return_by_user");

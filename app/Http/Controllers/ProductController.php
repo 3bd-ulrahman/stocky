@@ -270,9 +270,6 @@ class ProductController extends BaseController
         }
     }
 
-    //-------------- Update Product  ---------------\\
-    //-----------------------------------------------\\
-
     public function update(Request $request, $id)
     {
 
@@ -726,9 +723,6 @@ class ProductController extends BaseController
 
     }
 
-    //-------------- Remove Product  ---------------\\
-    //-----------------------------------------------\\
-
     public function destroy(Request $request, $id)
     {
         $this->authorizeForUser($request->user('api'), 'delete', Product::class);
@@ -760,8 +754,6 @@ class ProductController extends BaseController
 
         return response()->json(['success' => true]);
     }
-
-    //-------------- Delete by selection  ---------------\\
 
     public function delete_by_selection(Request $request)
     {
@@ -799,15 +791,12 @@ class ProductController extends BaseController
 
     }
 
-
-    //--------------  Show Product Details ---------------\\
-
     public function Get_Products_Details(Request $request, $id)
     {
 
         $this->authorizeForUser($request->user('api'), 'view', Product::class);
 
-        $Product = Product::where('deleted_at', '=', null)->findOrFail($id);
+        $Product = Product::query()->findOrFail($id);
         //get warehouses assigned to user
         $user_auth = auth()->user();
         if($user_auth->is_all_warehouses){
@@ -901,7 +890,6 @@ class ProductController extends BaseController
         $data[] = $item;
 
         return response()->json($data[0]);
-
     }
 
     //------------ Get products By Warehouse -----------------\\

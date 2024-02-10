@@ -19,7 +19,7 @@
               :value="product.code"
               textmargin="0"
               fontoptions="bold"
-            ></barcode>
+            />
           </b-col>
 
           <b-col md="8">
@@ -199,7 +199,9 @@ export default {
 
   methods: {
     //------------------------------Formetted Numbers -------------------------\\
-    formatNumber(number, dec) {
+    formatNumber(numbers, dec) {
+      console.log(number);
+      let number = 100;
       const value = (typeof number === "string"
         ? number
         : number.toString()

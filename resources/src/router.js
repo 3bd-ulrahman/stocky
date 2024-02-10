@@ -823,7 +823,10 @@ const routes = [
       // Reports
       {
         path: "/app/reports",
-        component: () => import("./views/app/pages/reports"),
+        component: {
+          name: "Reports",
+          render: (h) => h('router-view')
+        },
         redirect: "/app/reports/profit_and_loss",
         children: [
           {
@@ -1001,30 +1004,18 @@ const routes = [
           {
             name: "top_customers",
             path: "top_customers",
-            component: () =>
-              import(
-                /* webpackChunkName: "top_customers" */
-                "./views/app/pages/reports/top_customers"
-              )
+            component: () => import("./views/app/pages/reports/top_customers")
           },
 
           {
             name: "stock_report",
             path: "stock_report",
-            component: () =>
-              import(
-                /* webpackChunkName: "stock_report" */
-                "./views/app/pages/reports/stock_report"
-              )
+            component: () => import("./views/app/pages/reports/StockReport.vue")
           },
           {
             name: "detail_stock_report",
             path: "detail_stock/:id",
-            component: () =>
-              import(
-                /* webpackChunkName: "detail_stock_report" */
-                "./views/app/pages/reports/detail_stock_report"
-              )
+            component: () => import("./views/app/pages/reports/detail_stock_report")
           },
 
           {
