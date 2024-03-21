@@ -5,6 +5,9 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use App\Http\Middleware\TrimStrings;
+use Illuminate\Http\Request;
 
 class StoreProductRequest extends FormRequest
 {
@@ -64,5 +67,7 @@ class StoreProductRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge(json_decode($this->payload, true));
+        (new ConvertEmptyStringsToNull())->handle($this, function ($request) {});
+        (new TrimStrings())->handle($this, function ($request) {});
     }
 }

@@ -1,5 +1,4 @@
 <template>
-  <!-- ============ Body content start ============= -->
   <div class="main-content">
     <div v-if="loading" class="loading_page spinner spinner-primary mr-3"></div>
     <div v-else-if="!loading && currentUserPermissions && currentUserPermissions.includes('dashboard')">
@@ -17,13 +16,14 @@
           </b-form-group>
         </b-col>
 
+        <!-- date -->
         <b-col lg="4" md="4" sm="12">
-          <b-form-group :label="$t('Filter_by_warehouse')">
+          <b-form-group :label="$t('Filter by date')">
             <v-select
               @input="Selected_Warehouse"
               v-model="period"
               :reduce="label => label.value"
-              :placeholder="$t('Choose_Warehouse')"
+              :placeholder="$t('Filter by date')"
               :options="date()"
             />
           </b-form-group>
@@ -234,13 +234,10 @@
     </div>
 
   </div>
-
-  <!-- ============ Body content End ============= -->
 </template>
 <script>
 import { mapGetters } from "vuex";
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, format } from 'date-fns';
-
 import ECharts from "vue-echarts/components/ECharts.vue";
 
 // import ECharts modules manually to reduce bundle size

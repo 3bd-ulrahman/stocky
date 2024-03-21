@@ -199,10 +199,11 @@ export default {
 
   methods: {
     //------------------------------Formetted Numbers -------------------------\\
-    formatNumber(numbers, dec) {
-      console.log(number);
-      let number = 100;
-      const value = (typeof number === "string"
+    formatNumber(number, dec) {
+      if (number === null) {
+        return number;
+      }
+      const value = (typeof number === "string" || number === null
         ? number
         : number.toString()
       ).split(".");

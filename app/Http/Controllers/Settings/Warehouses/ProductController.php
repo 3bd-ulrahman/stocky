@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\product_warehouse;
-use App\Models\ProductVariant;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

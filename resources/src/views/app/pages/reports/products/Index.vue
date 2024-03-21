@@ -25,35 +25,21 @@
         @on-page-change="onPageChange"
         @on-per-page-change="onPerPageChange"
         @on-search="onSearch_products"
-          :search-options="{
-            placeholder: $t('Search_this_table'),
-            enabled: true,
+        :search-options="{
+          placeholder: $t('Search_this_table'),
+          enabled: true,
         }"
         :pagination-options="{
-        enabled: true,
-        mode: 'records',
-        nextLabel: 'next',
-        prevLabel: 'prev',
-      }"
+          enabled: true,
+          mode: 'records',
+          nextLabel: 'next',
+          prevLabel: 'prev',
+        }"
         styleClass="mt-5 table-hover tableOne vgt-table"
       >
-      <div slot="table-actions" class="mt-2 mb-3">
-        <b-button @click="export_PDF()" size="sm" variant="outline-success ripple m-1">
-          <i class="i-File-Copy"></i> PDF
-        </b-button>
-         <vue-excel-xlsx
-              class="btn btn-sm btn-outline-danger ripple m-1"
-              :data="products"
-              :columns="columns"
-              :file-name="'product_report'"
-              :file-type="'xlsx'"
-              :sheet-name="'product_report'"
-              >
-              <i class="i-File-Excel"></i> EXCEL
-          </vue-excel-xlsx>
-
-           <!-- warehouse -->
-          <b-form-group :label="$t('warehouse')">
+        <div slot="table-actions" class="mb-3">
+          <!-- warehouse -->
+          <b-form-group>
             <v-select
               @input="Selected_Warehouse"
               v-model="warehouse_id"
@@ -63,7 +49,20 @@
             />
           </b-form-group>
 
-      </div>
+          <b-button @click="export_PDF()" size="sm" variant="outline-success ripple m-1 mt-0">
+            <i class="i-File-Copy"></i> PDF
+          </b-button>
+            <vue-excel-xlsx
+              class="btn btn-sm btn-outline-danger ripple m-1 mt-0"
+              :data="products"
+              :columns="columns"
+              :file-name="'product_report'"
+              :file-type="'xlsx'"
+              :sheet-name="'product_report'"
+            >
+              <i class="i-File-Excel"></i> EXCEL
+            </vue-excel-xlsx>
+        </div>
         <template slot="table-row" slot-scope="props">
           <span v-if="props.column.field == 'actions'">
             <router-link title="Report" :to="'/app/reports/detail_product/'+props.row.id">
@@ -75,14 +74,12 @@
             <span>{{currentUser.currency}} {{props.row.sold_amount}}</span>
           </div>
         </template>
-
       </vue-good-table>
       <!-- </b-card> -->
     </div>
 </template>
 
 <script>
-import NProgress from "nprogress";
 import { mapGetters } from "vuex";
 import DateRangePicker from 'vue2-daterange-picker'
 //you need to import the CSS manually
@@ -90,6 +87,7 @@ import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import moment from 'moment'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import _debounce from 'lodash/debounce'
 
 export default {
   metaInfo: {
@@ -180,13 +178,10 @@ export default {
   },
 
   methods: {
-
-
-    onSearch_products(value) {
+    onSearch_products: _debounce(function (value) {
       this.search_products = value.searchTerm;
       this.Get_products_report(1);
-    },
-
+    }, 500),
 
     //----------------------------------- Export PDF ------------------------------\\
     export_PDF() {
@@ -253,48 +248,36 @@ export default {
       if (value === null) {
         this.warehouse_id = "";
       }
+      this.warehouse_id = value;
       this.Get_products_report(1);
     },
 
 
     //----------------------------- Get_products_report------------------\\
     Get_products_report(page) {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
       this.get_data_loaded();
 
-      axios
-        .get(
-          "report/product_report?page=" +
-            page +
-            "&limit=" +
-            this.limit +
-            "&warehouse_id=" +
-            this.warehouse_id +
-            "&to=" +
-            this.endDate +
-            "&from=" +
-            this.startDate +
-            "&search=" +
-            this.search_products
-        )
-        .then(response => {
-          this.warehouses = response.data.warehouses;
-          this.products = response.data.products;
-          this.totalRows = response.data.totalRows;
-          // Complete the animation of theprogress bar.
-          NProgress.done();
+      axios.get("report/product_report", {
+        params: {
+          page: page,
+          limit: this.limit,
+          warehouse_id: this.warehouse_id,
+          to: this.endDate,
+          from: this.startDate,
+          search: this.search_products
+        }
+      }).then(response => {
+        this.warehouses = response.data.warehouses;
+        this.products = response.data.products;
+        this.totalRows = response.data.totalRows;
+        this.isLoading = false;
+        this.today_mode = false;
+      }).catch(response => {
+        setTimeout(() => {
           this.isLoading = false;
           this.today_mode = false;
-        })
-        .catch(response => {
-          NProgress.done();
-          setTimeout(() => {
-            this.isLoading = false;
-            this.today_mode = false;
-          }, 500);
-        });
+        }, 500);
+      });
     }
   }, //end Methods
 

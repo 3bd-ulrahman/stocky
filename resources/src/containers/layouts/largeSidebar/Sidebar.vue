@@ -916,7 +916,7 @@
             class="nav-item"
             v-if="currentUserPermissions && currentUserPermissions.includes('Reports_purchase')"
           >
-            <router-link tag="a" class to="/app/reports/purchase_report">
+            <router-link tag="a" class to="/app/reports/purchases">
               <i class="nav-icon i-Bar-Chart5"></i>
               <span class="item-name">{{$t('PurchasesReport')}}</span>
             </router-link>
@@ -936,7 +936,7 @@
             class="nav-item"
             v-if="currentUserPermissions && currentUserPermissions.includes('Reports_customers')"
           >
-            <router-link tag="a" class to="/app/reports/customers_report">
+            <router-link tag="a" class to="/app/reports/customers">
               <i class="nav-icon i-Bar-Chart"></i>
               <span class="item-name">{{$t('CustomersReport')}}</span>
             </router-link>
@@ -945,7 +945,7 @@
             class="nav-item"
             v-if="currentUserPermissions && currentUserPermissions.includes('Reports_suppliers')"
           >
-            <router-link tag="a" class to="/app/reports/providers_report">
+            <router-link tag="a" class to="/app/reports/providers">
               <i class="nav-icon i-Pie-Chart"></i>
               <span class="item-name">{{$t('SuppliersReport')}}</span>
             </router-link>
@@ -975,7 +975,7 @@
             class="nav-item"
             v-if="currentUserPermissions && currentUserPermissions.includes('users_report')"
           >
-            <router-link tag="a" class to="/app/reports/users_report">
+            <router-link tag="a" class to="/app/reports/users">
               <i class="nav-icon i-Pie-Chart"></i>
               <span class="item-name">{{$t('Users_Report')}}</span>
             </router-link>

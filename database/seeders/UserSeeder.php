@@ -37,6 +37,7 @@ class UserSeeder extends Seeder
                 'username' => fake()->userName(),
                 'email' => fake()->unique()->safeEmail(),
                 'password' => fake()->password(),
+                'is_representative' => fake()->randomElement([0, 1]),
                 'avatar' => 'no_avatar.png',
                 'phone' => fake()->phoneNumber(),
                 'role_id' => fake()->numberBetween(1, 5),

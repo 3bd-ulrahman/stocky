@@ -3,19 +3,31 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchaseReturn extends Model
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
+    protected $table = 'purchase_returns';
 
     protected $fillable = [
-        'date', 'Ref', 'GrandTotal',
-        'user_id', 'discount', 'shipping',
-        'warehouse_id','purchase_id', 'provider_id', 'notes', 'TaxNet', 'tax_rate', 'statut',
-        'paid_amount', 'payment_statut', 'created_at', 'updated_at', 'deleted_at',
+        'user_id',
+        'warehouse_id',
+        'purchase_id',
+        'provider_id',
+        'date',
+        'Ref',
+        'GrandTotal',
+        'discount',
+        'shipping',
+        'notes',
+        'TaxNet',
+        'tax_rate',
+        'statut',
+        'paid_amount',
+        'payment_statut',
     ];
 
     protected $casts = [
@@ -31,9 +43,10 @@ class PurchaseReturn extends Model
         'paid_amount' => 'double',
     ];
 
-    public function user()
+    // Relationships
+    public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class);
     }
 
     public function details()

@@ -7,6 +7,8 @@ use App\Models\Enums\ProductType;
 use App\Models\Translations\ProductTranslation;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -61,12 +63,7 @@ class Product extends Model implements TranslatableContract
     ];
 
     // Relationships
-    public function productVariant()
-    {
-        return $this->hasMany(ProductVariant::class);
-    }
-
-    public function PurchaseDetail()
+    public function PurchaseDetail(): BelongsTo
     {
         return $this->belongsTo('App\Models\PurchaseDetail');
     }
@@ -83,7 +80,7 @@ class Product extends Model implements TranslatableContract
 
     public function category()
     {
-        return $this->belongsTo('App\Models\Category');
+        return $this->belongsTo(Category::class);
     }
 
     public function unit()
@@ -106,6 +103,11 @@ class Product extends Model implements TranslatableContract
         return $this->belongsTo(Brand::class)->withDefault([
             'name' => 'N/D'
         ]);
+    }
+
+    public function productVariant(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
     }
 
     public function warehouses(): BelongsToMany

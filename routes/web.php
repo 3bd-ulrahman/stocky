@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -99,6 +100,9 @@ if ($installed === false) {
     });
 
 } else {
+    Route::get('test', function () {
+        return Product::query()->with('productVariant')->get();
+    });
     Route::any('/setup/{vue}', function () {
         abort(403);
     });
@@ -156,6 +160,3 @@ Route::group(['middleware' => ['auth', 'Is_Active']], function () {
     ]);
 
 });
-
-
-

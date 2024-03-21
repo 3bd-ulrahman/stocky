@@ -742,7 +742,6 @@ export default {
         }
       }
 
-      // Send Data with axios
       axios.post("products", formData).then(response => {
         // Complete the animation of theprogress bar.
         NProgress.done();

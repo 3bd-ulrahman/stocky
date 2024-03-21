@@ -3,14 +3,27 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Quotation extends Model
 {
-    protected $dates = ['deleted_at'];
+    use SoftDeletes;
+
+    protected $table = 'quotations';
 
     protected $fillable = [
-        'date', 'Ref', 'client_id', 'GrandTotal', 'warehouse_id', 'user_id', 'statut',
-        'notes', 'discount', 'shipping', 'TaxNet', 'tax_rate', 'created_at', 'updated_at', 'deleted_at',
+        'user_id',
+        'client_id',
+        'warehouse_id',
+        'date',
+        'Ref',
+        'GrandTotal',
+        'statut',
+        'notes',
+        'discount',
+        'shipping',
+        'TaxNet',
+        'tax_rate',
     ];
 
     protected $casts = [
@@ -25,9 +38,10 @@ class Quotation extends Model
 
     ];
 
+    // Relationships
     public function user()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class);
     }
 
     public function details()
@@ -44,5 +58,4 @@ class Quotation extends Model
     {
         return $this->belongsTo('App\Models\Warehouse');
     }
-
 }

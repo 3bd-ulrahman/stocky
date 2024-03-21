@@ -41,7 +41,7 @@ class AuthServiceProvider extends ServiceProvider
         'App\Models\Sale'                      => 'App\Policies\SalePolicy',
         'App\Models\User'                      => 'App\Policies\UserPolicy',
         'App\Models\Shipment'                  => 'App\Policies\ShipmentPolicy',
-        
+
         //hrm
         'App\Models\Employee'                  => 'App\Policies\EmployeePolicy',
         'App\Models\Company'                   => 'App\Policies\CompanyPolicy',
@@ -59,10 +59,10 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(){
+    public function boot()
+    {
         $this->registerPolicies();
 
         Passport::routes();
-    
     }
 }

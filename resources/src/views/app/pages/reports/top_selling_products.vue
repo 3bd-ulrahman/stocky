@@ -3,16 +3,19 @@
     <breadcumb :page="$t('Top_Selling_Products')" :folder="$t('Reports')"/>
     <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
     <b-col md="12" class="text-center" v-if="!isLoading">
-        <date-range-picker 
-          v-model="dateRange" 
-          :startDate="startDate" 
-          :endDate="endDate" 
+
+      <!-- date range -->
+        <date-range-picker
+          v-model="dateRange"
+          :startDate="startDate"
+          :endDate="endDate"
            @update="Submit_filter_dateRange"
-          :locale-data="locale" > 
+          :locale-data="locale"
+        >
 
           <template v-slot:input="picker" style="min-width: 350px;">
               {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}
-          </template>        
+          </template>
         </date-range-picker>
       </b-col>
 
@@ -95,21 +98,21 @@ export default {
       products: [],
       search_products:"",
       today_mode: true,
-      startDate: "", 
-      endDate: "", 
-      dateRange: { 
-       startDate: "", 
-       endDate: "" 
-      }, 
-      locale:{ 
+      startDate: "",
+      endDate: "",
+      dateRange: {
+       startDate: "",
+       endDate: ""
+      },
+      locale:{
           //separator between the two ranges apply
-          Label: "Apply", 
-          cancelLabel: "Cancel", 
-          weekLabel: "W", 
-          customRangeLabel: "Custom Range", 
-          daysOfWeek: moment.weekdaysMin(), 
-          //array of days - see moment documenations for details 
-          monthNames: moment.monthsShort(), //array of month names - see moment documenations for details 
+          Label: "Apply",
+          cancelLabel: "Cancel",
+          weekLabel: "W",
+          customRangeLabel: "Custom Range",
+          daysOfWeek: moment.weekdaysMin(),
+          //array of days - see moment documenations for details
+          monthNames: moment.monthsShort(), //array of month names - see moment documenations for details
           firstDay: 1 //ISO first day of week - see moment documenations for details
         },
     };
@@ -154,7 +157,7 @@ export default {
 
   methods: {
 
-     
+
     onSearch_products(value) {
       this.search_products = value.searchTerm;
       this.Get_top_products(1);
@@ -216,51 +219,38 @@ export default {
 
         self.dateRange.startDate = today.getFullYear();
         self.dateRange.endDate = new Date().toJSON().slice(0, 10);
-        
+
       }
     },
 
     //----------------------------- Get_top_products------------------\\
     Get_top_products(page) {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
+
       this.get_data_loaded();
 
-      axios
-        .get(
-          "report/top_products?page=" +
-            page +
-            "&limit=" +
-            this.limit +
-            "&to=" +
-            this.endDate +
-            "&from=" +
-            this.startDate +
-            "&search=" +
-            this.search_products
-        )
-        .then(response => {
-          this.products = response.data.products;
-          this.totalRows = response.data.totalRows;
-          // Complete the animation of theprogress bar.
-          NProgress.done();
+      axios.get("report/top_products", {
+        params: {
+          page: page,
+          limit: this.limit,
+          from: this.startDate,
+          to: this.endDate,
+          search: this.search_products
+        }
+      }).then(response => {
+        this.products = response.data.products;
+        this.totalRows = response.data.totalRows;
+
+        this.isLoading = false;
+        this.today_mode = false;
+      })
+      .catch(response => {
+        setTimeout(() => {
           this.isLoading = false;
           this.today_mode = false;
-        })
-        .catch(response => {
-          // Complete the animation of theprogress bar.
-          NProgress.done();
-          setTimeout(() => {
-            this.isLoading = false;
-            this.today_mode = false;
-          }, 500);
-        });
+        }, 500);
+      });
     }
-  }, //end Methods
-
-  //----------------------------- Created function------------------- \\
-
+  },
   created: function() {
     this.Get_top_products(1);
   }

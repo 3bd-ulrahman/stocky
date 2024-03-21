@@ -48,10 +48,7 @@ const routes = [
           {
             path: "detail/:id",
             name: "detail_product",
-            component: () =>
-              import(
-                                /* webpackChunkName: "detail_product" */ "./views/app/pages/products/Detail_Product"
-              )
+            component: () => import("./views/app/pages/products/Detail_Product.vue")
           },
           {
             path: "barcode",
@@ -257,10 +254,7 @@ const routes = [
           {
             name: "change_to_sale",
             path: "create_sale/:id",
-            component: () =>
-              import(
-                                /* webpackChunkName: "change_to_sale" */ "./views/app/pages/sales/change_to_sale.vue"
-              )
+            component: () => import("./views/app/pages/sales/change_to_sale.vue")
           }
         ]
       },
@@ -285,11 +279,7 @@ const routes = [
           {
             name: "store_purchase",
             path: "store",
-            component: () =>
-              import(
-                /* webpackChunkName: "store_purchase" */
-                "./views/app/pages/purchases/create_purchase"
-              )
+            component: () => import("./views/app/pages/purchases/create_purchase.vue")
           },
           {
             name: "edit_purchase",
@@ -336,26 +326,17 @@ const routes = [
           {
             name: "store_sale",
             path: "store",
-            component: () =>
-              import(
-                                /* webpackChunkName: "store_sale" */ "./views/app/pages/sales/create_sale"
-              )
+            component: () => import("./views/app/pages/sales/Create.vue")
           },
           {
             name: "edit_sale",
             path: "edit/:id",
-            component: () =>
-              import(
-                                /* webpackChunkName: "edit_sale" */ "./views/app/pages/sales/edit_sale"
-              )
+            component: () => import("./views/app/pages/sales/edit_sale")
           },
           {
             name: "sale_return",
             path: "sale_return/:id",
-            component: () =>
-              import(
-                                /* webpackChunkName: "create_sale_return" */ "./views/app/pages/sale_return/create_sale_return"
-              )
+            component: () => import("./views/app/pages/sale_return/create_sale_return")
           },
           {
             name: "detail_sale",
@@ -879,126 +860,74 @@ const routes = [
           {
             name: "quantity_alerts",
             path: "quantity_alerts",
-            component: () =>
-              import(
-                /* webpackChunkName: "quantity_alerts" */
-                "./views/app/pages/reports/quantity_alerts"
-              )
+            component: () => import("./views/app/pages/reports/quantity_alerts")
           },
           {
             name: "warehouse_report",
             path: "warehouse_report",
-            component: () =>
-              import(
-                /* webpackChunkName: "warehouse_report" */
-                "./views/app/pages/reports/warehouse_report"
-              )
+            component: () => import("./views/app/pages/reports/Warehouse.vue")
           },
 
           {
             name: "sales_report",
             path: "sales_report",
-            component: () =>
-              import(
-                /* webpackChunkName: "sales_report" */
-                "./views/app/pages/reports/sales_report"
-              )
+            component: () => import("./views/app/pages/reports/sales_report.vue")
           },
 
           {
             name: "product_sales_report",
             path: "product_sales_report",
-            component: () =>
-              import(
-                /* webpackChunkName: "product_sales_report" */
-                "./views/app/pages/reports/product_sales_report"
-              )
+            component: () => import("./views/app/pages/reports/product_sales_report.vue")
           },
           {
             name: "purchase_report",
-            path: "purchase_report",
-            component: () =>
-              import(
-                /* webpackChunkName: "purchase_report" */
-                "./views/app/pages/reports/purchase_report"
-              )
+            path: "purchases",
+            component: () => import("./views/app/pages/reports/purchases/Index.vue")
           },
 
           {
             name: "product_purchases_report",
             path: "product_purchases_report",
-            component: () =>
-              import(
-                /* webpackChunkName: "product_purchases_report" */
-                "./views/app/pages/reports/product_purchases_report"
-              )
+            component: () => import("./views/app/pages/reports/product_purchases_report")
           },
 
           {
             name: "customers_report",
-            path: "customers_report",
-            component: () =>
-              import(
-                /* webpackChunkName: "customers_report" */
-                "./views/app/pages/reports/customers_report"
-              )
+            path: "customers",
+            component: () => import("./views/app/pages/reports/customers/Index.vue")
           },
           {
             name: "detail_customer_report",
             path: "detail_customer/:id",
-            component: () =>
-              import(
-                /* webpackChunkName: "detail_customer_report" */
-                "./views/app/pages/reports/detail_Customer_Report"
-              )
+            component: () => import("./views/app/pages/reports/detail_Customer_Report.vue")
           },
 
           {
             name: "providers_report",
-            path: "providers_report",
-            component: () =>
-              import(
-                /* webpackChunkName: "providers_report" */
-                "./views/app/pages/reports/providers_report"
-              )
+            path: "providers",
+            component: () => import("./views/app/pages/reports/providers/Index.vue")
           },
           {
             name: "detail_supplier_report",
             path: "detail_supplier/:id",
-            component: () =>
-              import(
-                /* webpackChunkName: "detail_supplier_report" */
-                "./views/app/pages/reports/detail_Supplier_Report"
-              )
+            component: () => import("./views/app/pages/reports/detail_Supplier_Report")
           },
 
           {
             name: "top_selling_products",
             path: "top_selling_products",
-            component: () =>
-              import(
-                /* webpackChunkName: "top_selling_products" */
-                "./views/app/pages/reports/top_selling_products"
-              )
+            component: () => import("./views/app/pages/reports/top_selling_products.vue")
           },
 
           {
             name: "product_report",
             path: "product_report",
-            component: () =>
-              import(
-                /* webpackChunkName: "product_report" */
-                "./views/app/pages/reports/product_report"
-              )
+            component: () => import("./views/app/pages/reports/products/Index.vue")
           },
           {
             name: "detail_product_report",
             path: "detail_product/:id",
-            component: () =>
-              import(
-                /* webpackChunkName: "detail_product_report" */
-                "./views/app/pages/reports/detail_product_report"
-              )
+            component: () => import("./views/app/pages/reports/detail_product_report")
           },
 
           {
@@ -1019,23 +948,35 @@ const routes = [
           },
 
           {
-            name: "users_report",
-            path: "users_report",
-            component: () =>
-              import(
-                /* webpackChunkName: "users_report" */
-                "./views/app/pages/reports/users_report"
-              )
+            path: "users",
+            component: {
+              name: 'users',
+              render: (h) => h('router-view')
+            },
+            children: [
+              {
+                name: "users_report",
+                path: "/",
+                component: () => import("./views/app/pages/reports/users/Index.vue")
+              },
+              {
+                name: "detail_user_report",
+                path: "show/:id",
+                component: () => import("./views/app/pages/reports/users/Show.vue")
+              },
+            ],
           },
-          {
-            name: "detail_user_report",
-            path: "detail_user/:id",
-            component: () =>
-              import(
-                /* webpackChunkName: "detail_user_report" */
-                "./views/app/pages/reports/detail_user_report"
-              )
-          },
+
+          // {
+          //   name: "users_report",
+          //   path: "users",
+          //   component: () => import("./views/app/pages/reports/users/Index.vue")
+          // },
+          // {
+          //   name: "detail_user_report",
+          //   path: "detail_user/:id",
+          //   component: () => import("./views/app/pages/reports/detail_user_report")
+          // },
         ]
       },
 
@@ -1062,14 +1003,10 @@ const routes = [
                 /* webpackChunkName: "NotFound" */ "./views/app/pages/notFound"
       )
   },
-
   {
-    path: "not_authorize",
+    path: "/not_authorize",
     name: "not_authorize",
-    component: () =>
-      import(
-                /* webpackChunkName: "not_authorize" */ "./views/app/pages/NotAuthorize"
-      )
+    component: () => import("./views/app/pages/NotAuthorize")
   }
 ];
 

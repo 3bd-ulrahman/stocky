@@ -136,7 +136,7 @@ export default {
             );
 
           window.location = '/';
-           
+
           NProgress.done();
           this.loading = false;
         })

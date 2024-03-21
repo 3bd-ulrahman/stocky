@@ -3,20 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SaleDetail extends Model
 {
     protected $table = 'sale_details';
 
     protected $fillable = [
-        'id',
-        'date',
         'sale_id',
         'sale_unit_id',
-        'quantity',
         'product_id',
-        'total',
         'product_variant_id',
+        'date',
+        'quantity',
+        'total',
         'price',
         'TaxNet',
         'discount',
@@ -37,13 +37,14 @@ class SaleDetail extends Model
         'discount' => 'double',
     ];
 
-    public function sale()
+    // Relationships
+    public function sale(): BelongsTo
     {
-        return $this->belongsTo(Sale::class);
+        return $this->belongsTo(Sale::class, 'sale_id', 'id');
     }
 
-    public function product()
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 }

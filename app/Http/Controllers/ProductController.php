@@ -142,6 +142,23 @@ class ProductController extends BaseController
         ]);
     }
 
+    public function create(Request $request)
+    {
+        $this->authorizeForUser($request->user('api'), 'create', Product::class);
+
+        $categories = Category::query()->get();
+        $brands = Brand::query()->get();
+        $units = Unit::query()->where('base_unit', null)->get();
+        $warehouses = Warehouse::query()->get();
+
+        return response()->json([
+            'categories' => $categories,
+            'brands' => $brands,
+            'units' => $units,
+            'warehouses' => $warehouses
+        ]);
+    }
+
     public function store(StoreProductRequest $request)
     {
         $this->authorizeForUser($request->user('api'), 'create', Product::class);
@@ -1198,24 +1215,6 @@ class ProductController extends BaseController
         return response()->json([
             'products' => $products,
             'warehouses' => $warehouses,
-        ]);
-    }
-
-    //---------------- Show Form Create Product ---------------\\
-    public function create(Request $request)
-    {
-        $this->authorizeForUser($request->user('api'), 'create', Product::class);
-
-        $categories = Category::query()->get();
-        $brands = Brand::query()->get(['id', 'name']);
-        $units = Unit::query()->where('base_unit', null)->get();
-        $warehouses = Warehouse::query()->get();
-
-        return response()->json([
-            'categories' => $categories,
-            'brands' => $brands,
-            'units' => $units,
-            'warehouses' => $warehouses
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -9,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-use Laravel\Cashier\Billable;
 
 class User extends Authenticatable
 {
@@ -53,9 +53,10 @@ class User extends Authenticatable
         'is_all_warehouses' => 'integer',
     ];
 
+    // Relationships
     public function oauthAccessToken()
     {
-        return $this->hasMany('\App\Models\OauthAccessToken');
+        return $this->hasMany(OauthAccessToken::class, 'user_id', 'id');
     }
 
     public function roles(): BelongsToMany
@@ -84,6 +85,41 @@ class User extends Authenticatable
     public function warehouses(): BelongsToMany
     {
         return $this->belongsToMany(Warehouse::class);
+    }
+
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class, 'user_id', 'id');
+    }
+
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(Purchase::class, 'user_id', 'id');
+    }
+
+    public function quotations(): HasMany
+    {
+        return $this->hasMany(Quotation::class, 'user_id', 'id');
+    }
+
+    public function purchaseReturns(): HasMany
+    {
+        return $this->hasMany(PurchaseReturn::class, 'user_id', 'id');
+    }
+
+    public function SaleReturns(): HasMany
+    {
+        return $this->hasMany(SaleReturn::class, 'user_id', 'id');
+    }
+
+    public function transfers(): HasMany
+    {
+        return $this->hasMany(Transfer::class, 'user_id', 'id');
+    }
+
+    public function adjustments(): HasMany
+    {
+        return $this->hasMany(Adjustment::class, 'user_id', 'id');
     }
 
     // Accessorss & Mutators

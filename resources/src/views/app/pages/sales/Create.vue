@@ -1108,16 +1108,15 @@ export default {
 
     // Search Products
     search(){
-
       if (this.timer) {
-            clearTimeout(this.timer);
-            this.timer = null;
+        clearTimeout(this.timer);
+        this.timer = null;
       }
 
-       if (this.search_input.length < 2) {
-
+      if (this.search_input.length < 2) {
         return this.product_filter= [];
       }
+
       if (this.sale.warehouse_id != "" &&  this.sale.warehouse_id != null) {
         this.timer = setTimeout(() => {
           const product_filter = this.products.filter(product => product.code === this.search_input || product.barcode.includes(this.search_input));
@@ -1152,6 +1151,7 @@ export default {
     //------------------------- Submit Search Product
 
     SearchProduct(result) {
+      console.log('here');
       this.product = {};
       if (
         this.details.length > 0 &&
@@ -1417,43 +1417,40 @@ export default {
         NProgress.done();
         this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
       } else {
-        axios
-          .post("sales", {
-            date: this.sale.date,
-            client_id: this.sale.client_id,
-            warehouse_id: this.sale.warehouse_id,
-            statut: this.sale.statut,
-            notes: this.sale.notes,
-            tax_rate: this.sale.tax_rate?this.sale.tax_rate:0,
-            TaxNet: this.sale.TaxNet?this.sale.TaxNet:0,
-            discount: this.sale.discount?this.sale.discount:0,
-            shipping: this.sale.shipping?this.sale.shipping:0,
-            GrandTotal: this.GrandTotal,
-            details: this.details,
-            payment: this.payment,
-            amount: parseFloat(this.payment.amount).toFixed(2),
-            received_amount: parseFloat(this.payment.received_amount).toFixed(2),
-            change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
-            token: token.id,
-            is_new_credit_card: this.is_new_credit_card,
-            selectedCard: this.selectedCard,
-            card_id: this.card_id
-          })
-          .then(response => {
-            this.paymentProcessing = false;
-            this.makeToast(
-              "success",
-              this.$t("Create.TitleSale"),
-              this.$t("Success")
-            );
-            NProgress.done();
-            this.$router.push({ name: "index_sales" });
-          })
-          .catch(error => {
-            this.paymentProcessing = false;
-            NProgress.done();
-            this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
-          });
+        axios.post("sales", {
+          date: this.sale.date,
+          client_id: this.sale.client_id,
+          warehouse_id: this.sale.warehouse_id,
+          statut: this.sale.statut,
+          notes: this.sale.notes,
+          tax_rate: this.sale.tax_rate?this.sale.tax_rate:0,
+          TaxNet: this.sale.TaxNet?this.sale.TaxNet:0,
+          discount: this.sale.discount?this.sale.discount:0,
+          shipping: this.sale.shipping?this.sale.shipping:0,
+          GrandTotal: this.GrandTotal,
+          details: this.details,
+          payment: this.payment,
+          amount: parseFloat(this.payment.amount).toFixed(2),
+          received_amount: parseFloat(this.payment.received_amount).toFixed(2),
+          change: parseFloat(this.payment.received_amount - this.payment.amount).toFixed(2),
+          token: token.id,
+          is_new_credit_card: this.is_new_credit_card,
+          selectedCard: this.selectedCard,
+          card_id: this.card_id
+        }).then(response => {
+          this.paymentProcessing = false;
+          this.makeToast(
+            "success",
+            this.$t("Create.TitleSale"),
+            this.$t("Success")
+          );
+          NProgress.done();
+          this.$router.push({ name: "index_sales" });
+        }).catch(error => {
+          this.paymentProcessing = false;
+          NProgress.done();
+          this.makeToast("danger", this.$t("InvalidData"), this.$t("Failed"));
+        });
       }
     },
     //--------------------------------- Create Sale -------------------------\\

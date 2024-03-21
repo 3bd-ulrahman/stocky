@@ -58,7 +58,5 @@ class AuthController extends BaseController
             $this->destroyCookie('Stocky_token');
             return response()->json('success');
         }
-
     }
-
 }

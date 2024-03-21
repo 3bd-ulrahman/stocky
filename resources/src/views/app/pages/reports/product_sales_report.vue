@@ -1,21 +1,20 @@
 <template>
   <div class="main-content">
-    <breadcumb :page="$t('product_sales_report')" :folder="$t('Reports')"/>
+    <breadcumb :page="$t('product_sales_report')" :folder="$t('Reports')" />
     <div v-if="isLoading" class="loading_page spinner spinner-primary mr-3"></div>
 
-     <b-col md="12" class="text-center" v-if="!isLoading">
-        <date-range-picker 
-          v-model="dateRange" 
-          :startDate="startDate" 
-          :endDate="endDate" 
-           @update="Submit_filter_dateRange"
-          :locale-data="locale" > 
-
-          <template v-slot:input="picker" style="min-width: 350px;">
-              {{ picker.startDate.toJSON().slice(0, 10)}} - {{ picker.endDate.toJSON().slice(0, 10)}}
-          </template>        
-        </date-range-picker>
-      </b-col>
+    <b-col md="12" class="text-center" v-if="!isLoading">
+      <date-range-picker
+        v-model="dateRange"
+        :startDate="startDate"
+        :endDate="endDate"
+        @update="Submit_filter_dateRange"
+        :locale-data="locale">
+        <template v-slot:input="picker" style="min-width: 350px;">
+          {{ picker.startDate.toJSON().slice(0, 10) }} - {{ picker.endDate.toJSON().slice(0, 10) }}
+        </template>
+      </date-range-picker>
+    </b-col>
 
 
     <div v-if="!isLoading">
@@ -29,42 +28,39 @@
         @on-sort-change="onSortChange"
         @on-search="onSearch"
         :search-options="{
-        placeholder: $t('Search_this_table'),
-        enabled: true,
-      }"
-       :group-options="{
+          placeholder: $t('Search_this_table'),
+          enabled: true,
+        }"
+        :group-options="{
           enabled: true,
           headerPosition: 'bottom',
         }"
-       
         :pagination-options="{
-        enabled: true,
-        mode: 'records',
-        nextLabel: 'next',
-        prevLabel: 'prev',
-      }"
-        :styleClass="showDropdown?'tableOne table-hover vgt-table full-height':'tableOne table-hover vgt-table non-height'"
+          enabled: true,
+          mode: 'records',
+          nextLabel: 'next',
+          prevLabel: 'prev',
+        }"
+        :styleClass="showDropdown ? 'tableOne table-hover vgt-table full-height' : 'tableOne table-hover vgt-table non-height'"
       >
-       
-        <div slot="table-actions" class="mt-2 mb-3">
-          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>
+        <div slot="table-actions" class="mb-3">
+          <b-button variant="outline-info ripple m-1 mt-0" size="sm" v-b-toggle.sidebar-right>
             <i class="i-Filter-2"></i>
             {{ $t("Filter") }}
           </b-button>
-          <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">
+          <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1 mt-0">
             <i class="i-File-Copy"></i> PDF
           </b-button>
           <vue-excel-xlsx
-              class="btn btn-sm btn-outline-danger ripple m-1"
-              :data="sales"
-              :columns="columns"
-              :file-name="'sales'"
-              :file-type="'xlsx'"
-              :sheet-name="'sales'"
-              >
-              <i class="i-File-Excel"></i> EXCEL
+            class="btn btn-sm btn-outline-danger ripple m-1 mt-0"
+            :data="sales"
+            :columns="columns"
+            :file-name="'sales'"
+            :file-type="'xlsx'"
+            :sheet-name="'sales'">
+            <i class="i-File-Excel"></i> EXCEL
           </vue-excel-xlsx>
-         
+
         </div>
 
       </vue-good-table>
@@ -82,8 +78,7 @@
                 :reduce="label => label.value"
                 :placeholder="$t('Choose_Customer')"
                 v-model="Filter_Client"
-                :options="customers.map(customers => ({label: customers.name, value: customers.id}))"
-              />
+                :options="customers.map(customers => ({ label: customers.name, value: customers.id }))" />
             </b-form-group>
           </b-col>
 
@@ -94,7 +89,7 @@
                 v-model="Filter_warehouse"
                 :reduce="label => label.value"
                 :placeholder="$t('Choose_Warehouse')"
-                :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"
+                :options="warehouses.map(warehouses => ({ label: warehouses.name, value: warehouses.id }))"
               />
             </b-form-group>
           </b-col>
@@ -124,7 +119,6 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import NProgress from "nprogress";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import DateRangePicker from 'vue2-daterange-picker'
@@ -139,23 +133,23 @@ export default {
   components: { DateRangePicker },
   data() {
     return {
-      startDate: "", 
-      endDate: "", 
-      dateRange: { 
-       startDate: "", 
-       endDate: "" 
-      }, 
-      locale:{ 
-          //separator between the two ranges apply
-          Label: "Apply", 
-          cancelLabel: "Cancel", 
-          weekLabel: "W", 
-          customRangeLabel: "Custom Range", 
-          daysOfWeek: moment.weekdaysMin(), 
-          //array of days - see moment documenations for details 
-          monthNames: moment.monthsShort(), //array of month names - see moment documenations for details 
-          firstDay: 1 //ISO first day of week - see moment documenations for details
-        },
+      startDate: "",
+      endDate: "",
+      dateRange: {
+        startDate: "",
+        endDate: ""
+      },
+      locale: {
+        //separator between the two ranges apply
+        Label: "Apply",
+        cancelLabel: "Cancel",
+        weekLabel: "W",
+        customRangeLabel: "Custom Range",
+        daysOfWeek: moment.weekdaysMin(),
+        //array of days - see moment documenations for details
+        monthNames: moment.monthsShort(), //array of month names - see moment documenations for details
+        firstDay: 1 //ISO first day of week - see moment documenations for details
+      },
       isLoading: true,
       serverParams: {
         sort: {
@@ -166,11 +160,11 @@ export default {
         perPage: 10
       },
       rows: [{
-          statut: 'Total',
-         
-          children: [
-             
-          ],
+        statut: 'Total',
+
+        children: [
+
+        ],
       },],
       search: "",
       totalRows: "",
@@ -186,7 +180,7 @@ export default {
       from: "",
     };
   },
-   mounted() {
+  mounted() {
     this.$root.$on("bv::dropdown::show", bvEvent => {
       this.showDropdown = true;
     });
@@ -222,7 +216,7 @@ export default {
           tdClass: "text-left",
           thClass: "text-left"
         },
-      
+
         {
           label: this.$t("Name_product"),
           field: "product_name",
@@ -254,16 +248,16 @@ export default {
   methods: {
 
     sumCount(rowObj) {
-     
-    	let sum = 0;
+
+      let sum = 0;
       for (let i = 0; i < rowObj.children.length; i++) {
         sum += rowObj.children[i].quantity;
       }
       return sum;
     },
     sumCount2(rowObj) {
-     
-    	let sum = 0;
+
+      let sum = 0;
       for (let i = 0; i < rowObj.children.length; i++) {
         sum += rowObj.children[i].total;
       }
@@ -312,7 +306,7 @@ export default {
       this.Get_Sales(this.serverParams.page);
     },
 
-    
+
     onSearch(value) {
       this.search = value.searchTerm;
       this.Get_Sales(this.serverParams.page);
@@ -375,7 +369,7 @@ export default {
     },
 
 
-  
+
     //---------------------------------------- Set To Strings-------------------------\\
     setToStrings() {
       // Simply replaces null values with strings=''
@@ -383,14 +377,14 @@ export default {
         this.Filter_Client = "";
       } else if (this.Filter_warehouse === null) {
         this.Filter_warehouse = "";
-      } 
+      }
     },
 
-    
-     //----------------------------- Submit Date Picker -------------------\\
+
+    //----------------------------- Submit Date Picker -------------------\\
     Submit_filter_dateRange() {
       var self = this;
-      self.startDate =  self.dateRange.startDate.toJSON().slice(0, 10);
+      self.startDate = self.dateRange.startDate.toJSON().slice(0, 10);
       self.endDate = self.dateRange.endDate.toJSON().slice(0, 10);
       self.Get_Sales(1);
     },
@@ -406,68 +400,45 @@ export default {
 
         self.dateRange.startDate = today.getFullYear();
         self.dateRange.endDate = new Date().toJSON().slice(0, 10);
-        
+
       }
     },
 
 
     //----------------------------------------- Get all Sales ------------------------------\\
     Get_Sales(page) {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
       this.setToStrings();
       this.get_data_loaded();
-      axios
-        .get(
-          "report/product_sales_report?page=" +
-            page +
-            "&client_id=" +
-            this.Filter_Client +
-            "&warehouse_id=" +
-            this.Filter_warehouse +
-            "&SortField=" +
-            this.serverParams.sort.field +
-            "&SortType=" +
-            this.serverParams.sort.type +
-            "&search=" +
-            this.search +
-            "&limit=" +
-            this.limit +
-            "&to=" +
-            this.endDate +
-            "&from=" +
-            this.startDate
-        )
-        .then(response => {
-          this.sales = response.data.sales;
-          this.customers = response.data.customers;
-          this.warehouses = response.data.warehouses;
-          this.totalRows = response.data.totalRows;
-          this.rows[0].children = this.sales;
-          // Complete the animation of theprogress bar.
-          NProgress.done();
+      axios.get("report/product_sales_report", {
+        params: {
+          page: page,
+          client_id: this.Filter_Client,
+          warehouse_id: this.Filter_warehouse,
+          SortField: this.serverParams.sort.field,
+          SortType: this.serverParams.sort.type,
+          search: this.search,
+          limit: this.limit,
+          from: this.startDate,
+          to: this.endDate
+        }
+      }).then(response => {
+        this.sales = response.data.sales;
+        this.customers = response.data.customers;
+        this.warehouses = response.data.warehouses;
+        this.totalRows = response.data.totalRows;
+        this.rows[0].children = this.sales;
+        this.isLoading = false;
+        this.today_mode = false;
+      }).catch(response => {
+        setTimeout(() => {
           this.isLoading = false;
           this.today_mode = false;
-        })
-        .catch(response => {
-          // Complete the animation of theprogress bar.
-          NProgress.done();
-          setTimeout(() => {
-            this.isLoading = false;
-            this.today_mode = false;
-          }, 500);
-        });
+        }, 500);
+      });
     },
-
-  
-  
-  
   },
-  //----------------------------- Created function-------------------\\
   created() {
     this.Get_Sales(1);
   }
 };
 </script>
-

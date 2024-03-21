@@ -3,16 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Transfer extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'transfers';
-    protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'id', 'date','user_id', 'from_warehouse_id', 'to_warehouse_id',
-        'items', 'statut', 'notes', 'GrandTotal', 'discount', 'shipping', 'TaxNet', 'tax_rate',
-        'created_at', 'updated_at', 'deleted_at',
+        'user_id',
+        'from_warehouse_id',
+        'to_warehouse_id',
+        'date',
+        'items',
+        'statut',
+        'notes',
+        'GrandTotal',
+        'discount',
+        'shipping',
+        'TaxNet',
+        'tax_rate',
     ];
 
     protected $casts = [
@@ -28,12 +41,13 @@ class Transfer extends Model
 
     ];
 
-    public function user()
+    // Relationships
+    public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function details()
+    public function details(): HasMany
     {
         return $this->hasMany('App\Models\TransferDetail');
     }
@@ -47,5 +61,4 @@ class Transfer extends Model
     {
         return $this->belongsTo('App\Models\Warehouse', 'to_warehouse_id');
     }
-
 }

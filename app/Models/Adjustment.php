@@ -6,11 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Adjustment extends Model
 {
-    protected $dates = ['deleted_at'];
+    protected $table = 'adjustments';
 
     protected $fillable = [
-        'date', 'Ref', 'user_id', 'warehouse_id',
-        'items', 'notes', 'created_at', 'updated_at', 'deleted_at',
+        'user_id',
+        'warehouse_id',
+        'date',
+        'Ref',
+        'items',
+        'notes',
     ];
 
     protected $casts = [
@@ -18,6 +22,7 @@ class Adjustment extends Model
         'warehouse_id' => 'integer',
     ];
 
+    // Relationships
     public function user()
     {
         return $this->belongsTo('App\Models\User');
@@ -32,5 +37,4 @@ class Adjustment extends Model
     {
         return $this->belongsTo('App\Models\Warehouse');
     }
-
 }

@@ -16,25 +16,22 @@ class Sale extends Model
     protected $fillable = [
         'user_id',
         'representative_id',
+        'warehouse_id',
+        'client_id',
         'date',
         'Ref',
         'is_pos',
-        'client_id',
         'GrandTotal',
         'qte_retturn',
         'TaxNet',
         'tax_rate',
         'notes',
         'total_retturn',
-        'warehouse_id',
         'statut',
         'discount',
         'shipping',
         'paid_amount',
         'payment_statut',
-        'created_at',
-        'updated_at',
-        'deleted_at',
         'shipping_status'
     ];
 
@@ -58,7 +55,7 @@ class Sale extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function details()

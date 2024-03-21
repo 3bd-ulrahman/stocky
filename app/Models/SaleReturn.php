@@ -9,13 +9,24 @@ class SaleReturn extends Model
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
+    protected $table = 'sale_returns';
 
     protected $fillable = [
-        'date', 'Ref', 'GrandTotal',
-        'user_id', 'discount', 'shipping',
-        'warehouse_id', 'client_id','sale_id', 'notes', 'TaxNet', 'tax_rate', 'statut',
-        'paid_amount', 'payment_statut', 'created_at', 'updated_at', 'deleted_at',
+        'user_id',
+        'client_id',
+        'warehouse_id',
+        'sale_id',
+        'date',
+        'Ref',
+        'GrandTotal',
+        'discount',
+        'shipping',
+        'notes',
+        'TaxNet',
+        'tax_rate',
+        'statut',
+        'paid_amount',
+        'payment_statut',
     ];
 
     protected $casts = [
@@ -31,6 +42,7 @@ class SaleReturn extends Model
         'paid_amount' => 'double',
     ];
 
+    // Relations
     public function user()
     {
         return $this->belongsTo('App\Models\User');
@@ -65,5 +77,4 @@ class SaleReturn extends Model
     {
         return $this->hasMany('App\Models\PaymentSaleReturns');
     }
-
 }

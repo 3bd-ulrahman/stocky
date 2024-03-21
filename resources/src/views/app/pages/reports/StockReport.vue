@@ -25,19 +25,18 @@
         }"
         styleClass="tableOne table-hover vgt-table mt-3"
       >
-
-      <div slot="table-actions" class="mb-3 quantity_alert_warehouse">
-        <!-- warehouse -->
-        <b-form-group>
-          <v-select
-            @input="Selected_Warehouse"
-            v-model="warehouse_id"
-            :reduce="label => label.value"
-            :placeholder="$t('Choose_Warehouse')"
-            :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"
-          />
-        </b-form-group>
-      </div>
+        <div slot="table-actions" class="mb-3 quantity_alert_warehouse">
+          <!-- warehouse -->
+          <b-form-group>
+            <v-select
+              @input="Selected_Warehouse"
+              v-model="warehouse_id"
+              :reduce="label => label.value"
+              :placeholder="$t('Choose_Warehouse')"
+              :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))"
+            />
+          </b-form-group>
+        </div>
 
        <div slot="table-actions" class="mt-2 mb-3">
 
@@ -217,10 +216,6 @@ export default {
     //--------------------------- Get Customer Report -------------\\
 
     Get_Stock_Report(page) {
-      // Start the progress bar.
-      NProgress.start();
-      NProgress.set(0.1);
-
       axios.get("report/stock", {
         params: {
           page: page,
@@ -234,12 +229,8 @@ export default {
         this.reports = response.data.report;
         this.totalRows = response.data.totalRows;
         this.warehouses = response.data.warehouses;
-        // Complete the animation of theprogress bar.
-        NProgress.done();
         this.isLoading = false;
       }).catch(response => {
-        // Complete the animation of theprogress bar.
-        NProgress.done();
         setTimeout(() => {
           this.isLoading = false;
         }, 500);

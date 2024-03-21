@@ -42,16 +42,16 @@
           prevLabel: 'prev',
         }"
         :styleClass="'mt-5 order-table vgt-table'">
-        <div slot="table-actions" class="mt-2 mb-3">
-          <b-button variant="outline-info ripple m-1" size="sm" v-b-toggle.sidebar-right>
+        <div slot="table-actions" class="mb-3">
+          <b-button variant="outline-info ripple m-1 mt-0" size="sm" v-b-toggle.sidebar-right>
             <i class="i-Filter-2"></i>
             {{ $t("Filter") }}
           </b-button>
-          <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1">
+          <b-button @click="Sales_PDF()" size="sm" variant="outline-success ripple m-1 mt-0">
             <i class="i-File-Copy"></i> PDF
           </b-button>
           <vue-excel-xlsx
-            class="btn btn-sm btn-outline-danger ripple m-1"
+            class="btn btn-sm btn-outline-danger ripple m-1 mt-0"
             :data="sales"
             :columns="columns"
             :file-name="'sales_report'"
@@ -457,7 +457,6 @@ export default {
 
         self.dateRange.startDate = today.getFullYear();
         self.dateRange.endDate = new Date().toJSON().slice(0, 10);
-
       }
     },
 

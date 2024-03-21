@@ -1,13 +1,11 @@
 <?php
 
 use App\Http\Controllers\PosController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Reports\UserController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\Settings\PaymentGatewayController;
-use App\Http\Controllers\Settings\Warehouses;
 use Settings\WarehouseController;
-use Settings\LocaleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -50,41 +48,41 @@ Route::middleware(['auth:api', 'Is_Active', 'localeSessionRedirect', 'localizati
 
     //-------------------------- Reports ---------------------------
 
-    Route::get("report/client", "ReportController@Client_Report");
+    Route::get("report/client", Reports\ClientController::class);
     Route::get("report/client/{id}", "ReportController@Client_Report_detail");
     Route::get("report/client_sales", "ReportController@Sales_Client");
     Route::get("report/client_payments", "ReportController@Payments_Client");
     Route::get("report/client_quotations", "ReportController@Quotations_Client");
     Route::get("report/client_returns", "ReportController@Returns_Client");
-    Route::get("report/provider", "ReportController@Providers_Report");
+    Route::get("report/provider", Reports\ProviderController::class);
     Route::get("report/provider/{id}", "ReportController@Provider_Report_detail");
     Route::get("report/provider_purchases", "ReportController@Purchases_Provider");
     Route::get("report/provider_payments", "ReportController@Payments_Provider");
     Route::get("report/provider_returns", "ReportController@Returns_Provider");
-    Route::get("report/sales", [ReportController::class, 'Report_Sales']);
-    Route::get("report/purchases", "ReportController@Report_Purchases");
+    Route::get("report/sales", Reports\SaleController::class);
+    Route::get("report/purchases", Reports\PurchaseController::class);
     Route::get("report/get_last_sales", "ReportController@Get_last_Sales");
     Route::get("report/stock_alert", "ReportController@Products_Alert");
     Route::get("report/payment_chart", "ReportController@Payment_chart");
-    Route::get("report/warehouse_report", "ReportController@Warehouse_Report");
-    Route::get("report/sales_warehouse", "ReportController@Sales_Warehouse");
-    Route::get("report/quotations_warehouse", "ReportController@Quotations_Warehouse");
-    Route::get("report/returns_sale_warehouse", "ReportController@Returns_Sale_Warehouse");
-    Route::get("report/returns_purchase_warehouse", "ReportController@Returns_Purchase_Warehouse");
-    Route::get("report/expenses_warehouse", "ReportController@Expenses_Warehouse");
-    Route::get("report/warhouse_count_stock", "ReportController@Warhouse_Count_Stock");
+    Route::get("report/warehouse_report", [\App\Http\Controllers\Reports\WarehouseController::class, 'WarehouseReport']);
+    Route::get("report/sales_warehouse", [\App\Http\Controllers\Reports\WarehouseController::class, 'Sales_Warehouse']);
+    Route::get("report/quotations_warehouse", [\App\Http\Controllers\Reports\WarehouseController::class, 'Quotations_Warehouse']);
+    Route::get("report/returns_sale_warehouse", [\App\Http\Controllers\Reports\WarehouseController::class, 'Returns_Sale_Warehouse']);
+    Route::get("report/returns_purchase_warehouse", [\App\Http\Controllers\Reports\WarehouseController::class, 'Returns_Purchase_Warehouse']);
+    Route::get("report/expenses_warehouse", [\App\Http\Controllers\Reports\WarehouseController::class, 'Expenses_Warehouse']);
+    Route::get("report/warhouse_count_stock", [\App\Http\Controllers\Reports\WarehouseController::class, 'WarhouseCountStock']);
     Route::get("report/report_today", "ReportController@report_today");
     Route::get("report/count_quantity_alert", "ReportController@count_quantity_alert");
     Route::get("report/profit_and_loss", "ReportController@ProfitAndLoss");
     Route::get("report/report_dashboard", "ReportController@report_dashboard");
-    Route::get("report/top_products", "ReportController@report_top_products");
+    Route::get("report/top_products", Reports\TopProductController::class);
     Route::get("report/top_customers", "ReportController@report_top_customers");
-    Route::get("report/product_report", "ReportController@product_report");
+    Route::get("report/product_report", Reports\ProductController::class);
     Route::get("report/sale_products_details", "ReportController@sale_products_details");
-    Route::get("report/product_sales_report", "ReportController@product_sales_report");
+    Route::get("report/product_sales_report", Reports\ProductSalesController::class);
     Route::get("report/product_purchases_report", "ReportController@product_purchases_report");
-
     Route::get("report/users", "ReportController@users_Report");
+    Route::get("report/users", Reports\UserController::class);
     Route::get("report/stock", Reports\StockController::class);
     Route::get("report/get_sales_by_user", "ReportController@get_sales_by_user");
     Route::get("report/get_quotations_by_user", "ReportController@get_quotations_by_user");
@@ -210,13 +208,13 @@ Route::middleware(['auth:api', 'Is_Active', 'localeSessionRedirect', 'localizati
 
     //---------------------- POS (point of sales) ----------------------\\
     //------------------------------------------------------------------\\
-
     Route::get('pos', [PosController::class, 'index']);
     Route::post('pos', [PosController::class, 'store']);
     Route::get('pos/get_products_pos', 'PosController@GetProductsByParametre');
 
-    //------------------------------- PRODUCTS --------------------------\\
-    //------------------------------------------------------------------\\
+    /**
+     * Products
+     */
     Route::resource('products', \ProductController::class);
     Route::post('products/import/csv', 'ProductController@import_products');
     Route::get('get_Products_by_warehouse/{id}', 'ProductController@Products_by_Warehouse');
@@ -402,7 +400,7 @@ Route::middleware(['auth:api', 'Is_Active', 'localeSessionRedirect', 'localizati
     /**
      * Locales
      */
-    Route::apiResource('settings/locales', LocaleController::class, ['namespace' => '']);
+    Route::apiResource('settings/locales', \Settings\LocaleController::class);
     Route::apiResource('settings', 'SettingsController');
     Route::get('get_Settings_data', 'SettingsController@getSettings');
     Route::put('pos_settings/{id}', 'SettingsController@update_pos_settings');

@@ -35,17 +35,14 @@ use App\Models\User;
 use App\Models\UserWarehouse;
 use App\Utils\Helpers;
 use Carbon\Carbon;
-use \Nwidart\Modules\Facades\Module;
 use App\Models\sms_gateway;
-use DB;
+use Illuminate\Support\Facades\DB;
 use PDF;
 use ArPHP\I18N\Arabic;
 
 class PurchasesController extends BaseController
 {
-
     //------------- Show ALL Purchases ----------\\
-
     public function index(request $request)
     {
         $this->authorizeForUser($request->user('api'), 'view', Purchase::class);
@@ -170,7 +167,6 @@ class PurchasesController extends BaseController
     }
 
     //------ Store new Purchase -------------\\
-
     public function store(Request $request)
     {
         $this->authorizeForUser($request->user('api'), 'create', Purchase::class);
@@ -180,7 +176,7 @@ class PurchasesController extends BaseController
             'warehouse_id' => 'required',
         ]);
 
-        \DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $order = new Purchase;
 
             $order->date = $request->date;

@@ -86,5 +86,3 @@ let login = new Vue({
   i18n,
   router: router,
 });
-
-console.log('login.js: ' + i18n.locale);
